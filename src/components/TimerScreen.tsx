@@ -14,6 +14,7 @@ import { reviewSolve, type SolveReview } from "@/lib/solveReview";
 import { loadState, newSolve, saveState, type PersistedState } from "@/lib/storage";
 import type { Penalty, Solve } from "@/lib/types";
 import { useSpeedTimer } from "@/lib/useSpeedTimer";
+import { useLatest } from "@/lib/useLatest";
 
 const RECENT_COUNT = 12;
 
@@ -103,8 +104,7 @@ export function TimerScreen() {
   }, [scramble]);
 
   // Held in a ref so `nextRound` can stay stable across renders.
-  const advanceScrambleRef = useRef(advanceScramble);
-  advanceScrambleRef.current = advanceScramble;
+  const advanceScrambleRef = useLatest(advanceScramble);
 
   const mutateSolves = useCallback((fn: (solves: Solve[]) => Solve[]) => {
     setState((current) => {
@@ -153,7 +153,7 @@ export function TimerScreen() {
         source: "keyboard",
       });
     },
-    [mutateSolves],
+    [mutateSolves, advanceScrambleRef],
   );
 
   const splitLabels = useMemo(() => (splitMode ? SPLIT_LABELS : []), [splitMode]);

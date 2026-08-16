@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { CubeStateTracker, warmCubeState } from "./cubeState";
 import { SolveRecorder, type SolveRecording } from "./moveStream";
 import { connectKeyboard, type ConnectedPuzzle } from "./puzzleSource";
+import { useLatest } from "./useLatest";
 
 /**
  * A solve the app can actually verify.
@@ -54,10 +55,8 @@ export function useKeyboardSolve({
   if (recorderRef.current === null) recorderRef.current = new SolveRecorder();
 
   const rafRef = useRef<number | null>(null);
-  const onSolvedRef = useRef(onSolved);
-  const onMoveRef = useRef(onMove);
-  onSolvedRef.current = onSolved;
-  onMoveRef.current = onMove;
+  const onSolvedRef = useLatest(onSolved);
+  const onMoveRef = useLatest(onMove);
 
   /** Elapsed milliseconds right now, for a live display. */
   const elapsed = useCallback(
@@ -129,7 +128,7 @@ export function useKeyboardSolve({
       sourceRef.current?.disconnect();
       sourceRef.current = null;
     };
-  }, [active, scramble, completion, displayRef, format]);
+  }, [active, scramble, completion, displayRef, format, onMoveRef, onSolvedRef]);
 
   return { running, moveCount, elapsed };
 }

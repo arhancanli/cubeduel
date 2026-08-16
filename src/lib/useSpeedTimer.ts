@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatRunning } from "./format";
+import { useLatest } from "./useLatest";
 
 export type TimerPhase = "idle" | "holding" | "ready" | "running" | "stopped";
 
@@ -71,10 +72,8 @@ export function useSpeedTimer({
 
   // Callbacks live in refs so the global listeners can stay mounted for the
   // lifetime of the component instead of rebinding on every parent render.
-  const onCompleteRef = useRef(onComplete);
-  const onCancelRef = useRef(onCancel);
-  onCompleteRef.current = onComplete;
-  onCancelRef.current = onCancel;
+  const onCompleteRef = useLatest(onComplete);
+  const onCancelRef = useLatest(onCancel);
 
   const paint = useCallback((text: string) => {
     if (displayRef.current) displayRef.current.textContent = text;
@@ -165,7 +164,7 @@ export function useSpeedTimer({
       paint(formatRunning(elapsed));
       onCompleteRef.current(elapsed, [...splitsRef.current]);
     },
-    [paint, paintStatic, setPhaseBoth, stopRaf],
+    [paint, paintStatic, setPhaseBoth, stopRaf, onCancelRef, onCompleteRef],
   );
 
   /**

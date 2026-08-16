@@ -49,7 +49,7 @@ async function freshScramble(event: string): Promise<string> {
  * happened. Results would then be a filtered highlight reel rather than a record.
  */
 async function closeOpenAttempts(profileId: string): Promise<void> {
-  await db()
+  const { error } = await db()
     .from("ranked_attempts")
     .update({
       status: "expired",
@@ -59,6 +59,12 @@ async function closeOpenAttempts(profileId: string): Promise<void> {
     })
     .eq("profile_id", profileId)
     .eq("status", "issued");
+
+  // If this fails and we issue anyway, the abandoned attempt stays open and the
+  // reroll defence is gone — which is the exact exploit it exists to close.
+  if (error) {
+    throw new Error(`Could not close the open attempt: ${error.message}`);
+  }
 }
 
 export async function issueAttempt(
@@ -200,7 +206,7 @@ export async function submitAttempt(
   }
 
   const solvedAt = new Date(receivedAt).toISOString();
-  const { data: solve } = await db()
+  const { data: solve, error: solveError } = await db()
     .from("solves")
     .insert({
       profile_id: attempt.profile_id,
@@ -222,6 +228,12 @@ export async function submitAttempt(
     })
     .select("id")
     .single();
+
+  // The attempt is about to be marked complete against this solve. Completing it
+  // with no solve stored would leave a rated result nobody can inspect.
+  if (solveError) {
+    throw new Error(`Could not store the verified solve: ${solveError.message}`);
+  }
 
   await recordResult(attempt, {
     solveId: solve?.id ?? null,
@@ -249,7 +261,7 @@ async function recordResult(
   attempt: Row<"ranked_attempts">,
   result: { solveId: string | null; durationMs: number; penalty: Penalty },
 ): Promise<void> {
-  await db()
+  const { error } = await db()
     .from("ranked_attempts")
     .update({
       status: "completed",
@@ -262,6 +274,12 @@ async function recordResult(
     // Only an attempt still open may be completed, so two submissions racing
     // cannot both write a result.
     .eq("status", "issued");
+
+  // Losing this write drops the attempt out of every future rating window
+  // without a trace, so the player quietly never reaches five.
+  if (error) {
+    throw new Error(`Could not record the attempt result: ${error.message}`);
+  }
 }
 
 /**
@@ -361,51 +379,37 @@ export async function rateReadyWindows(
     const outcome = applyWindow(state, attempts, now);
     const windowIndex = state.windowCount;
 
-    // Claim the window first. The unique constraint on
-    // (profile_id, event, pool, window_index) is what makes a double submission
-    // fail here instead of applying the same five results twice.
-    const { error: claimError } = await db().from("rating_events").insert({
-      profile_id: profileId,
-      event,
-      pool,
-      window_index: windowIndex,
-      rating_before: state.rating ?? outcome.state.rating ?? 0,
-      deviation_before: state.deviation,
-      rating_after: outcome.state.rating ?? 0,
-      deviation_after: outcome.state.deviation,
-      at: new Date(now).toISOString(),
+    // All three writes — claim the window, move the rating, consume the five
+    // attempts — happen inside one Postgres function, so they are one
+    // transaction.
+    //
+    // Issued separately they were not atomic, and the failure was silent and
+    // permanent: the claim would land, the rating upsert would fail, and because
+    // the claim is UNIQUE the window could never be retried. The audit trail
+    // said the rating moved, the rating had not, and nothing reported it.
+    const { error: applyError } = await db().rpc("apply_rating_window", {
+      p_profile_id: profileId,
+      p_event: event,
+      p_pool: pool,
+      p_window_index: windowIndex,
+      p_rating_before: state.rating ?? outcome.state.rating ?? 0,
+      p_deviation_before: state.deviation,
+      p_rating_after: outcome.state.rating ?? 0,
+      p_deviation_after: outcome.state.deviation,
+      p_solve_count: (windowIndex + 1) * WINDOW_SIZE,
+      p_peak_rating: outcome.state.peak,
+      p_at: new Date(now).toISOString(),
+      p_attempt_ids: pending.map((a) => a.id),
     });
 
-    if (claimError) {
-      // Someone else rated this window between our read and our write. Their
-      // result is as valid as ours; stop rather than racing again.
-      break;
+    if (applyError) {
+      // A unique violation means another request rated this window between our
+      // read and our write; their result is as valid as ours, so stop rather
+      // than racing. Anything else is a real fault and must not be swallowed —
+      // the caller has just told a player their solve counted.
+      if (applyError.code === "23505") break;
+      throw new Error(`Could not apply the rating window: ${applyError.message}`);
     }
-
-    await db()
-      .from("ratings")
-      .upsert(
-        {
-          profile_id: profileId,
-          event,
-          pool,
-          rating: outcome.state.rating ?? 0,
-          deviation: outcome.state.deviation,
-          solve_count: (windowIndex + 1) * WINDOW_SIZE,
-          peak_rating: outcome.state.peak,
-          last_solve_at: new Date(now).toISOString(),
-          updated_at: new Date(now).toISOString(),
-        },
-        { onConflict: "profile_id,event,pool" },
-      );
-
-    await db()
-      .from("ranked_attempts")
-      .update({ window_index: windowIndex })
-      .in(
-        "id",
-        pending.map((a) => a.id),
-      );
 
     latest = {
       before: state.rating,

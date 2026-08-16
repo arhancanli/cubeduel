@@ -2,7 +2,7 @@
  * Generated from the live schema. Do not hand-edit.
  *
  * Regenerate after any migration:
- *   npx supabase gen types typescript --project-id bintkxeivnqpeqjnxzyr
+ *   npx supabase gen types typescript --project-id <your-project-ref>
  *
  * Only the table shapes are kept — the generator also emits a large set of
  * conditional helper types for schema-qualified lookups that this app has no use
@@ -212,7 +212,29 @@ export interface Database {
       };
     };
     Views: Record<never, never>;
-    Functions: Record<never, never>;
+    Functions: {
+      /**
+       * Applies one rating window in a single transaction. See the migration for
+       * why this cannot be three separate statements from the application.
+       */
+      apply_rating_window: {
+        Args: {
+          p_profile_id: string;
+          p_event: string;
+          p_pool: string;
+          p_window_index: number;
+          p_rating_before: number;
+          p_deviation_before: number;
+          p_rating_after: number;
+          p_deviation_after: number;
+          p_solve_count: number;
+          p_peak_rating: number | null;
+          p_at: string;
+          p_attempt_ids: string[];
+        };
+        Returns: undefined;
+      };
+    };
     Enums: Record<never, never>;
     CompositeTypes: Record<never, never>;
   };

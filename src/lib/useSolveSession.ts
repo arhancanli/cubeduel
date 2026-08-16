@@ -19,6 +19,7 @@ import {
   type ConnectedPuzzle,
   type SmartCubeSupport,
 } from "@/lib/puzzleSource";
+import { useLatest } from "./useLatest";
 
 /**
  * One solve loop, used by every mode that solves a cube.
@@ -95,8 +96,7 @@ export function useSolveSession(options: SolveSessionOptions): SolveSession {
 
   // Held in a ref so the mount-only input effect always calls the current
   // callbacks without being torn down and reconnected on every render.
-  const optionsRef = useRef(options);
-  optionsRef.current = options;
+  const optionsRef = useLatest(options);
 
   const recorderRef = useRef<SolveRecorder | null>(null);
   if (recorderRef.current === null) {
@@ -167,7 +167,7 @@ export function useSolveSession(options: SolveSessionOptions): SolveSession {
 
     recorderRef.current!.arm();
     setPhase("armed");
-  }, [paint, stopRaf]);
+  }, [paint, stopRaf, optionsRef]);
 
   const handleMove = useCallback(
     (move: string, timestamp: number) => {
@@ -232,11 +232,10 @@ export function useSolveSession(options: SolveSessionOptions): SolveSession {
           );
       }
     },
-    [paint, stopRaf, tick],
+    [paint, stopRaf, tick, optionsRef],
   );
 
-  const handleMoveRef = useRef(handleMove);
-  handleMoveRef.current = handleMove;
+  const handleMoveRef = useLatest(handleMove);
 
   // Highlight the pressed key so the layout is learned by using it.
   useEffect(() => {
@@ -300,11 +299,14 @@ export function useSolveSession(options: SolveSessionOptions): SolveSession {
       // A cancelled device picker is a normal user action, not a failure.
       if (!/cancel/i.test(message)) setConnectError(message);
     }
-  }, []);
+  }, [handleMoveRef]);
 
-  const pushMove = useCallback((move: string) => {
-    handleMoveRef.current(move, performance.now());
-  }, []);
+  const pushMove = useCallback(
+    (move: string) => {
+      handleMoveRef.current(move, performance.now());
+    },
+    [handleMoveRef],
+  );
 
   const onPlayerReady = useCallback((player: CubePlayer | null) => {
     playerRef.current = player;

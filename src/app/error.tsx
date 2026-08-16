@@ -54,6 +54,13 @@ export default function Error({
             } catch {
               /* Nothing more we can do; the reload is still worth attempting. */
             }
+            // A full document load, deliberately, and not `router.push()`.
+            //
+            // This button exists because a corrupt record took the page down
+            // during render, so the React tree that would handle a soft
+            // navigation is the broken thing we are escaping. Reloading is the
+            // point: it re-reads storage from scratch with the bad record gone.
+            // eslint-disable-next-line @next/next/no-location-assign-relative-destination -- see above
             window.location.href = "/timer";
           }}
           className="rounded-lg border border-danger/40 px-5 py-2.5 text-sm text-danger transition-colors hover:bg-danger/10"

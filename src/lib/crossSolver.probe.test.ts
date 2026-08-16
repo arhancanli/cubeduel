@@ -15,7 +15,6 @@ test("the table is exhaustive, and its distances are provably optimal", async ()
 
   const depths = new Map<number, number>();
   for (const v of table) depths.set(v, (depths.get(v) ?? 0) + 1);
-  const max = Math.max(...[...depths.keys()]);
   console.log(
     `  depth histogram: ${[...depths.entries()].sort((a, b) => a[0] - b[0]).map(([d, n]) => `${d}:${n}`).join("  ")}`,
   );

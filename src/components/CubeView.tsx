@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLatest } from "@/lib/useLatest";
 
 /**
  * A live 3D render of the cube in its scrambled state.
@@ -80,8 +81,7 @@ export function CubeView({
 }: Props) {
   // Held in a ref so a caller passing an inline function cannot force the whole
   // Three.js scene to be rebuilt on every render.
-  const onReadyRef = useRef(onPlayerReady);
-  onReadyRef.current = onPlayerReady;
+  const onReadyRef = useLatest(onPlayerReady);
   const hostRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<TwistyPlayerInstance | null>(null);
   const [ready, setReady] = useState(false);
@@ -90,8 +90,7 @@ export function CubeView({
   // Read at construction time so the first render shows the right state without
   // putting `scramble` in the creation effect's deps — that would rebuild the
   // whole Three.js scene on every solve.
-  const scrambleRef = useRef(scramble);
-  scrambleRef.current = scramble;
+  const scrambleRef = useLatest(scramble);
 
   // Created once. The scramble is pushed in through a separate effect so a new
   // scramble never costs a full Three.js teardown and rebuild.
@@ -140,13 +139,18 @@ export function CubeView({
       }
     })();
 
+    // Captured now rather than read in the cleanup: by the time cleanup runs the
+    // ref may already hold the NEXT consumer's callback, and this teardown is
+    // meant to tell the consumer that owned this player that it is gone.
+    const notifyOwner = onReadyRef.current;
+
     return () => {
       cancelled = true;
       playerRef.current = null;
-      onReadyRef.current?.(null);
+      notifyOwner?.(null);
       host.replaceChildren();
     };
-  }, [interactive, backView, visualization, movePressInput]);
+  }, [interactive, backView, visualization, movePressInput, onReadyRef, scrambleRef]);
 
   useEffect(() => {
     if (playerRef.current && scramble) {

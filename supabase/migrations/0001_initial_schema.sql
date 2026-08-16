@@ -208,6 +208,82 @@ create index daily_results_board on daily_results (day, event, penalty, duration
 -- Lock everything down. See the note at the top of this file.
 -- ---------------------------------------------------------------------------
 
+-- ---------------------------------------------------------------------------
+-- Applying a rating window, atomically
+-- ---------------------------------------------------------------------------
+
+-- A rating update is three writes: claim the window, move the rating, mark the
+-- five attempts as consumed. Issued separately from the application they are not
+-- atomic, and the failure is both silent and permanent:
+--
+--   the window claim succeeds, the rating upsert fails -> the audit trail says
+--   the rating moved, the rating did not, and because the window claim is
+--   UNIQUE the window can never be retried. The player loses that update
+--   forever and nothing anywhere reports a problem.
+--
+-- A single function call runs in one implicit transaction, so either all three
+-- land or none do. The rating arithmetic itself deliberately stays in
+-- TypeScript, where it is unit-tested; this function only commits a decision
+-- that has already been made.
+create function apply_rating_window(
+  p_profile_id       uuid,
+  p_event            text,
+  p_pool             text,
+  p_window_index     integer,
+  p_rating_before    real,
+  p_deviation_before real,
+  p_rating_after     real,
+  p_deviation_after  real,
+  p_solve_count      integer,
+  p_peak_rating      real,
+  p_at               timestamptz,
+  p_attempt_ids      uuid[]
+) returns void
+language plpgsql
+as $$
+begin
+  -- Claims the window. The unique constraint is what turns a double submission
+  -- into a loud failure rather than a rating applied twice.
+  insert into rating_events (
+    profile_id, event, pool, window_index,
+    rating_before, deviation_before, rating_after, deviation_after, at
+  ) values (
+    p_profile_id, p_event, p_pool, p_window_index,
+    p_rating_before, p_deviation_before, p_rating_after, p_deviation_after, p_at
+  );
+
+  insert into ratings (
+    profile_id, event, pool, rating, deviation,
+    solve_count, peak_rating, last_solve_at, updated_at
+  ) values (
+    p_profile_id, p_event, p_pool, p_rating_after, p_deviation_after,
+    p_solve_count, p_peak_rating, p_at, p_at
+  )
+  on conflict (profile_id, event, pool) do update set
+    rating        = excluded.rating,
+    deviation     = excluded.deviation,
+    solve_count   = excluded.solve_count,
+    peak_rating   = excluded.peak_rating,
+    last_solve_at = excluded.last_solve_at,
+    updated_at    = excluded.updated_at;
+
+  update ranked_attempts
+     set window_index = p_window_index
+   where id = any (p_attempt_ids);
+end;
+$$;
+
+-- PostgREST exposes functions over HTTP and Postgres grants EXECUTE to PUBLIC by
+-- default, so without this the browser could move its own rating with one POST —
+-- which would undo the entire point of the server-authoritative write path.
+revoke all on function apply_rating_window(
+  uuid, text, text, integer, real, real, real, real, integer, real, timestamptz, uuid[]
+) from public;
+
+grant execute on function apply_rating_window(
+  uuid, text, text, integer, real, real, real, real, integer, real, timestamptz, uuid[]
+) to service_role;
+
 alter table profiles        enable row level security;
 alter table solves          enable row level security;
 alter table ranked_attempts enable row level security;
