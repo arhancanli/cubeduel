@@ -147,7 +147,13 @@ create table ratings (
   profile_id    uuid not null references profiles(id) on delete cascade,
   event         text not null,
   pool          text not null check (pool in ('keyboard', 'smartcube')),
-  rating        real not null,
+  -- NULL means unrated, and it has to be nullable for a reason that only shows
+  -- up in practice: a player's very FIRST window can be a DNF. A failed window
+  -- deliberately does not produce a rating — that is the whole anti-farming
+  -- rule — so there is genuinely no number to store, only a widened deviation.
+  -- A `not null` column forces a zero in there, and zero is not "unrated", it
+  -- is a rating below the floor of 100 that the player never earned.
+  rating        real,
   deviation     real not null,
   solve_count   integer not null default 0,
   peak_rating   real,
@@ -168,9 +174,12 @@ create table rating_events (
   solve_id         uuid references solves(id) on delete set null,
   event            text not null,
   pool             text not null,
-  rating_before    real not null,
+  -- Nullable for the same reason as `ratings.rating`: a failed window moves the
+  -- deviation and leaves the rating untouched, and on a first window there is no
+  -- rating on either side of it.
+  rating_before    real,
   deviation_before real not null,
-  rating_after     real not null,
+  rating_after     real,
   deviation_after  real not null,
   window_index     integer,
   at               timestamptz not null default now(),
@@ -273,12 +282,22 @@ begin
 end;
 $$;
 
--- PostgREST exposes functions over HTTP and Postgres grants EXECUTE to PUBLIC by
--- default, so without this the browser could move its own rating with one POST —
--- which would undo the entire point of the server-authoritative write path.
+-- PostgREST exposes functions over HTTP, so without this the browser could move
+-- its own rating with one POST — which would undo the entire point of the
+-- server-authoritative write path.
+--
+-- Revoking from PUBLIC alone is NOT enough here, and it silently looks like it
+-- is. Supabase ships `alter default privileges ... grant execute on functions to
+-- anon, authenticated, service_role`, so those three get their OWN grant the
+-- moment the function is created — a grant that a revoke against PUBLIC does not
+-- touch. Verified the hard way: with only the PUBLIC revoke in place, a POST
+-- carrying nothing but the publishable key reached the function body and was
+-- stopped one layer later by RLS. Defence in depth did its job, but the revoke
+-- was decorative, and a future `security definer` on this function would have
+-- turned that into unlimited rating forgery.
 revoke all on function apply_rating_window(
   uuid, text, text, integer, real, real, real, real, integer, real, timestamptz, uuid[]
-) from public;
+) from public, anon, authenticated;
 
 grant execute on function apply_rating_window(
   uuid, text, text, integer, real, real, real, real, integer, real, timestamptz, uuid[]

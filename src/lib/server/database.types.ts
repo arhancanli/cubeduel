@@ -133,7 +133,7 @@ export interface Database {
           profile_id: string;
           event: string;
           pool: string;
-          rating: number;
+          rating: number | null;
           deviation: number;
           solve_count: number;
           peak_rating: number | null;
@@ -144,7 +144,7 @@ export interface Database {
           profile_id: string;
           event: string;
           pool: string;
-          rating: number;
+          rating: number | null;
           deviation: number;
           solve_count?: number;
           peak_rating?: number | null;
@@ -161,9 +161,9 @@ export interface Database {
           solve_id: string | null;
           event: string;
           pool: string;
-          rating_before: number;
+          rating_before: number | null;
           deviation_before: number;
-          rating_after: number;
+          rating_after: number | null;
           deviation_after: number;
           window_index: number | null;
           at: string;
@@ -174,9 +174,9 @@ export interface Database {
           solve_id?: string | null;
           event: string;
           pool: string;
-          rating_before: number;
+          rating_before: number | null;
           deviation_before: number;
-          rating_after: number;
+          rating_after: number | null;
           deviation_after: number;
           window_index?: number | null;
           at?: string;
@@ -223,9 +223,9 @@ export interface Database {
           p_event: string;
           p_pool: string;
           p_window_index: number;
-          p_rating_before: number;
+          p_rating_before: number | null;
           p_deviation_before: number;
-          p_rating_after: number;
+          p_rating_after: number | null;
           p_deviation_after: number;
           p_solve_count: number;
           p_peak_rating: number | null;

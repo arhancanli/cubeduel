@@ -41,6 +41,10 @@ export async function ratingBoard(
     .eq("event", event)
     .eq("pool", pool)
     .lte("deviation", ESTABLISHED_DEVIATION)
+    // A row can exist with a null rating: a player whose windows have all failed
+    // has a deviation but no rating. They are not ranked, because there is
+    // nothing to rank them by.
+    .not("rating", "is", null)
     .order("rating", { ascending: false })
     .limit(limit);
 
@@ -67,7 +71,9 @@ export async function ratingBoard(
       handle: profile.handle,
       displayName: profile.display_name,
       country: profile.country,
-      rating: row.rating,
+      // The query excludes nulls; this keeps the narrowing explicit rather than
+      // asserting it away.
+      rating: row.rating ?? 0,
       deviation: row.deviation,
       solveCount: row.solve_count,
     };
@@ -234,6 +240,11 @@ export async function profileStats(
         mode: row.mode,
       })) ?? [],
     history:
-      history.data?.map((row) => ({ at: row.at, rating: row.rating_after })) ?? [],
+      history.data
+        // A failed window is a real event but it has no rating to plot — the
+        // rule is that it moves the deviation and leaves the rating alone.
+        // Dropping it here keeps the chart a chart of ratings.
+        ?.filter((row) => row.rating_after !== null)
+        .map((row) => ({ at: row.at, rating: row.rating_after as number })) ?? [],
   };
 }

@@ -330,6 +330,8 @@ export async function currentRating(
   if (!data) return UNRATED;
 
   return {
+    // Null in the column means unrated, which is exactly what `RatingState`
+    // already models. No coercion in either direction.
     rating: data.rating,
     deviation: data.deviation,
     windowCount: Math.floor(data.solve_count / WINDOW_SIZE),
@@ -392,9 +394,13 @@ export async function rateReadyWindows(
       p_event: event,
       p_pool: pool,
       p_window_index: windowIndex,
-      p_rating_before: state.rating ?? outcome.state.rating ?? 0,
+      // Passed through as null rather than coerced to 0. A failed first window
+      // produces no rating at all, and 0 is not "unrated" — it is a rating below
+      // the floor of 100 that the player never earned, and it would show on
+      // their profile as a real number.
+      p_rating_before: state.rating,
       p_deviation_before: state.deviation,
-      p_rating_after: outcome.state.rating ?? 0,
+      p_rating_after: outcome.state.rating,
       p_deviation_after: outcome.state.deviation,
       p_solve_count: (windowIndex + 1) * WINDOW_SIZE,
       p_peak_rating: outcome.state.peak,
