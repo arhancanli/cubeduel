@@ -35,7 +35,7 @@ export async function ratingBoard(
   pool: RatingPool,
   limit = 100,
 ): Promise<BoardEntry[]> {
-  const { data } = await db()
+  const { data, error } = await db()
     .from("ratings")
     .select("rating, deviation, solve_count, profiles!inner(handle, display_name, country)")
     .eq("event", event)
@@ -44,6 +44,13 @@ export async function ratingBoard(
     .order("rating", { ascending: false })
     .limit(limit);
 
+  // Thrown rather than degraded to an empty list. "Nobody is ranked yet" and
+  // "the database is unreachable" are opposite facts, and rendering the first
+  // when the second is true is the most misleading thing this page could do —
+  // it was doing exactly that against a project with no schema, and looked fine.
+  if (error) {
+    throw new Error(`Could not load the rating board: ${error.message}`);
+  }
   if (!data) return [];
 
   return data.map((row, index) => {
@@ -88,7 +95,7 @@ export async function dailyBoard(
   event = "333",
   limit = 100,
 ): Promise<DailyEntry[]> {
-  const { data } = await db()
+  const { data, error } = await db()
     .from("daily_results")
     .select("duration_ms, penalty, verified, profiles!inner(handle, display_name)")
     .eq("day", day)
@@ -97,6 +104,9 @@ export async function dailyBoard(
     .order("duration_ms", { ascending: true })
     .limit(limit);
 
+  if (error) {
+    throw new Error(`Could not load the daily board: ${error.message}`);
+  }
   if (!data) return [];
 
   const rows = data.map((row) => {

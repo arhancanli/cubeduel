@@ -32,10 +32,40 @@ export default async function LeaderboardPage() {
   }
 
   const day = todayNumber(dailies.start);
-  const [board, daily] = await Promise.all([
-    ratingBoard("333", "keyboard"),
-    dailyBoard(day),
-  ]);
+
+  // The boards throw rather than degrade to an empty list, so a failure has to be
+  // caught and named here. Rendering "nobody is ranked yet" when the truth is
+  // "the database is unreachable" would be a confident lie on the one page whose
+  // entire value is being believed.
+  let board: Awaited<ReturnType<typeof ratingBoard>> | null = null;
+  let daily: Awaited<ReturnType<typeof dailyBoard>> | null = null;
+  let failed = false;
+
+  try {
+    [board, daily] = await Promise.all([
+      ratingBoard("333", "keyboard"),
+      dailyBoard(day),
+    ]);
+  } catch {
+    failed = true;
+  }
+
+  if (failed || board === null || daily === null) {
+    return (
+      <Shell>
+        <section className="w-full">
+          <h2 className="mb-3 text-lg font-medium tracking-tight">
+            The boards are not loading.
+          </h2>
+          <p className="max-w-xl text-sm leading-relaxed text-muted">
+            Something is wrong at our end — this is not an empty leaderboard, it
+            is a broken one, and saying otherwise would be worse than saying
+            nothing. Solving, the daily and your own progress are unaffected.
+          </p>
+        </section>
+      </Shell>
+    );
+  }
 
   return (
     <Shell>
