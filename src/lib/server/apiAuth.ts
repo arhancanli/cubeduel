@@ -20,12 +20,33 @@ export function jsonError(message: string, status: number): Response {
   return Response.json({ error: message }, { status });
 }
 
-export async function requireProfile(): Promise<AuthedResult> {
+/**
+ * What the caller was trying to do, so the refusal can say something true.
+ *
+ * Every route used to answer "Sign in to play ranked", including the ones that
+ * have nothing to do with ranked — syncing your practice history, or posting a
+ * daily. A message that names the wrong feature is worse than a bare 401: it
+ * sends people looking for a problem that is not there.
+ */
+export type ProtectedAction = "ranked" | "sync" | "daily";
+
+const SIGNED_OUT: Record<ProtectedAction, string> = {
+  ranked: "Sign in to play ranked.",
+  sync: "Sign in to sync your solves.",
+  daily: "Sign in to post a daily result.",
+};
+
+const UNAVAILABLE: Record<ProtectedAction, string> = {
+  ranked: "Ranked play is not available right now.",
+  sync: "Syncing is not available right now.",
+  daily: "The daily board is not available right now.",
+};
+
+export async function requireProfile(
+  action: ProtectedAction = "ranked",
+): Promise<AuthedResult> {
   if (!isDatabaseConfigured()) {
-    return {
-      ok: false,
-      response: jsonError("Ranked play is not available right now.", 503),
-    };
+    return { ok: false, response: jsonError(UNAVAILABLE[action], 503) };
   }
 
   let profile: Profile | null;
@@ -36,7 +57,7 @@ export async function requireProfile(): Promise<AuthedResult> {
   }
 
   if (!profile) {
-    return { ok: false, response: jsonError("Sign in to play ranked.", 401) };
+    return { ok: false, response: jsonError(SIGNED_OUT[action], 401) };
   }
 
   return { ok: true, profile };

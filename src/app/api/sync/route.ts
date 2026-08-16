@@ -40,7 +40,7 @@ const PENALTIES = new Set<Penalty>(["OK", "PLUS2", "DNF"]);
 const SOURCES = new Set(["keyboard", "smartcube", "manual"]);
 
 export async function POST(request: Request) {
-  const auth = await requireProfile();
+  const auth = await requireProfile("sync");
   if (!auth.ok) return auth.response;
 
   const body = await readJson<{ solves?: unknown }>(request);

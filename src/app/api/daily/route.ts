@@ -46,7 +46,7 @@ function parseMoves(value: unknown): SubmittedMove[] | null {
 }
 
 export async function POST(request: Request) {
-  const auth = await requireProfile();
+  const auth = await requireProfile("daily");
   if (!auth.ok) return auth.response;
 
   const body = await readJson<Body>(request);
