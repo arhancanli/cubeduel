@@ -1,0 +1,100 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+
+import { RankedScreen } from "@/components/RankedScreen";
+import { SiteHeader } from "@/components/SiteHeader";
+import { UNRATED, isEstablished } from "@/lib/rating";
+import { ensureProfile } from "@/lib/server/profiles";
+import { currentRating, pendingResultCount } from "@/lib/server/ranked";
+import { isDatabaseConfigured } from "@/lib/server/supabase";
+
+export const metadata: Metadata = {
+  title: "Ranked — cubeduel",
+  description:
+    "Solve server-issued scrambles for a rating that means something. Every solve is verified against the scramble it was issued for.",
+};
+
+/**
+ * Never prerendered.
+ *
+ * Without this the page is statically generated at build time, where there is no
+ * signed-in user and no database configured — so the "not available" gate below
+ * gets baked into the deployment and served to every visitor forever, while the
+ * ladder underneath it works perfectly. The build output says `○ (Static)` and
+ * nothing else looks wrong, which is exactly the kind of failure that ships.
+ */
+export const dynamic = "force-dynamic";
+
+/**
+ * Ranked is the one place in the app that requires an account, and it is worth
+ * being clear about why: a rating is a claim about a person that persists, and
+ * there is nobody to attach it to otherwise. Everything else still works signed
+ * out.
+ */
+export default async function RankedPage() {
+  if (!isDatabaseConfigured()) {
+    return (
+      <Gate title="Ranked is not available right now.">
+        The ladder needs its database, which is not configured for this
+        deployment. Practice, the daily and your progress all still work.
+      </Gate>
+    );
+  }
+
+  const profile = await ensureProfile();
+
+  if (!profile) {
+    return (
+      <Gate title="Sign in to play ranked.">
+        A rating has to belong to someone. Practice mode needs no account and is
+        the same cube — the only difference is that nothing there is recorded
+        against you.
+        <span className="mt-5 block">
+          <Link
+            href="/play"
+            className="rounded-lg border border-border px-4 py-2 text-xs text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+          >
+            Practice instead
+          </Link>
+        </span>
+      </Gate>
+    );
+  }
+
+  const [state, gathered] = await Promise.all([
+    currentRating(profile.id, "333", "keyboard"),
+    pendingResultCount(profile.id, "333", "keyboard"),
+  ]);
+
+  return (
+    <RankedScreen
+      initial={{
+        rating: state.rating,
+        deviation: state.deviation ?? UNRATED.deviation,
+        peak: state.peak,
+        established: isEstablished(state),
+        pendingAttempts: gathered,
+      }}
+    />
+  );
+}
+
+function Gate({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <main className="flex min-h-dvh flex-col">
+      <SiteHeader active="ranked" />
+      <div className="flex flex-1 items-center justify-center px-6 pb-24">
+        <div className="max-w-md text-center">
+          <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
+          <p className="mt-4 text-sm leading-relaxed text-muted">{children}</p>
+        </div>
+      </div>
+    </main>
+  );
+}

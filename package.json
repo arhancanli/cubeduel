@@ -4,14 +4,24 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test src/lib/*.test.ts",
+    "dailies": "node scripts/generate-dailies.mjs",
+    "pool": "node scripts/generate-pool.mjs",
+    "check:bundle": "node scripts/check-bundle.mjs",
+    "e2e": "python3 e2e/timer.py && python3 e2e/play.py && python3 e2e/train.py"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.7.3",
+    "@supabase/supabase-js": "^2.109.0",
+    "cubing": "^0.56.0",
     "next": "16.3.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -21,6 +31,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }
