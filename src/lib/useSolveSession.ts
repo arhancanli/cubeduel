@@ -52,6 +52,15 @@ export interface SolveSessionOptions {
   onSolved?: (outcome: SolveOutcome) => void;
   /** Reported to the caller when a round cannot be started at all. */
   onRoundError?: (message: string) => void;
+  /**
+   * Whether to fetch a puzzle as soon as the screen mounts.
+   *
+   * True for practice, where a scramble waiting on arrival is the whole point.
+   * False for ranked, where starting a round is a commitment — an attempt that
+   * is opened and walked away from is recorded as a DNF, and merely visiting a
+   * page must never cost somebody a result they did not agree to.
+   */
+  autoStart?: boolean;
 }
 
 export interface SolveSession {
@@ -273,7 +282,7 @@ export function useSolveSession(options: SolveSessionOptions): SolveSession {
       }
     })();
 
-    void startRound();
+    if (optionsRef.current.autoStart !== false) void startRound();
 
     return () => {
       cancelled = true;

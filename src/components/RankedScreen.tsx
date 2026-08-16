@@ -66,9 +66,12 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
   const [rejection, setRejection] = useState<string | null>(null);
   const [lastWindow, setLastWindow] = useState<SubmitResponse["rating"]>(null);
   const [submitting, setSubmitting] = useState(false);
+  /** False until the player opens their first attempt of this visit. */
+  const [started, setStarted] = useState(false);
 
   /** Ask the server for a scramble. This is the whole point of ranked. */
   const supplyScramble = useCallback(async () => {
+    setStarted(true);
     setRejection(null);
     setStatus(null);
     submittedRef.current = false;
@@ -94,6 +97,10 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
 
   const session = useSolveSession({
     nextScramble: supplyScramble,
+    // Nothing is requested until the player asks for it. Opening an attempt is
+    // a commitment — walking away from it is a DNF — so it cannot happen just
+    // because somebody looked at the page.
+    autoStart: false,
     onRoundError: (message) => setRejection(message),
     onSolved: ({ recording, analysis, source }) => {
       const attemptId = attemptIdRef.current;
@@ -206,7 +213,8 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
             {phase === "armed" && "Ranked attempt live — the first turn starts the clock."}
             {phase === "running" && `${moveCount} moves`}
             {phase === "solved" && (submitting ? "Verifying…" : "Solved")}
-            {phase === "idle" && "Getting a scramble…"}
+            {phase === "idle" &&
+              (started ? "Getting a scramble…" : "Nothing is counted until you start.")}
           </p>
         </div>
 
@@ -234,7 +242,11 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
             disabled={submitting}
             className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-40"
           >
-            {phase === "solved" ? "Next attempt" : "New attempt"}
+            {!started
+              ? "Start a ranked attempt"
+              : phase === "solved"
+                ? "Next attempt"
+                : "New attempt"}
           </button>
         </div>
 

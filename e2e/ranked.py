@@ -213,8 +213,17 @@ with sync_playwright() as p:
     if not signed_in:
         print("\n  Cannot continue without a session.")
     else:
-        print("\n== the server issues a scramble ==")
+        print("\n== nothing is issued until the player asks ==")
         page.wait_for_selector("twisty-player", timeout=30000)
+        page.wait_for_timeout(2500)
+        pre = " ".join(page.locator("div.font-mono").first.inner_text().split())
+        check("no attempt is opened just by visiting", pre == "",
+              f"scramble already showing: {pre[:40]}")
+        check("the page says nothing is counted yet",
+              "Nothing is counted until you start" in page.inner_text("body"))
+
+        print("\n== the server issues a scramble ==")
+        page.locator("button:has-text('Start a ranked attempt')").first.click()
         # The container renders before the API answers, so wait for it to have a
         # scramble in it rather than for it to exist.
         page.wait_for_function(
