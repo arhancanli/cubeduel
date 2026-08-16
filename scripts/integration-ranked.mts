@@ -26,6 +26,7 @@
  */
 
 import {
+  ANCHOR_FAST_RATING,
   ESTABLISHED_DEVIATION,
   WINDOW_SIZE,
   ratingForMs,
@@ -77,7 +78,11 @@ async function honestSolve(profileId: string, label: string) {
   const solution = solutionFor(attempt.scramble);
   const gap = Math.round(SOLVE_MS / Math.max(1, solution.length - 1));
   const moves = stream(solution, gap);
-  const durationMs = moves[moves.length - 1].atMs;
+  // Fractional on purpose. A real browser measures with `performance.now()` and
+  // reports 3184.699999988079, never 3184 — and an integer column rejected that
+  // outright, surfacing as a bare 500 with no hint at the cause. Whole numbers
+  // here hid the bug completely.
+  const durationMs = moves[moves.length - 1].atMs + 0.699999988079;
 
   await new Promise((resolve) => setTimeout(resolve, durationMs));
 
@@ -221,13 +226,16 @@ async function main() {
   check("every issued scramble was unique", seen.size === issued,
     `${seen.size} distinct of ${issued}`);
 
-  // The whole point of the log-time scale is that it is exact and readable.
-  // A 5.00s average is the documented world-class anchor, so this is an
-  // end-to-end proof that the ladder in the database is the ladder in the docs.
+  // The point of the log-time scale is that it is exact and readable, so a
+  // roughly-5-second average must land on the documented world-class anchor.
+  // The tolerance is real: scramble lengths vary, so the paced solves come out
+  // a few milliseconds either side of 5.000s and the average moves with them.
+  // Pinning an exact 3000 would be pinning the scramble generator, not the scale.
+  const anchorGap = Math.abs((stored.rating ?? 0) - ANCHOR_FAST_RATING);
   check(
-    "a 5.00s average rates exactly 3000, the documented anchor",
-    Math.round(stored.rating ?? 0) === 3000,
-    `${Math.round(stored.rating ?? 0)}`,
+    "a ~5 second average lands on the world-class anchor",
+    anchorGap < 15,
+    `${Math.round(stored.rating ?? 0)} vs anchor ${ANCHOR_FAST_RATING} (gap ${anchorGap.toFixed(1)})`,
   );
 
   console.log("\n== the window really was atomic ==");

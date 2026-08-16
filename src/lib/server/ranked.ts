@@ -137,8 +137,22 @@ export interface RatingResult {
 }
 
 export async function submitAttempt(
-  input: SubmissionInput,
+  raw: SubmissionInput,
 ): Promise<SubmissionResult> {
+  // Rounded here, once, for every caller.
+  //
+  // The browser measures a solve with `performance.now()`, which is fractional —
+  // 3184.699999988079, not 3184. `solves.duration_ms` and
+  // `ranked_attempts.duration_ms` are integer columns, so the insert failed and
+  // the whole submission came back as a 500 that said only "Could not record
+  // that solve". Nothing upstream was wrong and nothing in the message hinted at
+  // the cause. Sub-millisecond precision means nothing on a timer that displays
+  // hundredths, so the honest fix is to store whole milliseconds.
+  const input: SubmissionInput = {
+    ...raw,
+    durationMs: Math.round(raw.durationMs),
+  };
+
   const { data: attempt } = await db()
     .from("ranked_attempts")
     .select("*")
