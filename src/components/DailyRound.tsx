@@ -7,7 +7,7 @@ import { CubeView } from "@/components/CubeView";
 import { DailyMemory, readDailyStats } from "@/components/DailyMemory";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
-  buildShareText,
+  buildDailyShare,
   formatCountdown,
   msUntilNextUtcDay,
   crossDifficultyLabel,
@@ -23,6 +23,8 @@ import {
   recordResult,
   type DailyEntry,
 } from "@/lib/dailyStorage";
+import { analyzeSolve, type PhaseSplit, type SolveAnalysis } from "@/lib/cfop";
+import { SolveBreakdown } from "@/components/SolveBreakdown";
 import { recordSolve } from "@/lib/solveHistory";
 import { submitDailyResult } from "@/lib/sync";
 import { useKeyboardSolve } from "@/lib/useKeyboardSolve";
@@ -87,6 +89,14 @@ export function DailyRound({ dayKey, dayNumber, startKey, scramble, crossMoves }
   }, []);
 
   const verifiedRef = useRef(false);
+  /**
+   * Where the time went, for keyboard solves.
+   *
+   * The daily recorded `splits: []` until now, so the one round a lot of people
+   * play was also the only one that told them nothing — and it was invisible in
+   * the progress analysis for the same reason.
+   */
+  const [splits, setSplits] = useState<PhaseSplit[]>([]);
 
   const handleComplete = useCallback(
     (ms: number, moves?: { move: string; atMs: number }[]) => {
@@ -106,19 +116,38 @@ export function DailyRound({ dayKey, dayNumber, startKey, scramble, crossMoves }
       });
       // The daily is still a solve. Keeping it out of history meant a player whose
       // only habit was the daily saw an empty analysis page forever.
-      recordSolve({
-        scramble: scramble ?? "",
-        durationMs: ms,
-        penalty: "OK",
-        moveCount: 0,
-        tps: 0,
-        splits: [],
-        ollCase: null,
-        pllCase: null,
-        ollSetup: null,
-        pllSetup: null,
-        source: "keyboard",
-      });
+      const store = (analysis: SolveAnalysis) => {
+        setSplits(analysis.splits);
+        recordSolve({
+          scramble: scramble ?? "",
+          durationMs: ms,
+          penalty: "OK",
+          moveCount: moves?.length ?? 0,
+          tps: moves && ms > 0 ? moves.length / (ms / 1000) : 0,
+          splits: analysis.splits,
+          ollCase: analysis.ollCase,
+          pllCase: analysis.pllCase,
+          ollSetup: analysis.ollSetup,
+          pllSetup: analysis.pllSetup,
+          source: "keyboard",
+        });
+      };
+
+      if (moves && moves.length > 0 && scramble) {
+        // Replayed after the fact rather than tracked live, so a pair broken and
+        // reinserted is credited where the work actually happened.
+        void analyzeSolve(scramble, moves)
+          .then(store)
+          // A solve that cannot be split is still a solve. Dropping it would bias
+          // the record toward clean CFOP solves.
+          .catch(() =>
+            store({ splits: [], ollCase: null, pllCase: null, ollSetup: null, pllSetup: null }),
+          );
+      } else {
+        // Hand-timed: no move stream, so nothing to split.
+        store({ splits: [], ollCase: null, pllCase: null, ollSetup: null, pllSetup: null });
+      }
+
       setEntry(getEntry(dayKey));
       setStage("done");
     },
@@ -185,7 +214,7 @@ export function DailyRound({ dayKey, dayNumber, startKey, scramble, crossMoves }
   const share = useCallback(async () => {
     if (!entry || entry.status !== "done") return;
     const host = typeof window === "undefined" ? "cubeduel.app" : window.location.host;
-    const text = buildShareText(
+    const text = buildDailyShare(
       {
         dayKey,
         ms: entry.ms,
@@ -193,6 +222,7 @@ export function DailyRound({ dayKey, dayNumber, startKey, scramble, crossMoves }
         verified: entry.status === "done" && entry.verified,
       },
       startKey,
+      splits,
       host,
     );
     try {
@@ -202,7 +232,11 @@ export function DailyRound({ dayKey, dayNumber, startKey, scramble, crossMoves }
     } catch {
       /* Clipboard blocked — the text is still shown on screen to copy by hand. */
     }
-  }, [dayKey, entry, startKey]);
+    // `splits` is a real dependency, not lint noise: the CFOP analysis resolves
+    // asynchronously and lands AFTER the result does, so a callback that closed
+    // over the initial empty array would quietly share the plain speed bar even
+    // for a solve that had a full breakdown ready.
+  }, [dayKey, entry, startKey, splits]);
 
   if (!scramble) {
     return (
@@ -340,6 +374,13 @@ export function DailyRound({ dayKey, dayNumber, startKey, scramble, crossMoves }
               Best daily yet
             </span>
           ) : null}
+          {/*
+            The same shape that goes in the share, on screen first. Nobody should
+            be pasting a picture of their solve into a group chat without having
+            understood it themselves — and it is the part of the result that
+            actually tells them what to practise.
+          */}
+          {splits.length > 0 ? <SolveBreakdown splits={splits} /> : null}
           {entry?.status === "done" ? (
             <span
               className={`text-xs ${entry.verified ? "text-ready" : "text-muted-dim"}`}

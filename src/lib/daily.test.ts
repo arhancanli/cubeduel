@@ -98,3 +98,111 @@ test("a hand-timed result never shares as verified", () => {
   // The mark is the only difference — the time and bar are identical either way.
   assert.equal(watched.replace(" ✓", ""), selfTimed);
 });
+
+// ---------------------------------------------------------------------------
+// The shape share
+// ---------------------------------------------------------------------------
+
+import { SHAPE_WIDTH, buildDailyShare, buildShapeBar } from "./daily";
+
+/** Counts code points, not UTF-16 units — every block here is a surrogate pair. */
+const blocks = (bar: string) => [...bar].length;
+
+const split = (phase: string, durationMs: number) => ({ phase, durationMs });
+
+test("the shape bar is always exactly the same width", () => {
+  // The entire value of the artifact is that two people can lay theirs side by
+  // side. A bar whose length changes with the solve is not comparable, and
+  // rounding each phase independently produces exactly that.
+  const cases = [
+    [split("cross", 1000), split("F2L", 8000), split("OLL", 2000), split("PLL", 2000)],
+    [split("cross", 500), split("F2L", 20000), split("OLL", 300), split("PLL", 400)],
+    [split("cross", 1), split("F2L", 1), split("OLL", 1), split("PLL", 1)],
+    [split("cross", 9999), split("F2L", 1), split("OLL", 1), split("PLL", 1)],
+    [split("cross", 3333), split("F2L", 3333), split("OLL", 3333), split("PLL", 1)],
+  ];
+  for (const splits of cases) {
+    assert.equal(blocks(buildShapeBar(splits)), SHAPE_WIDTH, JSON.stringify(splits));
+  }
+});
+
+test("a phase that happened is never invisible", () => {
+  // A 0.2s PLL inside a 40s solve rounds to nothing. Showing that solve as having
+  // no PLL is a lie in the one place people look closely.
+  const bar = buildShapeBar([
+    split("cross", 2000),
+    split("F2L", 38000),
+    split("OLL", 3000),
+    split("PLL", 200),
+  ]);
+  assert.equal(blocks(bar), SHAPE_WIDTH);
+  assert.ok(bar.includes("\u{1F7EA}"), "PLL must still appear");
+});
+
+test("phases appear in solve order", () => {
+  const bar = buildShapeBar([
+    split("cross", 1000),
+    split("F2L", 5000),
+    split("OLL", 2000),
+    split("PLL", 2000),
+  ]);
+  const order = [...bar];
+  const firstOf = (block: string) => order.indexOf(block);
+  assert.ok(firstOf("\u{1F7E6}") < firstOf("\u{1F7E8}"), "cross before F2L");
+  assert.ok(firstOf("\u{1F7E8}") < firstOf("\u{1F7E9}"), "F2L before OLL");
+  assert.ok(firstOf("\u{1F7E9}") < firstOf("\u{1F7EA}"), "OLL before PLL");
+});
+
+test("a solve with no usable splits produces no bar", () => {
+  assert.equal(buildShapeBar([]), "");
+  assert.equal(buildShapeBar([split("cross", 0), split("F2L", 0)]), "");
+  assert.equal(buildShapeBar([split("nonsense", 5000)]), "");
+});
+
+test("a hand-timed daily falls back to the speed bar", () => {
+  // No move stream means no splits. The share must still work, and must not
+  // pretend to know where the time went.
+  const text = buildDailyShare(
+    { dayKey: "2026-08-16", ms: 18420, penalty: "OK", verified: false },
+    "2026-08-01",
+    [],
+  );
+  assert.ok(text.includes("18.42"));
+  assert.ok(!text.includes("cross"), "must not claim a breakdown it does not have");
+});
+
+test("a verified daily shares where the time went", () => {
+  const text = buildDailyShare(
+    { dayKey: "2026-08-16", ms: 18420, penalty: "OK", verified: true },
+    "2026-08-01",
+    [split("cross", 2000), split("F2L", 9000), split("OLL", 4000), split("PLL", 3420)],
+  );
+  assert.ok(text.includes("daily #16"), text);
+  assert.ok(text.includes("18.42"));
+  assert.ok(text.includes("✓"), "a verified solve is marked");
+  assert.ok(text.includes("cross · F2L · OLL · PLL"), "the legend explains the colours");
+});
+
+test("a DNF never gets a shape", () => {
+  // There is no breakdown of a solve that did not finish.
+  const text = buildDailyShare(
+    { dayKey: "2026-08-16", ms: 0, penalty: "DNF", verified: true },
+    "2026-08-01",
+    [split("cross", 2000), split("F2L", 9000)],
+  );
+  assert.ok(text.includes("DNF"));
+  assert.ok(!text.includes("cross"));
+});
+
+test("the share stays short enough to paste anywhere", () => {
+  const text = buildDailyShare(
+    { dayKey: "2026-08-16", ms: 18420, penalty: "OK", verified: true },
+    "2026-08-01",
+    [split("cross", 2000), split("F2L", 9000), split("OLL", 4000), split("PLL", 3420)],
+  );
+  // Comfortably inside a post limit, and no line long enough to wrap on a phone.
+  assert.ok(text.length < 200, `${text.length} chars`);
+  for (const line of text.split("\n")) {
+    assert.ok([...line].length <= 32, `line too long: ${line}`);
+  }
+});

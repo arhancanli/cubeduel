@@ -332,3 +332,25 @@ drives this in a real browser.
 - **Elo-gated cube skins.** Cosmetic only. Anything that gates function behind rating
   turns a skill ladder into a paywall with extra steps.
 - **Events beyond 3x3.** The schema is keyed by event throughout; only `333` is wired.
+
+---
+
+## Contributing
+
+Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+It is short, and specific about the two rules that actually govern changes here:
+explain *why* rather than *what*, and never make a claim the code cannot support.
+
+Security reports go through [Security Advisories](../../security/advisories/new),
+not public issues — see [SECURITY.md](SECURITY.md). Note that **anything letting a
+rating be obtained without earning it is treated as a vulnerability**, not a
+gameplay bug.
+
+## Licence
+
+[GNU AGPL-3.0-only](LICENSE). Copyright (c) 2026 Arhan Canli.
+
+Free to use, study, modify and share. The one obligation that matters: if you run
+a modified version **as a network service**, you have to publish your changes
+(§13). Ordinary use, self-hosting and contribution are unaffected — the clause
+exists so improvements to a public ladder stay public.

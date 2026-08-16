@@ -112,6 +112,106 @@ export function buildShareText(
 }
 
 /**
+ * The shape of a solve, as blocks.
+ *
+ * The speed bar above says how fast. This says **where the time went**, and it is
+ * the more interesting thing to paste into a group chat: two people who both got
+ * 18 seconds with different shapes have something to argue about, and that
+ * argument is the growth loop. It is also the one thing a timer cannot show and
+ * this app can, so the share advertises the actual product rather than a number.
+ *
+ * Spoiler-free by construction: proportions reveal nothing about the scramble.
+ *
+ * Colours follow the phases as cubers picture them — cross on the bottom, F2L the
+ * bulk of the solve, then the last layer in two steps.
+ */
+const PHASE_BLOCKS: { phase: string; block: string }[] = [
+  { phase: "cross", block: "\u{1F7E6}" },
+  { phase: "F2L", block: "\u{1F7E8}" },
+  { phase: "OLL", block: "\u{1F7E9}" },
+  { phase: "PLL", block: "\u{1F7EA}" },
+];
+
+/** Wide enough to show a shape, short enough to survive a phone's line width. */
+export const SHAPE_WIDTH = 12;
+
+/**
+ * Structurally identical to `PhaseSplit` from the CFOP analysis, deliberately —
+ * the caller passes its splits straight in with no adapter, so the two cannot
+ * drift into disagreeing about which field holds the time.
+ */
+export interface PhaseShare {
+  phase: string;
+  durationMs: number;
+}
+
+/**
+ * Allocates `SHAPE_WIDTH` blocks across the phases in proportion to time spent.
+ *
+ * Largest-remainder rather than rounding each independently, because independent
+ * rounding does not add up: four phases rounded separately can produce 11 or 13
+ * blocks, and a share whose width changes between people is not comparable, which
+ * was the entire point of it.
+ *
+ * Every phase that took any time gets at least one block. A phase that rounds to
+ * nothing still happened, and showing a solve as having no OLL would be a lie in
+ * the one place people are looking closely.
+ */
+export function buildShapeBar(splits: readonly PhaseShare[]): string {
+  const known = splits.filter(
+    (s) => PHASE_BLOCKS.some((p) => p.phase === s.phase) && s.durationMs > 0,
+  );
+  if (known.length === 0) return "";
+
+  const total = known.reduce((sum, s) => sum + s.durationMs, 0);
+  if (total <= 0) return "";
+
+  // One block each up front, then share out what is left by proportion.
+  const spare = Math.max(0, SHAPE_WIDTH - known.length);
+  const exact = known.map((s) => (s.durationMs / total) * spare);
+  const counts = exact.map((n) => Math.floor(n));
+
+  let remaining = spare - counts.reduce((a, b) => a + b, 0);
+  const order = exact
+    .map((n, i) => ({ i, frac: n - Math.floor(n) }))
+    .sort((a, b) => b.frac - a.frac);
+  for (let k = 0; remaining > 0; k++, remaining--) {
+    counts[order[k % order.length].i] += 1;
+  }
+
+  return known
+    .map((s, i) => {
+      const block = PHASE_BLOCKS.find((p) => p.phase === s.phase)!.block;
+      return block.repeat(counts[i] + 1);
+    })
+    .join("");
+}
+
+/**
+ * The share, with the shape when there is one.
+ *
+ * A hand-timed solve has no move stream and therefore no splits, so it falls back
+ * to the speed bar. That asymmetry is deliberate and points the right way: the
+ * richer thing to share is the one the app can actually vouch for.
+ */
+export function buildDailyShare(
+  result: DailyResult,
+  startKey: string,
+  splits: readonly PhaseShare[] = [],
+  origin = "cubeduel.app",
+): string {
+  const effective = effectiveOf(result);
+  const shape = effective === null ? "" : buildShapeBar(splits);
+  if (!shape) return buildShareText(result, startKey, origin);
+
+  const n = dayNumber(startKey, result.dayKey);
+  const mark = result.verified ? " \u2713" : "";
+  const legend = PHASE_BLOCKS.map((p) => p.phase).join(" \u00b7 ");
+
+  return `cubeduel daily #${n} \u00b7 ${formatMs(effective!)}${mark}\n${shape}\n${legend}\n${origin}/daily`;
+}
+
+/**
  * How kind today's scramble is, as the optimal cross length minimised over all six
  * faces — what a colour-neutral solver would actually find.
  *
