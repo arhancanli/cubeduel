@@ -1,0 +1,4 @@
+# GitHub surfaces SECURITY.md automatically on the "New issue" screen and in the
+# Security tab, so no contact link is needed here — and a hardcoded one would be
+# a broken URL until the repository has a permanent home.
+blank_issues_enabled: true

@@ -1,31 +1,91 @@
 # cubeduel
 
-A speedcubing timer with WCA-legal scrambles, a shared daily round, and (next) head-to-head duels.
+**A speedcubing platform with a rating that means something.**
 
-First product in the skill-duel line. Ships standalone; the shared account/rating layer
-gets extracted only once a second title exists, not before.
+[cubeduel.vercel.app](https://cubeduel.vercel.app) · 3x3 · no account needed to solve
+
+The server hands you a scramble nobody has ever seen, replays your solve to prove
+it happened, and only then does it count. On top of that sits the analysis a timer
+normally cannot give you: every solve split into cross, F2L, OLL and PLL, so you
+practise the part that is actually slow.
+
+Solve with a keyboard, a Bluetooth smart cube, or a real cube and the spacebar.
+
+---
+
+## What makes it different
+
+**The rating is not Elo.** Elo exists because chess has no absolute scale — you
+only ever learn that one player beat another. Cubing has seconds. So the rating is
+linear in log time, fixed to two landmarks the sport already uses:
+
+    a 5 second average  = 3000        a 15 second average = 2000
+
+Sub-20 is ~1740, sub-30 ~1370, a minute ~740. Every rating converts back to the
+average that earned it, exactly, so the number always means something you can
+picture. Details in [The rating](#the-rating-srclibratingts).
+
+**Results are proven, not trusted.** The scramble is generated when you ask for it,
+so there is nothing to cherry-pick and nothing to pre-solve. Your moves are then
+replayed against that exact scramble on the server. If the cube does not end
+solved, the result does not exist. See [Verification](#verification-srclibverifysolvets)
+— including a precise account of what this does **not** prove.
+
+**Failure costs certainty, not points.** A rating that ignored failed attempts
+could be farmed by abandoning every solve that started badly. But rating a DNF as
+a *time* means inventing a number, and a failed attempt is no evidence about speed.
+So a failed average widens your margin of error and leaves the rating untouched.
+Abandoning can never gain you anything.
+
+**The trainer schedules on measured time.** No "did you get it?" button — the app
+watched the cube. The bar is your own median case time, and the deck is built from
+the cases your own solves produced rather than a hand-typed table of 57 algorithms.
 
 ## Running it
 
 ```bash
-npm run dev            # http://localhost:3000
-npm test               # 27 unit tests — stats engine and daily logic
-npm run typecheck
-npm run build          # production build (webpack — see below)
-npm run check:bundle   # build invariants; run after every build
-npm run dailies        # regenerate the pre-baked daily scrambles
-npm run pool           # regenerate the in-bundle startup scramble pool
+npm install
+cp .env.example .env.local     # fill in Clerk + Supabase, or leave blank
+npm run dev                    # http://localhost:3000
 ```
 
-End-to-end checks need a running server and drive a real browser:
+**It runs with no credentials at all.** Solving, the daily, progress analysis and
+the trainer are entirely local — `localStorage` is the source of truth and the app
+works offline. Accounts, ranked, leaderboards and profiles need Clerk and Supabase;
+without them those pages say so plainly instead of breaking.
+
+To enable them, apply [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql)
+to a fresh Supabase project and fill in `.env.local`.
+
+## How it is tested
+
+Four layers, because each one catches a class the others cannot. Every bug listed
+in the commit history was caught by exactly one of them.
+
+| | | |
+|---|---|---|
+| `npm test` | 192 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 4 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk sign-up driving a ranked solve end to end. |
+| `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
+| `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
+
+The e2e suite exists because of one specific failure mode: an anonymous request
+gets a 401 whether authentication works or is missing entirely. A suite that only
+poked the API signed out would have passed while ranked was completely dead — which
+it was, for a while, for two unrelated reasons. See the commit history.
 
 ```bash
 npm run build && npx next start -p 3210
-BASE=http://localhost:3210 python3 e2e/timer.py
+BASE=http://localhost:3210 npm run e2e
 ```
 
-Run e2e against a **production** build before deploying, not just dev — the scramble
-generator is a WASM worker and the two bundlers resolve it differently.
+Run e2e against a **production** build, not dev — the scramble generator is a WASM
+worker and the two bundlers resolve it differently.
+
+## Stack
+
+Next.js 16 · React 19 · TypeScript · Tailwind 4 · Clerk · Supabase (Postgres) ·
+[cubing.js](https://js.cubing.net) for scrambles, cube state and rendering.
 
 ## Build gotcha: Turbopack hangs on cubing.js
 

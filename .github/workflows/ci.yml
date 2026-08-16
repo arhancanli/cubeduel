@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to the same branch makes the first run irrelevant.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: typecheck · lint · tests · build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Matches the production runtime.
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # Route and page prop types are generated, not committed, so a new route
+      # fails typecheck until this has run.
+      - name: Generate route types
+        run: npx next typegen
+
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          # The build must not need real credentials. Every database-backed page
+          # degrades to an honest "not configured" state without them, and this
+          # job is what keeps that true — if a page ever starts requiring a key
+          # at build time, it breaks here rather than in production.
+          #
+          # The publishable key must still PARSE — Clerk base64-decodes its
+          # frontend API host out of it — so this is a well-formed key for a
+          # domain that does not exist, not an arbitrary string.
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk
+          CLERK_SECRET_KEY: sk_test_ciplaceholderciplaceholderciplaceholder
+
+      # Two invariants that fail silently in the app itself:
+      #   - future daily scrambles must NOT reach the client bundle
+      #   - the startup scramble pool MUST reach it
+      - name: Bundle invariants
+        run: npm run check:bundle
