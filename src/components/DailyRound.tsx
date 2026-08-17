@@ -49,9 +49,18 @@ interface Props {
   scramble: string | null;
   /** Optimal cross length for the easiest face, precomputed at build time. */
   crossMoves: number | null;
+  /** Shortest solution the engine found. Null when it could not be computed. */
+  optimalMoves: number | null;
 }
 
-export function DailyRound({ dayKey, dayNumber, startKey, scramble, crossMoves }: Props) {
+export function DailyRound({
+  dayKey,
+  dayNumber,
+  startKey,
+  scramble,
+  crossMoves,
+  optimalMoves,
+}: Props) {
   const [stage, setStage] = useState<Stage>("loading");
   const [entry, setEntry] = useState<DailyEntry | null>(null);
   const [copied, setCopied] = useState(false);
@@ -293,6 +302,18 @@ export function DailyRound({ dayKey, dayNumber, startKey, scramble, crossMoves }
               Today&apos;s cross is{" "}
               <span className="text-muted">{crossDifficultyLabel(crossMoves)}</span> —{" "}
               {crossMoves} moves on the easiest face.
+            </p>
+          ) : null}
+          {/*
+            How short today's cube can be solved, from this app's own engine.
+            It gives nothing away — a length is not a solution — and it is the
+            only number here that describes the puzzle rather than the player.
+          */}
+          {optimalMoves !== null ? (
+            <p className="text-xs text-muted-dim">
+              The whole cube can be solved in{" "}
+              <span className="text-muted">{optimalMoves} moves</span>. A human
+              method takes three or four times that.
             </p>
           ) : null}
           <Countdown remaining={remaining} />

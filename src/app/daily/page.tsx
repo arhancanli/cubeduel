@@ -34,6 +34,14 @@ export default function DailyPage() {
   const difficulty = (dailies as { difficulty?: Record<string, { cross: number; faces: string[] }> })
     .difficulty?.[dayKey];
 
+  // Read, not computed. Solving it here cost five and a half seconds on a cold
+  // load, because the first visitor of the day paid for the pruning tables and
+  // the search. The dailies are pre-generated so that nothing has to be worked
+  // out at request time, and this belongs in the same file for the same reason —
+  // see `npm run dailies:annotate`.
+  const optimal = (dailies as { optimal?: Record<string, number> }).optimal;
+  const optimalMoves = optimal?.[dayKey] ?? null;
+
   return (
     <DailyRound
       dayKey={dayKey}
@@ -41,6 +49,7 @@ export default function DailyPage() {
       startKey={dailies.start}
       scramble={scrambles[dayKey] ?? null}
       crossMoves={difficulty?.cross ?? null}
+      optimalMoves={optimalMoves}
     />
   );
 }

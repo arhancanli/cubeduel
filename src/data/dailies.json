@@ -1,1 +1,3641 @@
-{"event":"333","start":"2026-08-11","days":400,"scrambles":{"2026-08-11":"F2 U2 B' L2 B' R2 F' U2 F2 R2 U2 F R' D' L F R B' F2 R2 D'","2026-08-12":"F2 L D2 B2 L' B2 R' B2 F2 L' D2 R' D' B L' D2 U B' U2","2026-08-13":"L2 D2 R2 D' F2 D B2 F2 R2 U' F2 U' B R2 D R U R B D","2026-08-14":"U2 F2 R' F' B R U' R' D R' F2 D' L2 F2 U' R2 F2 R2 F2 B2 D","2026-08-15":"L F D2 R' F' B' R2 L2 U D2 B2 R2 B R2 L2 F' D2 F R2 U2 R2","2026-08-16":"F' U B2 R' D F' L' F2 L U D2 R2 F U2 R2 F L2 U2 L2 U2 B","2026-08-17":"D2 F2 R F' U D2 B R D2 B F2 R2 L2 D B2 D2 R2 U' B2 D' R2","2026-08-18":"U2 D2 F' D' B D B U2 R' B2 R2 B2 U R2 F2 U D R2 D' L2","2026-08-19":"R F L F U' F D R2 F R2 U2 B2 L2 D' F2 D' F2 U2 B2 D' B2","2026-08-20":"L2 U2 R' D2 R B2 L B2 R2 F2 D2 B2 D R2 F U' R F' U B2","2026-08-21":"B' R B2 F2 R B2 F2 D2 L2 B2 R F2 R B' U L2 F2 D F2 R U","2026-08-22":"F2 U2 B2 R L2 U' L' F' U F' U2 R2 B U2 R2 B U2 L2 U2 D2 B'","2026-08-23":"B L2 U L2 F D' R' D2 F' D2 B2 U F2 B2 U D2 L2 U R2 D L'","2026-08-24":"D2 F R U2 B R L' B D L2 U' L2 B2 D' F2 R2 U2 B2 L2 U2 L","2026-08-25":"L' D' F2 D' B' U2 L D' B U L2 F2 U' L2 U' B2 L2 U' B2 U L'","2026-08-26":"L2 F2 R' B' R2 L' B U2 F2 U2 D' F2 B2 R2 D R2 D B2 D2 R B'","2026-08-27":"F' R2 U' F U' F2 L U D' F2 R U2 R' B2 L2 U2 B2 L B2 R B2","2026-08-28":"R' L B' R L D R2 U R D' B2 U R2 U' R2 U2 L2 D' R2 U2","2026-08-29":"U2 L' F' U' L2 D' F2 D L F' U2 B2 U2 R2 L2 F2 L2 D' B2 U'","2026-08-30":"R U F2 R' B L D F D B2 R2 F2 R2 U' F2 R2 L2 D B2 U' B","2026-08-31":"L2 F' B2 U L2 R2 F2 U2 R2 D R2 D' F2 U2 R' F L' R2 B' L' U2","2026-09-01":"U2 R' D L2 D2 L F D L2 D2 F' D2 R2 B2 U2 F' R2 L2 U'","2026-09-02":"B D F2 D2 R' F D F U L2 F2 U F2 R2 D B2 L2 U2 D' L' D2","2026-09-03":"U2 L2 U2 L2 F U2 L2 B R2 U2 R2 B' R' U B R D' L' D' F'","2026-09-04":"D2 R D' L' B U L B' U2 F2 U' L2 B2 D B2 U2 D F2 U' F2 B'","2026-09-05":"R B D R' U R2 B' R L F2 D2 L2 F2 D2 L' D2 L U2 R' F R2","2026-09-06":"L F L D' B D2 F2 L2 U L' F2 R2 F2 R2 U F2 U D2 F2 U' R2","2026-09-07":"R U2 F2 U' B2 U2 R2 B2 F2 D R2 D B2 L' B L' B2 F' D L'","2026-09-08":"F U2 R2 U' B2 L' F L' R2 F R2 L2 F D2 R2 F B D2 B' R2","2026-09-09":"R' D' L2 R2 D B2 L2 D F2 U2 R2 F2 U L' F2 R' B' D2 F' L' D2","2026-09-10":"D2 L' B2 U D2 L B' R2 U B2 D B2 L2 U' B2 U R2 U L2 F' U'","2026-09-11":"U L B' U L U2 R2 F U L2 U D R2 F2 U2 R2 B2 D' B2 U' L","2026-09-12":"R' D F R' D' R B2 D L B2 D F2 R2 L2 D' B2 D' L2 F2 D2 B'","2026-09-13":"B2 L2 U' F2 R2 D U2 R2 F2 D F2 U F' U B2 U B' L R F'","2026-09-14":"U' B2 F2 R' D2 F2 L2 B2 L2 U2 R' U2 R2 F' L' B' R2 U B D2 L","2026-09-15":"L2 D B2 R2 D2 F2 L2 F2 U R2 D2 L2 F L2 D' F L' F' U R'","2026-09-16":"U2 L U2 R' F2 L R2 B2 L2 D2 B2 U2 D B' R' D2 L B D U' F2","2026-09-17":"F' R F2 D2 L U B2 D L2 D2 F L2 F2 B U2 F' D2 R2 F2 U2","2026-09-18":"L' U' R U' B' R' B D' L U2 F' L2 D2 F' U2 R2 L2 F' D2 B2","2026-09-19":"F2 D2 B2 L2 R2 U L2 B2 U' B2 U B2 L F2 R2 F' L2 U' F' R' U2","2026-09-20":"R2 U F L B' R' F2 L F2 R2 B' U2 R2 U2 R2 L2 F2 L2 F' U2","2026-09-21":"U D' R2 B2 L U' R F R2 D' L2 B' R2 U2 B2 U2 R2 F R2 L2 F'","2026-09-22":"R F R' D L' B' U' D2 L U2 B2 U2 D' L2 D F2 D2 B2 R2 U F2","2026-09-23":"D2 F R U' B R2 D' F' L' B2 D L2 D' B2 U' R2 U2 L2 F2 L2 F2","2026-09-24":"D' L2 D' L' D2 F D' R' U F2 R2 D2 F' D2 L2 B' U2 D2 F R2","2026-09-25":"L' F L2 F R2 U2 F R2 F' U2 F D2 F R' B D B U2 F L U'","2026-09-26":"D2 R2 F2 D2 R2 U L2 U' F2 L2 R2 D2 F U F' R' D B' D' U' B2","2026-09-27":"R U2 L' F2 U R2 F' U D L U2 R U2 R2 U2 B2 L D2 B2 R2 D2","2026-09-28":"R' F2 R' D' R' D2 F' U2 L2 U2 D B2 U' B2 R2 U' R2 B2 F' L F2","2026-09-29":"U2 R' B R' D B' R B2 D' B2 R2 L2 F U2 D2 F' D2 L2 F' R2 B'","2026-09-30":"D B2 U B2 D R2 B2 U2 R2 U R2 D F' U R D2 U B L' D2 U2","2026-10-01":"R2 F' R2 U2 L' D' F R U' R' B2 L' F2 R B2 R U2 F2 L2 B2 R","2026-10-02":"F2 D2 R2 B2 D2 R2 F2 U F2 U R2 B2 F L B2 R' D2 B' R U' F","2026-10-03":"B2 U B U2 L B' L' U F' L2 D2 B L2 F D2 B R2 D2 F2 D2 L","2026-10-04":"R2 F2 U' B2 L F2 D F2 R2 B' D2 R2 B' D2 F L2 U2 B' L'","2026-10-05":"R' L F' B' U R F' D B' D2 R2 F' U2 F D2 F2 L2 U2 L2 B' L","2026-10-06":"R2 B U D2 R' D' R D' L F' R U2 F2 U F2 B2 U2 F2 D L2 U'","2026-10-07":"F' R2 U2 F L2 B2 L2 U2 B' D2 L2 F2 U R2 B' F' R U2 L F2","2026-10-08":"D2 U2 B2 L' R' D2 L' F2 L2 U2 B2 R' D' R2 B' U' F U2 F L R'","2026-10-09":"F2 U2 B' D2 F2 D2 B' R2 D2 F' D2 F D L F D2 F2 R2 U' L D2","2026-10-10":"R D R B' U F' D2 R' B2 D R2 L2 U R2 L2 B2 D F2 U F2 R","2026-10-11":"F' D F2 D' L2 U B2 U F2 L2 D2 R2 U L' B' R' U2 F' L D U2","2026-10-12":"R U D2 L2 B' L' U' F L2 B U2 F2 L2 D2 F2 L2 D2 F U' R2 D","2026-10-13":"D R' U2 L' D R F' L B R' B2 U2 L2 B2 D' B2 U' B2 D2 F2","2026-10-14":"F D' R2 B2 R U2 R2 U2 B2 D2 F2 R U2 R F' L B' D L R U2","2026-10-15":"R' F' L U' F' D2 B' U L B D2 L2 F2 B U2 L2 D2 L2 F D2 R2","2026-10-16":"F' B U' B' R F' R' F' U D2 R2 B2 D' L2 B2 U B2 U R2 L2","2026-10-17":"U2 B' U2 F2 B2 D' R U F2 B2 D R2 B2 U2 D R2 U' R2 L F","2026-10-18":"L2 D2 R B' D F2 R D2 B U2 L2 B2 D' L2 B2 D B2 R2 B2 R2","2026-10-19":"R2 B2 F2 R' F2 L2 D2 B2 D2 B2 L' D2 F' D B L' D2 U L R2 B'","2026-10-20":"U2 L2 D' R B' U L' U' R2 F R2 L2 U2 F' D2 R2 B R2 F2 D' B'","2026-10-21":"U' B F2 U2 L B2 L' B2 F2 R' D2 R U2 B2 U' R2 F2 R' B F2 L'","2026-10-22":"F' R F' U2 F' R U' L' F' U2 R2 U2 R2 B2 D' B2 U L2 U' L2 D'","2026-10-23":"F B R' D B D' F' L R2 B R2 D2 F' L2 D2 B U2 B2 U2 F' U","2026-10-24":"B' L' U2 B2 U D R' L' D' R U2 F' U2 F2 B' D2 B' L2 F' D2","2026-10-25":"L D F' B2 R2 D' F' R B' U' D2 L2 F2 B2 D' B2 U F2 U' F2 R2","2026-10-26":"B2 U2 R' B' R B' D2 B' R D' F2 B2 L2 U L2 B2 D F2 U B2 U2","2026-10-27":"R' B' D' F U' B L2 U R' F' U B2 U2 F2 R2 D' B2 R2 U L2","2026-10-28":"B' U R2 U L2 U2 F2 L2 F2 U2 B2 U' L2 F' D' F2 U F' R D' U2","2026-10-29":"B2 L' U' L F L U R2 F U2 L2 U' B2 R2 U' R2 F2 R2 F2 D","2026-10-30":"L D' R2 B U' R F' D' L2 U B2 U' F2 D2 R2 F2 D' F2 D2 L U'","2026-10-31":"F2 L' D' R F L2 F' U B U' B2 L2 D' F2 D2 B2 R2 D' L2 U B2","2026-11-01":"F' R2 D' B L' F' R L' F' R2 F R2 L2 U2 B' D2 L2 F2 L2 F R'","2026-11-02":"R B2 R2 F2 R2 D2 F2 U' B2 D L2 F2 D R' B F' L' D R2 F L","2026-11-03":"F2 D' F' U2 B R2 B' R2 D2 L2 D2 F' L2 R' U' F' L B L2 D'","2026-11-04":"U2 R B' U' F2 L U D F2 R2 F2 R2 U2 F' U2 D2 F' R2 U2","2026-11-05":"B2 U B2 U' L2 D2 B2 R2 F2 D' R2 U2 L' B R' F' R' B' R' D R","2026-11-06":"U R D B' D' B' R D2 R2 L2 F2 B2 U' L2 F2 D L2 B2 F","2026-11-07":"R B2 L' D' B R2 U2 F' L R2 D2 L2 D2 F L2 B2 U2 B' D2 L2 B'","2026-11-08":"F' L2 D R' U D' B L' U2 D2 B2 D2 F' R2 F L2 B' U2 B U L","2026-11-09":"B' L' F2 U F R F D' B D2 B2 U R2 L2 D F2 B2 L2 F2 U'","2026-11-10":"D B L' U' F2 U' B U R F2 U L2 U' B2 D' B2 R2 U' D2 L2 U","2026-11-11":"B2 D2 R2 L' U2 D' F' U B2 L2 F2 B2 D B2 D2 F2 R2 U2 D' R U2","2026-11-12":"L2 U2 B' U2 F L2 B' U2 L2 B F2 R2 D B L' U' B' U2 F' D' R","2026-11-13":"U' F U2 F R' F' D2 L' U' B D2 R2 U F2 D' B2 D F2 U' R2 D","2026-11-14":"D R' F' U' D' L' B R B' U B2 U' B2 U2 B2 R2 D R2 F2 U' B'","2026-11-15":"U' F' U2 D2 F2 L' F D B2 R2 D' F2 D B2 U' F2 U' L2 F U2 R'","2026-11-16":"L B2 R' D2 U2 F2 U2 R2 D2 L F2 R D' B' F' L2 F2 D R' U L'","2026-11-17":"F L' F2 B R F' L F U R F2 U2 D2 R' D2 F2 D2 L2 B2 L","2026-11-18":"B2 R' F D B' R D F D R B2 R B2 R F2 R2 U2 F2 R' F2 D2","2026-11-19":"U F L U2 D' B U B2 L' B L2 F2 B2 U R2 B2 R2 F2 D F2 U2","2026-11-20":"F' U' L2 B' U F2 B2 R' L2 U' L2 D' L2 D2 R2 F2 D' F2 L'","2026-11-21":"R2 D2 B U2 R2 B2 D2 F' L2 B' L2 B U' L' F D B' D U B","2026-11-22":"U' D' F2 B' R' D L' B R F R2 F U2 L2 F' D2 B2 R2 U2 B'","2026-11-23":"B2 L2 B R2 F L2 B D2 B2 L2 D B' L' U' B2 R D' U F","2026-11-24":"B U D' L' U' B L' D R B2 D2 L' U2 R2 L U2 L' U2","2026-11-25":"B L2 F2 B R' U F B2 L' F2 U2 L2 D' F2 U' R2 D2 L2 F2 D2 L2","2026-11-26":"F2 R2 B' D2 F R2 B' U2 F R2 U2 F2 R D' R D2 L B L U'","2026-11-27":"U B' U2 F D2 R' F2 U D2 B' U2 F2 D R2 D2 L2 B2 U B2 D' R2","2026-11-28":"B2 L F2 L D2 B2 L D2 L B2 F2 L B' U' R B2 F2 U' F D' L2","2026-11-29":"R2 F U2 F' U2 R2 B' L2 D2 F' U2 F R' F L' U F2 U2 L R' D","2026-11-30":"B R' B2 D L2 F' D2 L U' D2 B2 L B2 U2 F2 U2 L' D2 L U2 L2","2026-12-01":"D' F2 U' F2 R2 U' R2 D' L2 U R2 U2 F' L B' L R F2 U2 B L2","2026-12-02":"B' D2 B2 F2 L F2 R F2 R2 D2 R U2 L' D B L2 U R2 D2 R'","2026-12-03":"L' F2 U R2 L2 D2 F' R B F2 U F2 U F2 B2 U B2 L2 D' F'","2026-12-04":"F U2 L B L D F' U F' R L2 F2 U2 B2 D' L2 D L2 D' L2 D","2026-12-05":"D R' L2 F' R2 B D' R2 B' L D2 F2 U B2 L2 U' L2 B2 U2 R2 F2","2026-12-06":"L' D' F2 D2 B' R B' L2 F2 D' F R2 F B U2 R2 B2 L2 B2 D2 L2","2026-12-07":"D B2 U R' U2 D2 F B2 U' L2 D' L2 B2 U F2 D L2 U2 L B D2","2026-12-08":"F' D2 U2 L2 B D2 L2 F2 U2 F L2 F2 R' D L F' R' U2 B'","2026-12-09":"R2 U2 F' U2 L2 F' U2 R2 F' D2 F R2 U R F' L' B' F D' R' B'","2026-12-10":"D2 B F2 U2 L2 F2 L' U2 R B2 R' U2 B2 R2 D' F' D' R' U L R'","2026-12-11":"B2 R D L2 D' B L U2 D2 F' U2 B2 R2 L2 B L2 U2 F' L' F","2026-12-12":"R U B' R' L' U' F B' U F2 U2 L2 U B2 D2 F2 D B2 D' B D2","2026-12-13":"R2 U2 R2 F' U2 F' L2 B D2 L2 U2 F' L' F L2 U F2 L2 U' L'","2026-12-14":"L' U2 R' B2 R' F2 R' D2 F2 D2 U2 R' D R' F2 U2 B' L U' R2 U","2026-12-15":"L B R2 U R L2 U R' U L2 U D2 B2 U' F2 B2 U' F2 R2 D' B","2026-12-16":"R B2 L2 U2 D' F R' F2 D R2 D2 B2 R2 U2 R U2 L F2 R L2 U2","2026-12-17":"U D B' U' L D B R2 B2 L2 U R2 D2 L2 D R2 U B2 U B' R","2026-12-18":"L2 D2 R F2 R U2 F2 L' R F2 U B' D' F L2 D' F2 L D","2026-12-19":"F2 L B2 D2 L2 R D2 B2 D2 F2 R' F2 B' R2 D' B' D R2 U' L","2026-12-20":"F2 U' F2 D L2 U' R2 F2 U' F2 D2 R2 F' R' D' L2 B D' F' D","2026-12-21":"F R2 F' U L' B U2 F D U2 F' L2 D2 R2 L2 F R2 U2 F U2 L2","2026-12-22":"F' R' L' B2 L' D F L F2 L2 F D2 B2 R2 U2 B2 R2 D2 B U B","2026-12-23":"U2 R2 D' L2 B2 D2 L2 D2 L' F2 D2 L' F2 L2 B D2 B D' R' F L'","2026-12-24":"U L' F2 U' F U' D B2 R2 F' U2 B' L2 B R2 B U2 F U2 R' F'","2026-12-25":"R' L' D' B2 U2 L' B' U D' F2 U R2 F2 L2 D' R2 B2 U R2 F U2","2026-12-26":"D L B2 D' F R' B' U' F2 D R2 F2 D2 F2 D F2 U' F2 R' B2 R'","2026-12-27":"R D2 L U2 L F L R2 D' R2 D2 R2 F2 D2 F2 U F2 R2 U' B'","2026-12-28":"R' F2 D' B2 L' D2 F' D2 F2 R' D2 F2 R L2 F2 L D2 L' D","2026-12-29":"R2 L D' L F' U' D' L2 F R2 U2 L2 U F2 U R2 U L2 U2 R2 U'","2026-12-30":"L' D' R' F U L' B F2 R F2 D2 B2 R D2 R' U2 R' F2 R B U'","2026-12-31":"L' F' R B' L F2 R U' L U2 R2 L2 D' F2 U2 B2 R2 U' R2 U2 R2","2027-01-01":"F D2 F2 D2 F' R2 F' U2 L2 D2 L2 F2 D' L' U' R' D2 B D R U2","2027-01-02":"L' U2 D F L U F2 B' L2 D' B2 D L2 D L2 F2 D L2 D' R2 L","2027-01-03":"F' L B U2 D' L U' F2 R B2 D2 L F2 R B2 R2 B2 R D2","2027-01-04":"R F' D R U' L' D' B R' F2 U B2 R2 U' B2 L2 D2 F2 L2 D L2","2027-01-05":"B2 D2 F2 U' F2 R2 U L2 D R2 F2 D L B2 D' L D2 L' B L2 F","2027-01-06":"D' B D2 F D B' U2 R F' L' F2 B2 R' U2 L2 U2 L' D2 B2 R' D2","2027-01-07":"R' B' U B R D L D2 B' U2 R2 D F2 L2 D' L2 U' B2 D F2 U'","2027-01-08":"B' R F2 D2 L2 R' U2 B2 L' U2 B2 R' D' F' R B R D U","2027-01-09":"U' L2 U F L2 U' B D R U2 B2 U2 L2 B2 U B2 U R2 D F2 L2","2027-01-10":"F' D R' D' L' F2 U B' L2 U' D' L2 B2 R2 B2 D B2 R2 D' R F'","2027-01-11":"L' B' U' R B' R2 B2 L U F2 R2 D R2 B2 U' R2 U L2 B2 U'","2027-01-12":"R' F U2 B U2 L' B D U2 B' U2 L2 B' D2 R2 B U2 R2 B2 L2 D","2027-01-13":"B D2 L' F' U' L' D' L B2 R' U2 B2 L D2 F2 B2 R2 B2 R' D L","2027-01-14":"F D2 B R U' L2 U' B2 U2 R' B2 D2 L2 B2 L' D2 F2 B2 L' U","2027-01-15":"R F' R' F2 U B2 D R B2 U R2 B2 U' F2 U D R2 U L2 U' F","2027-01-16":"D2 F2 L R2 F2 L R U2 R' B2 R' F' D' F2 U2 L2 R D B' F","2027-01-17":"F' D2 F2 R' D B' L' B' U2 B2 L2 U2 R2 U' L2 B2 U L2 U' F'","2027-01-18":"U2 R2 F D' R' F L2 D R' U F2 B2 L2 U2 B2 D' F2 D L2 D2 L2","2027-01-19":"B2 R2 L' U2 D' L F' U2 F R2 L' F2 B2 L' B2 D2 F2 D2 R2 D2 B2","2027-01-20":"L' F D2 B' R D R2 U' L2 F B2 L2 B R2 F' U2 R2 L2 B D2","2027-01-21":"F2 R' F D R2 D R' F' U2 R L2 U2 F2 R B2 R2 B2 U2 L' F2","2027-01-22":"R' U2 B2 F D2 B' L2 R2 U2 F' L2 U2 F' U B R2 U F2 R' F' U'","2027-01-23":"B2 L' B2 D2 F2 L2 B2 L R2 U2 L' R2 B' D' B U' B' U' L U' B","2027-01-24":"L2 B' U' B2 L U R U2 R2 B2 D R2 U B2 L2 F2 U2 F' D' L' F2","2027-01-25":"D2 R U' B' D' R2 B' D2 F' B2 R' U2 B2 R U2 D2 R F2 R U2","2027-01-26":"B R2 U' B D2 R' U2 B F2 D2 F2 R2 F2 L D2 B2 D2 L2 D2 R2 D","2027-01-27":"D R2 D F D' R U' D F' L' D' B2 U L2 U' F2 B2 R2 U F2","2027-01-28":"U D2 B2 R2 F U2 F R2 B' R2 B' L2 U2 R' B' U2 F' D' U' B D2","2027-01-29":"R F2 D B' R2 D R2 F' R B2 D2 R2 F2 B2 D' F2 U' L2 D' F2","2027-01-30":"D2 F R2 B D2 F' R2 B' U2 L2 R2 F2 D L' R D2 F' D U' F' D2","2027-01-31":"L2 B' F2 L2 R2 U' L2 F2 L2 D U R2 U' F2 L' F L' U F2 R' F'","2027-02-01":"U2 B U' L F D' R' B2 U F2 R' U2 D2 L' U2 B2 L2 F2 L B2","2027-02-02":"L2 U R U R2 L' D' F U2 F' L2 B2 U2 F2 B' R2 U2 F R2 L U'","2027-02-03":"R' F D R B' L2 U' F' L2 U F2 U2 L2 F2 B2 U L2 U' R2 F' R","2027-02-04":"U' R' U2 B L' F B2 U' D2 R' U2 F2 D' R2 D' R2 U B2 D B2 R2","2027-02-05":"D2 F' R' B D' F B2 L F D2 B D2 F' L2 B2 R2 D2 B2 D2 R'","2027-02-06":"D L2 B2 D F2 U F2 U B2 D2 R2 B2 R' D L' R2 F' U2 R B F'","2027-02-07":"R D' F B' D B' R2 F D R U2 B2 R2 B2 L' F2 U2 B2 L' D2 F","2027-02-08":"R B U2 L2 D2 F2 L' U' B' L2 F' U2 F' U2 L2 B2 D2 F U2 B D'","2027-02-09":"U2 F2 L2 F' R2 D2 L2 R2 B F2 R2 L' D2 R F2 D L' R2 B F'","2027-02-10":"L2 B2 R U' R2 F' D F R2 F2 D2 F2 U2 F2 R2 B R2 B2 D2","2027-02-11":"L' U2 R B' U F L' R2 F L2 U2 D2 B' R2 B U2 B R2 F' U' F'","2027-02-12":"R2 D' L2 B2 D F2 D U2 L2 U F2 R2 L' D B2 D B L2 B' D'","2027-02-13":"F R' U2 L2 U L' B D F' U' B2 U B2 R2 U R2 U2 B2 D R2 F2","2027-02-14":"D B' U' B R2 L B D' F L2 B2 D' R2 F2 D R2 U L2 B2 D2 L2","2027-02-15":"U' R L' U L D F' U R2 U' D2 L2 U' L2 F2 R2 U F2 L' U2 F'","2027-02-16":"F2 D2 F2 D2 L' D2 L' U2 R2 B2 D2 F2 B' D2 L D' B' R2 U'","2027-02-17":"U' F U' D B D R U' B R2 F2 R2 F' L2 B' D2 F U2 B' U2","2027-02-18":"R B2 L D' F' B D R U' L F2 D2 L2 U D2 R2 B2 D B2 U' R2","2027-02-19":"F2 R2 D2 B2 D2 R2 F2 L2 R D F U L2 R U' F' R U'","2027-02-20":"D2 B2 U' R2 L' U' F D' F2 R2 L2 B' L2 F2 U2 L2 U2 B' L2 D' R'","2027-02-21":"B R D L' U L2 U2 D R F' U2 F' U2 R2 F L2 U2 F' R2 B2 L","2027-02-22":"U' B' D' R F' R F' R B2 D' L2 B2 L2 B2 U F2 U R2 D R' F","2027-02-23":"U R' D2 L2 B' L2 U' B D F R F2 R' U2 L' B2 R' B2 D2 F2","2027-02-24":"B' R2 D2 B2 U2 B' L2 U2 B' R2 D2 R2 D' R2 U L D' L F D","2027-02-25":"U2 L2 F' R2 L' F2 R B2 U L2 F2 L' B2 L D2 B2 R U2 B2 R2 F2","2027-02-26":"B' U2 B2 R F' D L2 D R2 L2 D2 F' U2 B' L2 B U2 R2 L2 B2 R'","2027-02-27":"D' R D' L2 U2 F R' D B U' R2 L2 F2 R2 L2 F2 U F2 U2 B2 R2","2027-02-28":"B2 U2 D' B' U' F2 B2 L' U' R2 F2 B2 R2 U2 F2 R U2 D2 L' U2 F'","2027-03-01":"B D' B R2 L F' R U B U2 F2 U R2 F2 L2 B2 U' D' F2 L2 D2","2027-03-02":"B D' R2 D2 B R L2 U' L' U R2 U2 F2 D2 B2 U2 F2 R2 U' B2 U2","2027-03-03":"U2 B U' R' L D' L' B' U F2 R2 U F2 D2 R2 B2 U L2 U L","2027-03-04":"B D F2 U L2 B2 D2 B2 R2 F2 U' F2 L' U R2 D U' R' F U","2027-03-05":"R' D2 F' L2 B R' B' F2 L2 D' L2 U R2 D L2 U' F2 D B D B2","2027-03-06":"U' D R' U R' D L D B' U' F2 D B2 U' F2 U F2 U2 F2","2027-03-07":"F2 R2 U2 F' L2 B D2 B2 F' R2 U' R' B D L' U' L U2 B'","2027-03-08":"F2 D2 L2 R2 F D2 B' R2 B R2 U2 R' B' U R' B' D2 B2 L","2027-03-09":"R2 F2 R' U R D' B' D F2 U' R2 D' L2 U L2 B2 D2 L F R2 U'","2027-03-10":"F2 L R2 D2 B' R2 F2 U2 L2 F2 D2 B L2 R' B2 U L R2 B' D' L","2027-03-11":"R D' L' D F2 L' B D B2 U F2 B2 U2 B2 D' F2 L2 U' R2 L U'","2027-03-12":"U F2 D2 R L2 U L' D' F U2 F2 L' D2 L B2 D2 R' B2 U2 L2 U2","2027-03-13":"D R' F' D2 B' F U2 L2 F' L2 R2 D' B' R' F2 L2 F D'","2027-03-14":"U R U' F' D F' U2 L' D R F' D2 R2 F' L2 F2 L2 F' U2 F R2","2027-03-15":"U F' D2 L F2 U F' B2 R2 U R2 U D2 B2 D L2 U' F2 U L' D'","2027-03-16":"B2 F2 R2 B2 U F2 U' B2 U F2 U2 B D' L' U' B' F' D' U R'","2027-03-17":"U2 F' U2 R' L' U2 D2 F U L2 F2 B2 U2 B2 L2 B2 R D2 R U2 F2","2027-03-18":"R' B2 L D2 L2 B2 F2 L F2 D2 L U2 B L2 R F' U L' R D' L","2027-03-19":"U B2 R2 B2 U' L2 R2 B2 D' B2 U' R D L2 B' D L' U' F D' R'","2027-03-20":"L2 F' D' R' B' U L' D L' F2 B R2 B R2 U2 F' D2 L2 F U2 B","2027-03-21":"F' U2 R' B2 D2 L' D2 B2 L2 D2 B2 R' F2 D' R F2 L B' F' U' R2","2027-03-22":"U2 D R D F2 U R2 F' B D' F2 L B2 D2 R' U2 R' D2 R U2 R","2027-03-23":"B' U R' F' U2 L U2 D B U F2 U' L2 D2 F2 D' F2 R2 L2 U'","2027-03-24":"L2 D' F2 R' L B' D F R U2 F2 R2 U F2 U' R2 D F2 D2 R2 B2","2027-03-25":"R U' F D' F2 B2 R D2 F L2 F D2 B' L2 B' D2 F L2 R F","2027-03-26":"D2 R D2 L' U2 F2 U2 R' F2 R2 D2 L U B' R2 D U R2 U2 L' B'","2027-03-27":"F' L2 R2 D2 R2 D' L2 U' R2 U R2 B L R B' U2 B' L F'","2027-03-28":"U' L B2 U R D2 L2 F' L' F2 R2 F' R2 B R2 B' D2 L2 D2 L2 B'","2027-03-29":"D2 B' L' F' B' D2 R' L' D B F2 R2 D R2 U B2 R2 U2 L2 U2","2027-03-30":"B2 D' L2 U2 B2 U2 F' U R' U R2 D2 F2 U F2 B2 D' L2 U' R2 F2","2027-03-31":"R' L2 B' U B2 L2 F' L2 U2 D2 L D2 F2 R F2 R2 D2 B2 D F2 U","2027-04-01":"R' B R' D F2 B U' B' D' L' U L2 U' R2 L2 U2 F2 R2 L2 D2 B2","2027-04-02":"F2 U2 D F' D' R' B L' D' L' F2 R U2 F2 D2 F2 R D2 F2 R' U2","2027-04-03":"L' U' R2 B2 U' L2 U R2 B2 U' B2 D2 B2 L U' F R2 B' F U'","2027-04-04":"F2 U' R L2 D' B2 R F U' B R L B2 R B2 D2 R F2 D2 F2 R2","2027-04-05":"L B2 L2 B' U R' D L F' U2 F2 D2 L2 B2 L D2 F2 U2 B2 R' F2","2027-04-06":"R2 B D2 F' D' R2 F U D2 B2 R' B2 D2 R L2 D2 L' U2 F2 R F","2027-04-07":"F' L2 U' F' U2 D' B2 R D' F' R2 D2 B R2 L2 B2 L2 F L2 B U2","2027-04-08":"R2 D F2 D2 L U F D' R D2 R2 U2 D2 B2 R2 F' L2 U2 F R2 D2","2027-04-09":"F' B2 R' U' L D' B L2 U L2 D' L2 U D2 F2 B2 D' R2 B U2","2027-04-10":"U2 B' F2 D B2 D B2 F2 U' L2 U2 L2 U' R' F' L B F' U L2 F'","2027-04-11":"F' B' L2 D L2 D' F' B2 L U2 L B2 U2 R F2 L B2 U2 R' F R","2027-04-12":"U R2 D B' R2 B L B' U' F2 L2 U' F2 D B2 D B2 U' B2 R2 B","2027-04-13":"R D B' U' D L D B' R D2 L' B2 U2 B2 R2 B2 R2 L' D2 F2","2027-04-14":"D' F R2 D2 B U' R' L2 D F2 L' F2 L2 D2 B2 R F2 R F2","2027-04-15":"U R2 F2 R2 F' D' F2 D' R' B D2 B D2 F' L2 F U2 D2 F U2 B'","2027-04-16":"U R' F' B2 D B' D' R' L2 U' F2 R2 U2 L2 U' R2 U' B2 R2 D'","2027-04-17":"U' D' F2 B R B' R D' R' F2 U2 R2 L B2 D2 B2 D2 R' D2","2027-04-18":"D' F2 U' L2 U' L2 U' R2 D' F2 U L2 R D R' B' D' R U2 F","2027-04-19":"R' L' U' F' U2 L' U2 D B' R2 D2 L F2 D2 L F2 L U2 R F2 R","2027-04-20":"R' U B2 U' B2 R2 U F2 U B2 F2 L2 F2 L D' F U2 B' D F U'","2027-04-21":"F D2 F U' L D' R2 B' U' R2 B R2 D2 F U2 R2 F' R2 B R2 F'","2027-04-22":"U2 L U2 L' F2 R D2 B2 D2 F2 L2 R' B R2 D2 R' F' L' D R B2","2027-04-23":"R' D F2 D R' B2 R B R' F' U' F2 D' L2 U B2 L2 U2 R2 D' R2","2027-04-24":"R' U B2 F2 U F2 R2 D2 F2 R2 U2 R2 F' D' L' B' F' L R","2027-04-25":"B2 L B D F B2 D L' B U' R2 D' L2 U' R2 L2 B2 U2 D F2 L2","2027-04-26":"B2 L' D R F' B' U2 R2 U F D2 B' R2 D2 B2 L2 D2 R2 F' D2 B","2027-04-27":"U B D' B' L B' D' R' F L U2 R2 F' U2 D2 B' R2 U2 B' R2 L2","2027-04-28":"L' D' R' U D L' U D2 F U2 L2 B D2 F' U2 L2 F2 R2 F2 L' U'","2027-04-29":"U B' R F U' F' L F B L2 F2 U' B2 U2 F2 L2 D R2 D' R2 U'","2027-04-30":"F' U2 L B2 L' B2 U2 R D2 F2 R U2 R' U' F2 U L' F' D U L","2027-05-01":"R D2 R D' R U L' F D2 R2 U2 F D2 F2 L2 U2 B' U2 R2 U B'","2027-05-02":"L2 U L2 D' U' B2 R2 B2 R2 D2 F2 U' L' U' R' B L2 R B' L2","2027-05-03":"B' L F2 U' F2 L' U R2 B R' F2 R' U2 F2 U2 D2 L' D2 R' D2 F2","2027-05-04":"U' L' D2 R D' B L U2 D' F' U2 B L2 U2 F' U2 L2 U2 L2 B D2","2027-05-05":"U F' B2 D' R2 F' L R2 U L2 D2 B2 L2 U' R2 F2 U' R F' D","2027-05-06":"R L F B2 R B' R2 L' D' R L D2 R' B2 L' D2 L2 U2 L U2 D2","2027-05-07":"F' R2 U2 L2 U' R F L2 U' D' L2 F2 D' R2 L2 B2 U' L2 U B D","2027-05-08":"L2 B' L' U2 F' U' R2 B' D' R L2 U2 B U2 R2 F2 L2 B U2 F2 U2","2027-05-09":"B2 U R B2 R F2 R B2 D' L2 D R2 L2 D B2 D R2 F2 L2 B L'","2027-05-10":"L' D R2 F R D' B' U' L' F' R2 D2 F L2 U2 B' L2 B' D2 F L2","2027-05-11":"D' R D2 B2 R D2 L B D' B2 D' R2 U L2 D' F2 U' F2 R2 L","2027-05-12":"R2 F R2 B2 U' D F D R F2 R2 F2 R U2 F2 L2 B2 L U2 L' F'","2027-05-13":"D' L U2 B2 U' F L R2 D2 F' R2 U2 L2 F D2 B' R2 U2 R2 U' R2","2027-05-14":"F2 L B' R L' F L' D' U2 R2 U2 F' L2 F2 U2 D2 R2 F U2 B R'","2027-05-15":"D2 B2 U' L2 D F2 U B2 L2 U2 R2 U' R U' F R' U2 B' D2 F2 L","2027-05-16":"U L2 U' B2 L2 D' U' L2 D' F2 U' L2 R' F L2 B D B D' U F'","2027-05-17":"D2 F2 U B R' D F' B R' L2 U2 R2 U' R2 F2 D L2 F2 D L2 U'","2027-05-18":"U2 L2 U' L' F' R' B' D R2 D2 L2 F2 U' F2 U2 B2 L2 U F2 R' U2","2027-05-19":"L U' D2 R F' R' F' B L U2 F2 L2 U2 L2 U B2 D2 R2 B2 L2 B2","2027-05-20":"L' B U D2 F R' U L D2 F2 B2 D' B2 D F2 U R2 L2 B2 R","2027-05-21":"R' B R' U' F2 D' R' L2 B' L2 U F2 L2 D R2 L2 F2 U D2 R2 U2","2027-05-22":"R2 B L' F' D F' L2 D F' U L2 U L2 D2 B2 U' R2 U2 D' L2 D'","2027-05-23":"R2 U' D' F2 U' B U2 R F' D F2 D2 F2 B2 R2 U' F2 U' R2 L2","2027-05-24":"F' R U F2 L2 U B2 D' R2 F2 D2 R2 B2 D2 F' U R' D F2 U' B'","2027-05-25":"D L2 F' D2 F D2 R U' R2 D' L2 D' B2 R2 F2 U F2 U2 B2 R B","2027-05-26":"D' L' B' L2 B2 L2 F U2 B' U2 L2 R2 U2 L2 R B' L2 F D' R' U2","2027-05-27":"R' D2 B2 L2 F' L' D' F U' F L2 F' B R2 L2 B L2 D2 F2 U","2027-05-28":"U D F D2 R F2 L' F U B R2 U2 F2 D R2 U2 B2 D' F2 B2 U'","2027-05-29":"U L' U' D2 L B R' L F' D2 L2 F R2 F' U2 B' U2 B2 U2 F2 U'","2027-05-30":"U2 R2 D' F R2 U' D2 L' F2 R2 L2 B2 U' B2 D L2 U' F2 B2 D2 F","2027-05-31":"L' U D' F L D B' U2 L F2 U2 B2 L2 U' L2 U2 R2 L2 U L2 B2","2027-06-01":"D B2 L2 D' F2 U F2 L2 D2 R2 D B2 L' F' R2 B' U' L R' D F2","2027-06-02":"U2 D' F R U F' U' B D' U2 R D2 R B2 R2 B2 L F2 L' D2 R2","2027-06-03":"U' B' D2 R' F2 U2 B' L2 U L2 F2 D' B2 D' F2 B2 U' B2 D2 F'","2027-06-04":"L' D2 R' F2 R2 F2 D2 U2 R B2 D2 L2 U R2 D R' F' U' L' U' R2","2027-06-05":"L' F2 B U2 L F' B L' F2 U' L2 F2 U' R2 D2 R2 B2 U' F2 D' L'","2027-06-06":"B R2 U2 F2 D F2 R2 F2 L2 U B2 F2 L' B' U' F' D' F R D","2027-06-07":"R' L2 F2 R2 U2 R2 U' R2 D' L2 R2 B2 D2 R D L2 R2 B' F' D' L","2027-06-08":"U' R B' U F' U B U2 F2 L2 U' R2 U F2 D' F2 B2 U L U F'","2027-06-09":"R' U F' R2 L F D2 R L' F' U R2 U L2 D2 R2 D L2 F2 R2 F2","2027-06-10":"R2 F D2 R' F B2 R F' L' F2 U B2 R2 L2 U F2 U L2 U R2 L2","2027-06-11":"F U2 R D2 R2 D2 F U B R2 F' U2 F2 D2 L2 B' D2 B' D2 B' L'","2027-06-12":"F2 U F U L' U D B2 L' D2 B L2 B D2 L2 B2 U2 R2 B2 D2 F","2027-06-13":"R2 U' L D' B' R U B' U' F2 L2 D L2 B2 U2 B2 D F2 U' B2 R'","2027-06-14":"U R F' L U R' B' R F2 D' B2 U L2 D2 L2 U' F2 D R2 B' R2","2027-06-15":"B2 U2 L2 D L' D' R F' R2 U F2 B2 R2 U' R2 U D2 F2 D' F2 B","2027-06-16":"F' B' D' R' U L' B U2 L F' L2 B2 D' B2 U' B2 U R2 B2 D' R2","2027-06-17":"L2 F L2 B2 L2 F D2 R2 U2 F U2 L D' L U' L' F U L' R' D2","2027-06-18":"D2 B L2 D2 F D2 U2 L2 U2 B2 F' L2 D' R D2 U' L U' B D2 L2","2027-06-19":"F' U D' R D B' U2 F' R F U' R2 B2 U' F2 U2 D F2 R2 D' F2","2027-06-20":"F' U' D2 R' B' L U' F U F2 B2 U' L2 U B2 L2 F2 U2 B2 F' R2","2027-06-21":"D' R D' R F' D' B' R' F D2 F2 U' R2 B2 R2 F2 B2 R2 U R2 D2","2027-06-22":"D2 R U' L D2 R' B L2 U' D2 B R2 U2 R2 F2 R2 B' U2 B D2 R2","2027-06-23":"L F2 B' L' D R B' U2 B2 L2 D2 L D2 R D2 F2 R F2 L D","2027-06-24":"L B D2 R2 L' B' R' B2 D F2 U2 R2 D2 B2 R D2 B2 R2 L' U2 L2","2027-06-25":"B' D2 L' F' L2 D' R D F L R2 U2 F2 U2 B2 R2 F2 U R2 D'","2027-06-26":"L' F L' D2 F R' U L2 D L B2 D F2 U2 R2 L2 F2 U' F2 B2 U'","2027-06-27":"U R2 U2 D F' R U2 F' U2 L D' L2 B2 D' F2 D' B2 L2 D' B2 U'","2027-06-28":"U R B2 U2 L' U2 R F2 U2 L B2 R2 F2 U B F' D' B L' B R","2027-06-29":"R' D' L' F' R F L U' F R2 D2 B2 D2 R U2 R2 L F2 R' U2 L2","2027-06-30":"D' R2 U2 L' R2 D2 U2 F2 D2 L' D2 L F2 B U L' R' B' L R'","2027-07-01":"L2 F' U2 D' L' F R' D2 L' U2 F2 L2 F2 D2 F2 U R2 U2 L2 U R2","2027-07-02":"F' R F2 D2 B' U R U2 D R D2 F' U2 F' D2 R2 F D2 F' U2","2027-07-03":"R2 D2 R2 B2 L B' D B2 L2 F2 R' D2 L' D2 B2 L B2 L' B2 D","2027-07-04":"D F B2 D' F2 D F U B L' U F2 U D2 R2 B2 U' F2 B2 R2 D","2027-07-05":"L' F2 D2 B2 F2 L D2 L F2 R2 F2 U2 D F' U2 B' U' R2 F' D R'","2027-07-06":"D2 F2 L' U2 B' R2 D L B L2 U' B2 D2 L2 U' F2 D L2 F2 L2 U'","2027-07-07":"B' U2 L2 B2 D2 L2 F L2 B' D2 R2 B' U L2 F D' B U' F R U'","2027-07-08":"R2 F2 L D' L' F U B' D2 F2 R2 D' F2 U' F2 L2 U2 L2 B2 D L'","2027-07-09":"D2 F' R2 D F' D' B R' F2 U D2 B2 U L2 U' B2 U L2 U2 F","2027-07-10":"D R U2 R' B2 D F D F2 U D2 F2 B2 U' L2 B2 U2 F2 U' B' D'","2027-07-11":"R2 D' L' U2 F R' B R' L F' R2 D2 R2 B2 L2 F D2 B2 D2 B'","2027-07-12":"F B2 U B2 D' B2 L2 D' B2 U' B2 F2 L F L D L U F' R' U'","2027-07-13":"L2 B' U D2 L2 F U2 B' L2 B2 D2 F2 R B2 R U2 R D2 R2 U2 D'","2027-07-14":"R L F2 U2 F2 B' L' U R B2 D2 R' F2 B2 D2 L D2 R B2 R2","2027-07-15":"B D2 F' L2 B2 U2 F L2 R2 F2 L2 R2 U' L' B' F2 R2 B R U'","2027-07-16":"R' L D L2 F U2 B U R F2 R2 D' F2 B2 D' R2 D' L2 F2 U L'","2027-07-17":"L2 D L' U F L U2 R D L2 U' R2 D R2 F2 L2 F2 U2 R2 B' D","2027-07-18":"R F B2 U D2 L' D2 F L U' F2 D' B2 R2 L2 U F2 B2 D2 B2 U","2027-07-19":"U F2 U' F2 L2 D' F2 L2 U2 L2 U B2 F' U R2 F R D U2 F U","2027-07-20":"B U' L' F' U' F' R D2 F' L2 B2 L2 D2 F' R2 U2 R F U2","2027-07-21":"F2 D L2 B R F U F U2 B2 U2 D2 L U2 L' B2 L U2 D2 L U","2027-07-22":"F2 L2 F' L D' F' U2 F2 L' B' U' L2 U' B2 U2 L2 U' L2 D2","2027-07-23":"F2 R' L' U R2 U' F' L R2 B U2 R2 U2 F2 U2 L2 F' R2 F2 L2 R'","2027-07-24":"L U' B R2 F2 D F' L B2 D R2 D F2 U R2 F2 R2 D","2027-07-25":"F2 R2 F' L B U F' B U B2 L2 U' L2 F2 D F2 U R2 U' L' U2","2027-07-26":"F2 U' F L2 U2 F U2 B' U2 F2 D2 R2 B U2 L B' D F2 L2 R' D","2027-07-27":"F2 B U2 D R' F2 L' D U2 B' U2 L2 F' U2 F D2 F D2 B2 L2 D'","2027-07-28":"B2 U2 R' U2 L D2 F2 R B2 L2 D2 R' U' L R B L R2 U2 R","2027-07-29":"D' B2 L D2 R L2 B U L' D2 L' F2 D2 L2 F2 D2 B2 L U2 D'","2027-07-30":"U2 L B' R U' F2 B R2 F2 R' B2 R' F2 B2 U2 R' F2 L2 D2 U' F","2027-07-31":"B' D' L U2 F2 U R D2 F2 U2 D2 B' R2 L2 F R2 D2 F2 U F D'","2027-08-01":"L2 U2 L2 B2 F L2 B' L2 D2 B' F2 U B' F2 R' D U2 L' D2 U' L2","2027-08-02":"F2 U' R2 D L2 U' R2 U2 R2 F2 D2 U' B L' U2 R2 B' L B' D U'","2027-08-03":"B' U' F' R' U' B' L2 F L D' R2 F' R2 B L2 F L2 U2 F L2 F'","2027-08-04":"U R' B' U' B L' U2 B' D L B2 U' F2 U' F2 U R2 U' F2 U2 L2","2027-08-05":"L D L' F' U F B L F' L2 D' B2 L2 U' L2 F2 D F2 U2 D' F2","2027-08-06":"R' U B' D' F2 B L' F2 R' D2 B L2 D2 F R2 B L2 U2 R2 F'","2027-08-07":"F2 R U D' F U2 D R' B2 U2 F' L2 F D2 F L2 F2 R2 F' D2 L'","2027-08-08":"R2 U2 L2 B R2 U2 R2 D2 B' L2 B' F' L D' R B' D2 R' U2 F'","2027-08-09":"L2 D' R' F' D' R' B2 D R' L2 U2 R2 B2 R2 L2 D' R2 U B2 U' L2","2027-08-10":"B U' L' D' B2 R' D L B2 R D2 R B2 D2 R2 B2 L' B2 U","2027-08-11":"R2 U B' R' F' R2 L D R L2 D2 R2 U R2 B2 D' F2 B2 D B2 R2","2027-08-12":"U L' D R U' L' F2 D F' U R2 U' R2 F2 D2 L2 F2 U R2 F2 B2","2027-08-13":"D' B2 R' F' D F U' R U B2 U' B2 U B2 R2 D2 L2 U' L2 U'","2027-08-14":"R F' B D R F' L' B2 D L' F2 R' B2 R U2 D2 L2 B2 R' F","2027-08-15":"U' L B L2 U' R' F' U' B F2 D' R2 D' B2 U R2 L2 U' F2 D2 F2","2027-08-16":"D' R U' L2 U' B' D L2 D2 B' U2 R2 D2 F D2 B D2 L2 F U L'","2027-08-17":"R F2 B' R U2 R' U' R2 B2 L' F2 B2 R D2 R B2 R' B2 L' U' R","2027-08-18":"U' L' D R' F2 D R U2 L B' U2 F' R2 F2 D2 L2 U2 F' U2 D2 F2","2027-08-19":"F' U' F D' F' L D' B L' B2 D2 L U2 R' B2 D2 L B2 U2 D","2027-08-20":"U' B L2 F2 R2 B' R2 B' D2 R2 F' D2 L2 R B L B' L B D' F'","2027-08-21":"D2 B2 U' L' B2 L' F' U D2 B2 U F2 R2 U' B2 D2 R2 B2 R B L2","2027-08-22":"R2 U2 B' R' U F2 B L2 D2 F2 L2 U2 D R2 D B2 L2 F2 B' L U","2027-08-23":"R U L D' B2 L2 B L F D2 L2 D B2 U L2 U F2 R2 L2 U' F2","2027-08-24":"R2 U' F' R2 D2 L B' D U2 R2 F' U2 F2 L2 F' L2 F2 D2 R2","2027-08-25":"L2 D2 R2 B2 L D2 R' B2 R' D2 F2 D2 B' D' R2 D2 B' F' U' R B2","2027-08-26":"B' L2 F R2 B D2 B' D2 B U2 B U L B U2 L R2 U2 F2 U","2027-08-27":"R' U F' L2 F D R' L2 F' U D' F2 R2 L2 U' R2 D' R2 U' L2 D","2027-08-28":"D' L2 B' R' D R' D B' U R' U2 B2 R F2 U2 R' U2 D2 B2 L F2","2027-08-29":"D2 L2 R2 U' L2 U2 L2 F2 U F2 U2 B2 F' D' F' D' L' F' U2 L R","2027-08-30":"B' R' U' D2 B2 D2 R F U D2 R2 F2 R2 D R2 D2 R2 F2 U F2 R","2027-08-31":"L D' B' R U F B2 L' D B2 U2 B2 L' U2 R U2 R F2 B2 L U2","2027-09-01":"B' R2 F L2 U D2 F2 B' R F2 L D2 L B2 L' F2 R' D2 B2 L2","2027-09-02":"R' U' L' D' F B' U2 D' R U' L2 D' F2 U R2 D2 F2 D L2 D L2","2027-09-03":"F D2 L U B2 D' R2 L' D B U2 F2 U2 D2 F' R2 F D2 L2 B2","2027-09-04":"L2 F2 U2 R2 U2 F D2 U2 F' R2 F2 L2 U L B F' R' F' D' U'","2027-09-05":"R' U' D2 F' U' R' U2 D B2 R2 U2 B U2 F2 U2 R2 D2 F L2 B2","2027-09-06":"R2 B' U2 L' F2 D2 L D L2 U2 D2 B' D2 F U2 B' D2 F U2","2027-09-07":"U B U B L U' R D U2 R2 B D2 R2 D2 L2 B D2 F2 B U","2027-09-08":"L U R U' R' F2 R U2 F U' R2 L2 U' R2 D' R2 F2 B2 U2 R2 F","2027-09-09":"R' L U2 B' U B' U L U2 F' R2 D2 L2 B' R2 L2 F' U2 L2 F2","2027-09-10":"L' F2 U2 B R2 F2 L R2 B2 U F2 D' L2 D' R2 U2 F2 R2 U' R U","2027-09-11":"U L F' D' F' U' R U D F U2 B' U2 R2 D2 B2 L2 U2 F B2 U2","2027-09-12":"L' U' R' F2 U D' L D2 B' U' L2 U2 R2 D2 B D2 F' D2 B U2 B'","2027-09-13":"F' U2 R' L' F2 B' U B L' F' U2 F' U2 R2 B R2 L2 B' R2 F D2","2027-09-14":"U2 B' U L2 F2 D B2 D' F2 R2 U2 R2 D L2 F R D2 F R F' L'"},"difficulty":{"2026-08-11":{"cross":5,"faces":["R"]},"2026-08-12":{"cross":4,"faces":["D"]},"2026-08-13":{"cross":4,"faces":["L"]},"2026-08-14":{"cross":5,"faces":["D","B"]},"2026-08-15":{"cross":5,"faces":["L","B"]},"2026-08-16":{"cross":5,"faces":["D","R","L"]},"2026-08-17":{"cross":4,"faces":["U","R"]},"2026-08-18":{"cross":5,"faces":["R","B"]},"2026-08-19":{"cross":5,"faces":["R"]},"2026-08-20":{"cross":5,"faces":["U","L","F"]},"2026-08-21":{"cross":5,"faces":["U","L","B"]},"2026-08-22":{"cross":5,"faces":["U","R","L"]},"2026-08-23":{"cross":5,"faces":["D"]},"2026-08-24":{"cross":4,"faces":["R"]},"2026-08-25":{"cross":5,"faces":["D","L"]},"2026-08-26":{"cross":5,"faces":["L"]},"2026-08-27":{"cross":5,"faces":["U","D","R","L"]},"2026-08-28":{"cross":3,"faces":["F"]},"2026-08-29":{"cross":5,"faces":["B"]},"2026-08-30":{"cross":6,"faces":["L","B"]},"2026-08-31":{"cross":2,"faces":["B"]},"2026-09-01":{"cross":6,"faces":["U","D","L","B"]},"2026-09-02":{"cross":5,"faces":["U","R","B"]},"2026-09-03":{"cross":4,"faces":["U"]},"2026-09-04":{"cross":4,"faces":["L"]},"2026-09-05":{"cross":5,"faces":["D"]},"2026-09-06":{"cross":5,"faces":["D","R","B"]},"2026-09-07":{"cross":6,"faces":["U","D","R","L","B"]},"2026-09-08":{"cross":5,"faces":["U","R","L","F","B"]},"2026-09-09":{"cross":5,"faces":["L","B"]},"2026-09-10":{"cross":5,"faces":["F","B"]},"2026-09-11":{"cross":4,"faces":["U"]},"2026-09-12":{"cross":4,"faces":["L"]},"2026-09-13":{"cross":5,"faces":["B"]},"2026-09-14":{"cross":5,"faces":["L","B"]},"2026-09-15":{"cross":3,"faces":["R"]},"2026-09-16":{"cross":5,"faces":["F"]},"2026-09-17":{"cross":4,"faces":["B"]},"2026-09-18":{"cross":4,"faces":["D"]},"2026-09-19":{"cross":5,"faces":["U","R","B"]},"2026-09-20":{"cross":5,"faces":["F"]},"2026-09-21":{"cross":6,"faces":["U","D","L","B"]},"2026-09-22":{"cross":5,"faces":["U","R","F","B"]},"2026-09-23":{"cross":5,"faces":["D"]},"2026-09-24":{"cross":6,"faces":["U","R","L"]},"2026-09-25":{"cross":5,"faces":["B"]},"2026-09-26":{"cross":5,"faces":["D"]},"2026-09-27":{"cross":3,"faces":["F"]},"2026-09-28":{"cross":4,"faces":["L"]},"2026-09-29":{"cross":4,"faces":["L"]},"2026-09-30":{"cross":4,"faces":["B"]},"2026-10-01":{"cross":4,"faces":["L"]},"2026-10-02":{"cross":5,"faces":["R"]},"2026-10-03":{"cross":5,"faces":["U","F"]},"2026-10-04":{"cross":4,"faces":["L"]},"2026-10-05":{"cross":6,"faces":["U","D","R","L","F","B"]},"2026-10-06":{"cross":5,"faces":["R"]},"2026-10-07":{"cross":5,"faces":["U","F"]},"2026-10-08":{"cross":5,"faces":["R"]},"2026-10-09":{"cross":5,"faces":["R"]},"2026-10-10":{"cross":5,"faces":["D","L","F"]},"2026-10-11":{"cross":6,"faces":["U","D","R","L","F"]},"2026-10-12":{"cross":5,"faces":["R"]},"2026-10-13":{"cross":5,"faces":["R"]},"2026-10-14":{"cross":5,"faces":["U"]},"2026-10-15":{"cross":5,"faces":["U"]},"2026-10-16":{"cross":3,"faces":["D"]},"2026-10-17":{"cross":4,"faces":["R"]},"2026-10-18":{"cross":5,"faces":["D","R","F"]},"2026-10-19":{"cross":6,"faces":["U","D","L","B"]},"2026-10-20":{"cross":5,"faces":["F"]},"2026-10-21":{"cross":6,"faces":["F","B"]},"2026-10-22":{"cross":4,"faces":["R"]},"2026-10-23":{"cross":5,"faces":["U","R","F","B"]},"2026-10-24":{"cross":5,"faces":["U"]},"2026-10-25":{"cross":4,"faces":["B"]},"2026-10-26":{"cross":5,"faces":["L","B"]},"2026-10-27":{"cross":5,"faces":["L"]},"2026-10-28":{"cross":4,"faces":["D","B"]},"2026-10-29":{"cross":4,"faces":["U"]},"2026-10-30":{"cross":5,"faces":["U","L","F"]},"2026-10-31":{"cross":5,"faces":["U","R"]},"2026-11-01":{"cross":4,"faces":["B"]},"2026-11-02":{"cross":5,"faces":["F"]},"2026-11-03":{"cross":6,"faces":["D","R","L","F","B"]},"2026-11-04":{"cross":4,"faces":["F"]},"2026-11-05":{"cross":3,"faces":["F"]},"2026-11-06":{"cross":5,"faces":["U","D","L","F","B"]},"2026-11-07":{"cross":5,"faces":["U","L"]},"2026-11-08":{"cross":5,"faces":["R"]},"2026-11-09":{"cross":6,"faces":["D","R","F","B"]},"2026-11-10":{"cross":5,"faces":["D","L","B"]},"2026-11-11":{"cross":5,"faces":["R","F"]},"2026-11-12":{"cross":4,"faces":["F"]},"2026-11-13":{"cross":6,"faces":["U","D","R","L","F","B"]},"2026-11-14":{"cross":6,"faces":["U","D","R","L","F"]},"2026-11-15":{"cross":4,"faces":["R","B"]},"2026-11-16":{"cross":5,"faces":["R"]},"2026-11-17":{"cross":5,"faces":["B"]},"2026-11-18":{"cross":5,"faces":["U","L","B"]},"2026-11-19":{"cross":5,"faces":["D","L","F"]},"2026-11-20":{"cross":5,"faces":["L","F"]},"2026-11-21":{"cross":5,"faces":["F"]},"2026-11-22":{"cross":5,"faces":["R","F"]},"2026-11-23":{"cross":6,"faces":["U","D","L","B"]},"2026-11-24":{"cross":5,"faces":["U","R"]},"2026-11-25":{"cross":5,"faces":["D","F"]},"2026-11-26":{"cross":3,"faces":["U"]},"2026-11-27":{"cross":5,"faces":["U","D","R","L","F"]},"2026-11-28":{"cross":6,"faces":["U","D","R","F"]},"2026-11-29":{"cross":5,"faces":["U","L"]},"2026-11-30":{"cross":6,"faces":["U","D","F"]},"2026-12-01":{"cross":3,"faces":["L"]},"2026-12-02":{"cross":5,"faces":["D","R"]},"2026-12-03":{"cross":5,"faces":["F"]},"2026-12-04":{"cross":6,"faces":["U","L","B"]},"2026-12-05":{"cross":6,"faces":["U","D","R","L","B"]},"2026-12-06":{"cross":5,"faces":["R"]},"2026-12-07":{"cross":5,"faces":["U","R","B"]},"2026-12-08":{"cross":6,"faces":["U","R","F"]},"2026-12-09":{"cross":5,"faces":["F"]},"2026-12-10":{"cross":5,"faces":["D","B"]},"2026-12-11":{"cross":4,"faces":["R","F"]},"2026-12-12":{"cross":5,"faces":["D","R","B"]},"2026-12-13":{"cross":4,"faces":["U"]},"2026-12-14":{"cross":5,"faces":["F"]},"2026-12-15":{"cross":4,"faces":["R","F"]},"2026-12-16":{"cross":4,"faces":["F"]},"2026-12-17":{"cross":2,"faces":["U"]},"2026-12-18":{"cross":5,"faces":["B"]},"2026-12-19":{"cross":4,"faces":["U","B"]},"2026-12-20":{"cross":5,"faces":["F","B"]},"2026-12-21":{"cross":5,"faces":["U","D","F"]},"2026-12-22":{"cross":5,"faces":["B"]},"2026-12-23":{"cross":5,"faces":["U","L","F"]},"2026-12-24":{"cross":6,"faces":["U","D","R","B"]},"2026-12-25":{"cross":4,"faces":["F","B"]},"2026-12-26":{"cross":5,"faces":["D","F"]},"2026-12-27":{"cross":5,"faces":["F"]},"2026-12-28":{"cross":5,"faces":["D","B"]},"2026-12-29":{"cross":3,"faces":["U"]},"2026-12-30":{"cross":6,"faces":["D","L","F","B"]},"2026-12-31":{"cross":5,"faces":["F"]},"2027-01-01":{"cross":6,"faces":["R","L","B"]},"2027-01-02":{"cross":3,"faces":["B"]},"2027-01-03":{"cross":5,"faces":["D"]},"2027-01-04":{"cross":5,"faces":["D","L"]},"2027-01-05":{"cross":4,"faces":["L"]},"2027-01-06":{"cross":5,"faces":["U","D","R","L","F","B"]},"2027-01-07":{"cross":5,"faces":["L","F"]},"2027-01-08":{"cross":6,"faces":["U","F","B"]},"2027-01-09":{"cross":6,"faces":["U","D","L","B"]},"2027-01-10":{"cross":5,"faces":["R"]},"2027-01-11":{"cross":4,"faces":["D"]},"2027-01-12":{"cross":4,"faces":["B"]},"2027-01-13":{"cross":5,"faces":["L"]},"2027-01-14":{"cross":5,"faces":["D","R"]},"2027-01-15":{"cross":4,"faces":["R","B"]},"2027-01-16":{"cross":5,"faces":["D"]},"2027-01-17":{"cross":3,"faces":["B"]},"2027-01-18":{"cross":4,"faces":["R","F"]},"2027-01-19":{"cross":5,"faces":["D","L"]},"2027-01-20":{"cross":5,"faces":["F"]},"2027-01-21":{"cross":5,"faces":["U","D","R","L","F"]},"2027-01-22":{"cross":5,"faces":["D","R"]},"2027-01-23":{"cross":5,"faces":["L"]},"2027-01-24":{"cross":4,"faces":["R"]},"2027-01-25":{"cross":5,"faces":["L"]},"2027-01-26":{"cross":5,"faces":["R","B"]},"2027-01-27":{"cross":5,"faces":["B"]},"2027-01-28":{"cross":6,"faces":["D","R","L","F","B"]},"2027-01-29":{"cross":5,"faces":["D"]},"2027-01-30":{"cross":5,"faces":["D","R","L","F"]},"2027-01-31":{"cross":5,"faces":["D","L","F","B"]},"2027-02-01":{"cross":3,"faces":["L"]},"2027-02-02":{"cross":3,"faces":["R"]},"2027-02-03":{"cross":3,"faces":["R"]},"2027-02-04":{"cross":5,"faces":["R","B"]},"2027-02-05":{"cross":5,"faces":["U","R"]},"2027-02-06":{"cross":5,"faces":["D","L"]},"2027-02-07":{"cross":5,"faces":["L"]},"2027-02-08":{"cross":5,"faces":["U","F","B"]},"2027-02-09":{"cross":3,"faces":["B"]},"2027-02-10":{"cross":5,"faces":["U","D","R"]},"2027-02-11":{"cross":5,"faces":["U"]},"2027-02-12":{"cross":4,"faces":["F"]},"2027-02-13":{"cross":6,"faces":["D","L"]},"2027-02-14":{"cross":6,"faces":["U","D","R","F","B"]},"2027-02-15":{"cross":5,"faces":["L","B"]},"2027-02-16":{"cross":6,"faces":["U","D","R","L","F","B"]},"2027-02-17":{"cross":5,"faces":["U","B"]},"2027-02-18":{"cross":6,"faces":["U","D","F","B"]},"2027-02-19":{"cross":5,"faces":["F"]},"2027-02-20":{"cross":5,"faces":["U"]},"2027-02-21":{"cross":5,"faces":["U"]},"2027-02-22":{"cross":4,"faces":["U"]},"2027-02-23":{"cross":5,"faces":["D"]},"2027-02-24":{"cross":4,"faces":["U","F"]},"2027-02-25":{"cross":5,"faces":["D","R","L","F"]},"2027-02-26":{"cross":4,"faces":["L"]},"2027-02-27":{"cross":4,"faces":["R"]},"2027-02-28":{"cross":6,"faces":["U","D","L"]},"2027-03-01":{"cross":5,"faces":["U","D","R","L"]},"2027-03-02":{"cross":4,"faces":["U"]},"2027-03-03":{"cross":5,"faces":["B"]},"2027-03-04":{"cross":5,"faces":["B"]},"2027-03-05":{"cross":6,"faces":["U","D","R","L","F"]},"2027-03-06":{"cross":4,"faces":["U","D"]},"2027-03-07":{"cross":4,"faces":["D"]},"2027-03-08":{"cross":5,"faces":["F"]},"2027-03-09":{"cross":6,"faces":["U","D","L","B"]},"2027-03-10":{"cross":5,"faces":["U","D"]},"2027-03-11":{"cross":5,"faces":["R","L","B"]},"2027-03-12":{"cross":5,"faces":["D"]},"2027-03-13":{"cross":5,"faces":["D","L"]},"2027-03-14":{"cross":6,"faces":["D","R","F","B"]},"2027-03-15":{"cross":5,"faces":["R","L"]},"2027-03-16":{"cross":5,"faces":["L"]},"2027-03-17":{"cross":5,"faces":["R"]},"2027-03-18":{"cross":5,"faces":["D"]},"2027-03-19":{"cross":4,"faces":["F"]},"2027-03-20":{"cross":4,"faces":["U"]},"2027-03-21":{"cross":5,"faces":["D","R","F","B"]},"2027-03-22":{"cross":6,"faces":["D","F"]},"2027-03-23":{"cross":5,"faces":["F"]},"2027-03-24":{"cross":6,"faces":["L","B"]},"2027-03-25":{"cross":4,"faces":["U"]},"2027-03-26":{"cross":5,"faces":["B"]},"2027-03-27":{"cross":3,"faces":["B"]},"2027-03-28":{"cross":6,"faces":["U","D","R","L","F"]},"2027-03-29":{"cross":5,"faces":["B"]},"2027-03-30":{"cross":5,"faces":["U","F"]},"2027-03-31":{"cross":4,"faces":["U"]},"2027-04-01":{"cross":4,"faces":["L"]},"2027-04-02":{"cross":5,"faces":["U"]},"2027-04-03":{"cross":5,"faces":["U","R","L","B"]},"2027-04-04":{"cross":5,"faces":["D"]},"2027-04-05":{"cross":5,"faces":["U"]},"2027-04-06":{"cross":5,"faces":["B"]},"2027-04-07":{"cross":5,"faces":["D","R"]},"2027-04-08":{"cross":6,"faces":["U","D"]},"2027-04-09":{"cross":6,"faces":["U","L","F","B"]},"2027-04-10":{"cross":5,"faces":["U","D","R"]},"2027-04-11":{"cross":3,"faces":["U"]},"2027-04-12":{"cross":5,"faces":["R"]},"2027-04-13":{"cross":4,"faces":["U"]},"2027-04-14":{"cross":5,"faces":["D"]},"2027-04-15":{"cross":4,"faces":["R"]},"2027-04-16":{"cross":5,"faces":["U"]},"2027-04-17":{"cross":4,"faces":["F","B"]},"2027-04-18":{"cross":5,"faces":["U","R","B"]},"2027-04-19":{"cross":5,"faces":["D","R","B"]},"2027-04-20":{"cross":6,"faces":["U","R","L","F","B"]},"2027-04-21":{"cross":5,"faces":["U","D","F"]},"2027-04-22":{"cross":3,"faces":["R"]},"2027-04-23":{"cross":3,"faces":["B"]},"2027-04-24":{"cross":4,"faces":["F"]},"2027-04-25":{"cross":5,"faces":["R","F"]},"2027-04-26":{"cross":6,"faces":["U","R","L","F","B"]},"2027-04-27":{"cross":5,"faces":["R","F"]},"2027-04-28":{"cross":5,"faces":["L","B"]},"2027-04-29":{"cross":5,"faces":["F"]},"2027-04-30":{"cross":5,"faces":["D"]},"2027-05-01":{"cross":5,"faces":["U","F"]},"2027-05-02":{"cross":5,"faces":["U","L"]},"2027-05-03":{"cross":5,"faces":["D","R"]},"2027-05-04":{"cross":5,"faces":["D","L","F"]},"2027-05-05":{"cross":6,"faces":["U","R","L","B"]},"2027-05-06":{"cross":5,"faces":["L"]},"2027-05-07":{"cross":5,"faces":["L"]},"2027-05-08":{"cross":6,"faces":["U","D","L","F"]},"2027-05-09":{"cross":4,"faces":["R"]},"2027-05-10":{"cross":5,"faces":["R"]},"2027-05-11":{"cross":5,"faces":["L","B"]},"2027-05-12":{"cross":5,"faces":["U","B"]},"2027-05-13":{"cross":6,"faces":["U","D","R","L","F","B"]},"2027-05-14":{"cross":5,"faces":["D","R"]},"2027-05-15":{"cross":5,"faces":["F"]},"2027-05-16":{"cross":4,"faces":["D","R"]},"2027-05-17":{"cross":5,"faces":["L","F"]},"2027-05-18":{"cross":6,"faces":["U","D","L","F","B"]},"2027-05-19":{"cross":5,"faces":["D","L","B"]},"2027-05-20":{"cross":5,"faces":["F"]},"2027-05-21":{"cross":5,"faces":["U","F"]},"2027-05-22":{"cross":4,"faces":["R"]},"2027-05-23":{"cross":6,"faces":["U","D","R","L","F","B"]},"2027-05-24":{"cross":5,"faces":["U"]},"2027-05-25":{"cross":5,"faces":["F","B"]},"2027-05-26":{"cross":6,"faces":["U","D","R","L","B"]},"2027-05-27":{"cross":4,"faces":["D"]},"2027-05-28":{"cross":5,"faces":["R","L"]},"2027-05-29":{"cross":5,"faces":["U","L","B"]},"2027-05-30":{"cross":5,"faces":["U","L","F"]},"2027-05-31":{"cross":5,"faces":["R","B"]},"2027-06-01":{"cross":6,"faces":["U","D","L","B"]},"2027-06-02":{"cross":5,"faces":["B"]},"2027-06-03":{"cross":4,"faces":["R"]},"2027-06-04":{"cross":4,"faces":["L"]},"2027-06-05":{"cross":4,"faces":["B"]},"2027-06-06":{"cross":5,"faces":["L","B"]},"2027-06-07":{"cross":6,"faces":["U","F"]},"2027-06-08":{"cross":5,"faces":["B"]},"2027-06-09":{"cross":5,"faces":["D","L"]},"2027-06-10":{"cross":5,"faces":["U","D","B"]},"2027-06-11":{"cross":5,"faces":["D","B"]},"2027-06-12":{"cross":6,"faces":["U","D","R","F","B"]},"2027-06-13":{"cross":6,"faces":["U","R","L","F","B"]},"2027-06-14":{"cross":5,"faces":["U","R"]},"2027-06-15":{"cross":4,"faces":["U"]},"2027-06-16":{"cross":6,"faces":["D","R","B"]},"2027-06-17":{"cross":5,"faces":["D","B"]},"2027-06-18":{"cross":5,"faces":["U"]},"2027-06-19":{"cross":5,"faces":["U","D","L"]},"2027-06-20":{"cross":5,"faces":["B"]},"2027-06-21":{"cross":5,"faces":["R"]},"2027-06-22":{"cross":5,"faces":["D"]},"2027-06-23":{"cross":4,"faces":["F"]},"2027-06-24":{"cross":5,"faces":["R"]},"2027-06-25":{"cross":6,"faces":["U","R","L","F"]},"2027-06-26":{"cross":5,"faces":["U"]},"2027-06-27":{"cross":6,"faces":["U","D","L","F"]},"2027-06-28":{"cross":5,"faces":["D"]},"2027-06-29":{"cross":5,"faces":["D","B"]},"2027-06-30":{"cross":4,"faces":["L"]},"2027-07-01":{"cross":5,"faces":["U","L"]},"2027-07-02":{"cross":6,"faces":["R","F","B"]},"2027-07-03":{"cross":5,"faces":["D"]},"2027-07-04":{"cross":5,"faces":["D","R","L","F","B"]},"2027-07-05":{"cross":4,"faces":["D"]},"2027-07-06":{"cross":5,"faces":["U","L"]},"2027-07-07":{"cross":4,"faces":["D"]},"2027-07-08":{"cross":6,"faces":["D","R","F","B"]},"2027-07-09":{"cross":5,"faces":["U","R","L","B"]},"2027-07-10":{"cross":5,"faces":["D","F","B"]},"2027-07-11":{"cross":4,"faces":["L"]},"2027-07-12":{"cross":6,"faces":["U","D","L","F","B"]},"2027-07-13":{"cross":5,"faces":["U"]},"2027-07-14":{"cross":6,"faces":["U","D","R","L","F","B"]},"2027-07-15":{"cross":5,"faces":["U"]},"2027-07-16":{"cross":5,"faces":["D","B"]},"2027-07-17":{"cross":5,"faces":["F"]},"2027-07-18":{"cross":4,"faces":["U","D"]},"2027-07-19":{"cross":5,"faces":["F"]},"2027-07-20":{"cross":5,"faces":["F"]},"2027-07-21":{"cross":5,"faces":["F"]},"2027-07-22":{"cross":5,"faces":["U"]},"2027-07-23":{"cross":5,"faces":["U","R","L","F","B"]},"2027-07-24":{"cross":5,"faces":["D"]},"2027-07-25":{"cross":6,"faces":["U","D","L","F","B"]},"2027-07-26":{"cross":5,"faces":["L"]},"2027-07-27":{"cross":5,"faces":["U","R"]},"2027-07-28":{"cross":6,"faces":["D","R","L"]},"2027-07-29":{"cross":3,"faces":["B"]},"2027-07-30":{"cross":5,"faces":["B"]},"2027-07-31":{"cross":6,"faces":["U","D","R","L","F","B"]},"2027-08-01":{"cross":5,"faces":["U","L","B"]},"2027-08-02":{"cross":3,"faces":["U"]},"2027-08-03":{"cross":5,"faces":["B"]},"2027-08-04":{"cross":5,"faces":["L"]},"2027-08-05":{"cross":4,"faces":["U"]},"2027-08-06":{"cross":5,"faces":["U","D"]},"2027-08-07":{"cross":5,"faces":["U","D","R","F"]},"2027-08-08":{"cross":5,"faces":["D","L","B"]},"2027-08-09":{"cross":6,"faces":["U","D","R","L","F"]},"2027-08-10":{"cross":3,"faces":["D"]},"2027-08-11":{"cross":5,"faces":["B"]},"2027-08-12":{"cross":5,"faces":["U","R"]},"2027-08-13":{"cross":4,"faces":["U"]},"2027-08-14":{"cross":5,"faces":["L"]},"2027-08-15":{"cross":6,"faces":["U","R","L"]},"2027-08-16":{"cross":4,"faces":["U"]},"2027-08-17":{"cross":6,"faces":["D","R","L","F","B"]},"2027-08-18":{"cross":5,"faces":["L","F","B"]},"2027-08-19":{"cross":4,"faces":["L"]},"2027-08-20":{"cross":5,"faces":["R","B"]},"2027-08-21":{"cross":5,"faces":["U","D"]},"2027-08-22":{"cross":5,"faces":["F"]},"2027-08-23":{"cross":5,"faces":["U"]},"2027-08-24":{"cross":4,"faces":["D","R","L"]},"2027-08-25":{"cross":5,"faces":["U","R"]},"2027-08-26":{"cross":5,"faces":["B"]},"2027-08-27":{"cross":4,"faces":["L"]},"2027-08-28":{"cross":4,"faces":["L","F"]},"2027-08-29":{"cross":4,"faces":["R","F"]},"2027-08-30":{"cross":5,"faces":["R"]},"2027-08-31":{"cross":6,"faces":["U","R","F","B"]},"2027-09-01":{"cross":4,"faces":["F"]},"2027-09-02":{"cross":6,"faces":["U","D","L","F"]},"2027-09-03":{"cross":4,"faces":["U","B"]},"2027-09-04":{"cross":5,"faces":["D","R"]},"2027-09-05":{"cross":4,"faces":["F"]},"2027-09-06":{"cross":2,"faces":["U"]},"2027-09-07":{"cross":5,"faces":["U","B"]},"2027-09-08":{"cross":6,"faces":["U","D","R","L","F","B"]},"2027-09-09":{"cross":5,"faces":["U","L","F"]},"2027-09-10":{"cross":5,"faces":["R","F"]},"2027-09-11":{"cross":3,"faces":["U"]},"2027-09-12":{"cross":4,"faces":["U"]},"2027-09-13":{"cross":4,"faces":["B"]},"2027-09-14":{"cross":4,"faces":["L"]}}}
+{
+  "event": "333",
+  "start": "2026-08-11",
+  "days": 400,
+  "scrambles": {
+    "2026-08-11": "F2 U2 B' L2 B' R2 F' U2 F2 R2 U2 F R' D' L F R B' F2 R2 D'",
+    "2026-08-12": "F2 L D2 B2 L' B2 R' B2 F2 L' D2 R' D' B L' D2 U B' U2",
+    "2026-08-13": "L2 D2 R2 D' F2 D B2 F2 R2 U' F2 U' B R2 D R U R B D",
+    "2026-08-14": "U2 F2 R' F' B R U' R' D R' F2 D' L2 F2 U' R2 F2 R2 F2 B2 D",
+    "2026-08-15": "L F D2 R' F' B' R2 L2 U D2 B2 R2 B R2 L2 F' D2 F R2 U2 R2",
+    "2026-08-16": "F' U B2 R' D F' L' F2 L U D2 R2 F U2 R2 F L2 U2 L2 U2 B",
+    "2026-08-17": "D2 F2 R F' U D2 B R D2 B F2 R2 L2 D B2 D2 R2 U' B2 D' R2",
+    "2026-08-18": "U2 D2 F' D' B D B U2 R' B2 R2 B2 U R2 F2 U D R2 D' L2",
+    "2026-08-19": "R F L F U' F D R2 F R2 U2 B2 L2 D' F2 D' F2 U2 B2 D' B2",
+    "2026-08-20": "L2 U2 R' D2 R B2 L B2 R2 F2 D2 B2 D R2 F U' R F' U B2",
+    "2026-08-21": "B' R B2 F2 R B2 F2 D2 L2 B2 R F2 R B' U L2 F2 D F2 R U",
+    "2026-08-22": "F2 U2 B2 R L2 U' L' F' U F' U2 R2 B U2 R2 B U2 L2 U2 D2 B'",
+    "2026-08-23": "B L2 U L2 F D' R' D2 F' D2 B2 U F2 B2 U D2 L2 U R2 D L'",
+    "2026-08-24": "D2 F R U2 B R L' B D L2 U' L2 B2 D' F2 R2 U2 B2 L2 U2 L",
+    "2026-08-25": "L' D' F2 D' B' U2 L D' B U L2 F2 U' L2 U' B2 L2 U' B2 U L'",
+    "2026-08-26": "L2 F2 R' B' R2 L' B U2 F2 U2 D' F2 B2 R2 D R2 D B2 D2 R B'",
+    "2026-08-27": "F' R2 U' F U' F2 L U D' F2 R U2 R' B2 L2 U2 B2 L B2 R B2",
+    "2026-08-28": "R' L B' R L D R2 U R D' B2 U R2 U' R2 U2 L2 D' R2 U2",
+    "2026-08-29": "U2 L' F' U' L2 D' F2 D L F' U2 B2 U2 R2 L2 F2 L2 D' B2 U'",
+    "2026-08-30": "R U F2 R' B L D F D B2 R2 F2 R2 U' F2 R2 L2 D B2 U' B",
+    "2026-08-31": "L2 F' B2 U L2 R2 F2 U2 R2 D R2 D' F2 U2 R' F L' R2 B' L' U2",
+    "2026-09-01": "U2 R' D L2 D2 L F D L2 D2 F' D2 R2 B2 U2 F' R2 L2 U'",
+    "2026-09-02": "B D F2 D2 R' F D F U L2 F2 U F2 R2 D B2 L2 U2 D' L' D2",
+    "2026-09-03": "U2 L2 U2 L2 F U2 L2 B R2 U2 R2 B' R' U B R D' L' D' F'",
+    "2026-09-04": "D2 R D' L' B U L B' U2 F2 U' L2 B2 D B2 U2 D F2 U' F2 B'",
+    "2026-09-05": "R B D R' U R2 B' R L F2 D2 L2 F2 D2 L' D2 L U2 R' F R2",
+    "2026-09-06": "L F L D' B D2 F2 L2 U L' F2 R2 F2 R2 U F2 U D2 F2 U' R2",
+    "2026-09-07": "R U2 F2 U' B2 U2 R2 B2 F2 D R2 D B2 L' B L' B2 F' D L'",
+    "2026-09-08": "F U2 R2 U' B2 L' F L' R2 F R2 L2 F D2 R2 F B D2 B' R2",
+    "2026-09-09": "R' D' L2 R2 D B2 L2 D F2 U2 R2 F2 U L' F2 R' B' D2 F' L' D2",
+    "2026-09-10": "D2 L' B2 U D2 L B' R2 U B2 D B2 L2 U' B2 U R2 U L2 F' U'",
+    "2026-09-11": "U L B' U L U2 R2 F U L2 U D R2 F2 U2 R2 B2 D' B2 U' L",
+    "2026-09-12": "R' D F R' D' R B2 D L B2 D F2 R2 L2 D' B2 D' L2 F2 D2 B'",
+    "2026-09-13": "B2 L2 U' F2 R2 D U2 R2 F2 D F2 U F' U B2 U B' L R F'",
+    "2026-09-14": "U' B2 F2 R' D2 F2 L2 B2 L2 U2 R' U2 R2 F' L' B' R2 U B D2 L",
+    "2026-09-15": "L2 D B2 R2 D2 F2 L2 F2 U R2 D2 L2 F L2 D' F L' F' U R'",
+    "2026-09-16": "U2 L U2 R' F2 L R2 B2 L2 D2 B2 U2 D B' R' D2 L B D U' F2",
+    "2026-09-17": "F' R F2 D2 L U B2 D L2 D2 F L2 F2 B U2 F' D2 R2 F2 U2",
+    "2026-09-18": "L' U' R U' B' R' B D' L U2 F' L2 D2 F' U2 R2 L2 F' D2 B2",
+    "2026-09-19": "F2 D2 B2 L2 R2 U L2 B2 U' B2 U B2 L F2 R2 F' L2 U' F' R' U2",
+    "2026-09-20": "R2 U F L B' R' F2 L F2 R2 B' U2 R2 U2 R2 L2 F2 L2 F' U2",
+    "2026-09-21": "U D' R2 B2 L U' R F R2 D' L2 B' R2 U2 B2 U2 R2 F R2 L2 F'",
+    "2026-09-22": "R F R' D L' B' U' D2 L U2 B2 U2 D' L2 D F2 D2 B2 R2 U F2",
+    "2026-09-23": "D2 F R U' B R2 D' F' L' B2 D L2 D' B2 U' R2 U2 L2 F2 L2 F2",
+    "2026-09-24": "D' L2 D' L' D2 F D' R' U F2 R2 D2 F' D2 L2 B' U2 D2 F R2",
+    "2026-09-25": "L' F L2 F R2 U2 F R2 F' U2 F D2 F R' B D B U2 F L U'",
+    "2026-09-26": "D2 R2 F2 D2 R2 U L2 U' F2 L2 R2 D2 F U F' R' D B' D' U' B2",
+    "2026-09-27": "R U2 L' F2 U R2 F' U D L U2 R U2 R2 U2 B2 L D2 B2 R2 D2",
+    "2026-09-28": "R' F2 R' D' R' D2 F' U2 L2 U2 D B2 U' B2 R2 U' R2 B2 F' L F2",
+    "2026-09-29": "U2 R' B R' D B' R B2 D' B2 R2 L2 F U2 D2 F' D2 L2 F' R2 B'",
+    "2026-09-30": "D B2 U B2 D R2 B2 U2 R2 U R2 D F' U R D2 U B L' D2 U2",
+    "2026-10-01": "R2 F' R2 U2 L' D' F R U' R' B2 L' F2 R B2 R U2 F2 L2 B2 R",
+    "2026-10-02": "F2 D2 R2 B2 D2 R2 F2 U F2 U R2 B2 F L B2 R' D2 B' R U' F",
+    "2026-10-03": "B2 U B U2 L B' L' U F' L2 D2 B L2 F D2 B R2 D2 F2 D2 L",
+    "2026-10-04": "R2 F2 U' B2 L F2 D F2 R2 B' D2 R2 B' D2 F L2 U2 B' L'",
+    "2026-10-05": "R' L F' B' U R F' D B' D2 R2 F' U2 F D2 F2 L2 U2 L2 B' L",
+    "2026-10-06": "R2 B U D2 R' D' R D' L F' R U2 F2 U F2 B2 U2 F2 D L2 U'",
+    "2026-10-07": "F' R2 U2 F L2 B2 L2 U2 B' D2 L2 F2 U R2 B' F' R U2 L F2",
+    "2026-10-08": "D2 U2 B2 L' R' D2 L' F2 L2 U2 B2 R' D' R2 B' U' F U2 F L R'",
+    "2026-10-09": "F2 U2 B' D2 F2 D2 B' R2 D2 F' D2 F D L F D2 F2 R2 U' L D2",
+    "2026-10-10": "R D R B' U F' D2 R' B2 D R2 L2 U R2 L2 B2 D F2 U F2 R",
+    "2026-10-11": "F' D F2 D' L2 U B2 U F2 L2 D2 R2 U L' B' R' U2 F' L D U2",
+    "2026-10-12": "R U D2 L2 B' L' U' F L2 B U2 F2 L2 D2 F2 L2 D2 F U' R2 D",
+    "2026-10-13": "D R' U2 L' D R F' L B R' B2 U2 L2 B2 D' B2 U' B2 D2 F2",
+    "2026-10-14": "F D' R2 B2 R U2 R2 U2 B2 D2 F2 R U2 R F' L B' D L R U2",
+    "2026-10-15": "R' F' L U' F' D2 B' U L B D2 L2 F2 B U2 L2 D2 L2 F D2 R2",
+    "2026-10-16": "F' B U' B' R F' R' F' U D2 R2 B2 D' L2 B2 U B2 U R2 L2",
+    "2026-10-17": "U2 B' U2 F2 B2 D' R U F2 B2 D R2 B2 U2 D R2 U' R2 L F",
+    "2026-10-18": "L2 D2 R B' D F2 R D2 B U2 L2 B2 D' L2 B2 D B2 R2 B2 R2",
+    "2026-10-19": "R2 B2 F2 R' F2 L2 D2 B2 D2 B2 L' D2 F' D B L' D2 U L R2 B'",
+    "2026-10-20": "U2 L2 D' R B' U L' U' R2 F R2 L2 U2 F' D2 R2 B R2 F2 D' B'",
+    "2026-10-21": "U' B F2 U2 L B2 L' B2 F2 R' D2 R U2 B2 U' R2 F2 R' B F2 L'",
+    "2026-10-22": "F' R F' U2 F' R U' L' F' U2 R2 U2 R2 B2 D' B2 U L2 U' L2 D'",
+    "2026-10-23": "F B R' D B D' F' L R2 B R2 D2 F' L2 D2 B U2 B2 U2 F' U",
+    "2026-10-24": "B' L' U2 B2 U D R' L' D' R U2 F' U2 F2 B' D2 B' L2 F' D2",
+    "2026-10-25": "L D F' B2 R2 D' F' R B' U' D2 L2 F2 B2 D' B2 U F2 U' F2 R2",
+    "2026-10-26": "B2 U2 R' B' R B' D2 B' R D' F2 B2 L2 U L2 B2 D F2 U B2 U2",
+    "2026-10-27": "R' B' D' F U' B L2 U R' F' U B2 U2 F2 R2 D' B2 R2 U L2",
+    "2026-10-28": "B' U R2 U L2 U2 F2 L2 F2 U2 B2 U' L2 F' D' F2 U F' R D' U2",
+    "2026-10-29": "B2 L' U' L F L U R2 F U2 L2 U' B2 R2 U' R2 F2 R2 F2 D",
+    "2026-10-30": "L D' R2 B U' R F' D' L2 U B2 U' F2 D2 R2 F2 D' F2 D2 L U'",
+    "2026-10-31": "F2 L' D' R F L2 F' U B U' B2 L2 D' F2 D2 B2 R2 D' L2 U B2",
+    "2026-11-01": "F' R2 D' B L' F' R L' F' R2 F R2 L2 U2 B' D2 L2 F2 L2 F R'",
+    "2026-11-02": "R B2 R2 F2 R2 D2 F2 U' B2 D L2 F2 D R' B F' L' D R2 F L",
+    "2026-11-03": "F2 D' F' U2 B R2 B' R2 D2 L2 D2 F' L2 R' U' F' L B L2 D'",
+    "2026-11-04": "U2 R B' U' F2 L U D F2 R2 F2 R2 U2 F' U2 D2 F' R2 U2",
+    "2026-11-05": "B2 U B2 U' L2 D2 B2 R2 F2 D' R2 U2 L' B R' F' R' B' R' D R",
+    "2026-11-06": "U R D B' D' B' R D2 R2 L2 F2 B2 U' L2 F2 D L2 B2 F",
+    "2026-11-07": "R B2 L' D' B R2 U2 F' L R2 D2 L2 D2 F L2 B2 U2 B' D2 L2 B'",
+    "2026-11-08": "F' L2 D R' U D' B L' U2 D2 B2 D2 F' R2 F L2 B' U2 B U L",
+    "2026-11-09": "B' L' F2 U F R F D' B D2 B2 U R2 L2 D F2 B2 L2 F2 U'",
+    "2026-11-10": "D B L' U' F2 U' B U R F2 U L2 U' B2 D' B2 R2 U' D2 L2 U",
+    "2026-11-11": "B2 D2 R2 L' U2 D' F' U B2 L2 F2 B2 D B2 D2 F2 R2 U2 D' R U2",
+    "2026-11-12": "L2 U2 B' U2 F L2 B' U2 L2 B F2 R2 D B L' U' B' U2 F' D' R",
+    "2026-11-13": "U' F U2 F R' F' D2 L' U' B D2 R2 U F2 D' B2 D F2 U' R2 D",
+    "2026-11-14": "D R' F' U' D' L' B R B' U B2 U' B2 U2 B2 R2 D R2 F2 U' B'",
+    "2026-11-15": "U' F' U2 D2 F2 L' F D B2 R2 D' F2 D B2 U' F2 U' L2 F U2 R'",
+    "2026-11-16": "L B2 R' D2 U2 F2 U2 R2 D2 L F2 R D' B' F' L2 F2 D R' U L'",
+    "2026-11-17": "F L' F2 B R F' L F U R F2 U2 D2 R' D2 F2 D2 L2 B2 L",
+    "2026-11-18": "B2 R' F D B' R D F D R B2 R B2 R F2 R2 U2 F2 R' F2 D2",
+    "2026-11-19": "U F L U2 D' B U B2 L' B L2 F2 B2 U R2 B2 R2 F2 D F2 U2",
+    "2026-11-20": "F' U' L2 B' U F2 B2 R' L2 U' L2 D' L2 D2 R2 F2 D' F2 L'",
+    "2026-11-21": "R2 D2 B U2 R2 B2 D2 F' L2 B' L2 B U' L' F D B' D U B",
+    "2026-11-22": "U' D' F2 B' R' D L' B R F R2 F U2 L2 F' D2 B2 R2 U2 B'",
+    "2026-11-23": "B2 L2 B R2 F L2 B D2 B2 L2 D B' L' U' B2 R D' U F",
+    "2026-11-24": "B U D' L' U' B L' D R B2 D2 L' U2 R2 L U2 L' U2",
+    "2026-11-25": "B L2 F2 B R' U F B2 L' F2 U2 L2 D' F2 U' R2 D2 L2 F2 D2 L2",
+    "2026-11-26": "F2 R2 B' D2 F R2 B' U2 F R2 U2 F2 R D' R D2 L B L U'",
+    "2026-11-27": "U B' U2 F D2 R' F2 U D2 B' U2 F2 D R2 D2 L2 B2 U B2 D' R2",
+    "2026-11-28": "B2 L F2 L D2 B2 L D2 L B2 F2 L B' U' R B2 F2 U' F D' L2",
+    "2026-11-29": "R2 F U2 F' U2 R2 B' L2 D2 F' U2 F R' F L' U F2 U2 L R' D",
+    "2026-11-30": "B R' B2 D L2 F' D2 L U' D2 B2 L B2 U2 F2 U2 L' D2 L U2 L2",
+    "2026-12-01": "D' F2 U' F2 R2 U' R2 D' L2 U R2 U2 F' L B' L R F2 U2 B L2",
+    "2026-12-02": "B' D2 B2 F2 L F2 R F2 R2 D2 R U2 L' D B L2 U R2 D2 R'",
+    "2026-12-03": "L' F2 U R2 L2 D2 F' R B F2 U F2 U F2 B2 U B2 L2 D' F'",
+    "2026-12-04": "F U2 L B L D F' U F' R L2 F2 U2 B2 D' L2 D L2 D' L2 D",
+    "2026-12-05": "D R' L2 F' R2 B D' R2 B' L D2 F2 U B2 L2 U' L2 B2 U2 R2 F2",
+    "2026-12-06": "L' D' F2 D2 B' R B' L2 F2 D' F R2 F B U2 R2 B2 L2 B2 D2 L2",
+    "2026-12-07": "D B2 U R' U2 D2 F B2 U' L2 D' L2 B2 U F2 D L2 U2 L B D2",
+    "2026-12-08": "F' D2 U2 L2 B D2 L2 F2 U2 F L2 F2 R' D L F' R' U2 B'",
+    "2026-12-09": "R2 U2 F' U2 L2 F' U2 R2 F' D2 F R2 U R F' L' B' F D' R' B'",
+    "2026-12-10": "D2 B F2 U2 L2 F2 L' U2 R B2 R' U2 B2 R2 D' F' D' R' U L R'",
+    "2026-12-11": "B2 R D L2 D' B L U2 D2 F' U2 B2 R2 L2 B L2 U2 F' L' F",
+    "2026-12-12": "R U B' R' L' U' F B' U F2 U2 L2 U B2 D2 F2 D B2 D' B D2",
+    "2026-12-13": "R2 U2 R2 F' U2 F' L2 B D2 L2 U2 F' L' F L2 U F2 L2 U' L'",
+    "2026-12-14": "L' U2 R' B2 R' F2 R' D2 F2 D2 U2 R' D R' F2 U2 B' L U' R2 U",
+    "2026-12-15": "L B R2 U R L2 U R' U L2 U D2 B2 U' F2 B2 U' F2 R2 D' B",
+    "2026-12-16": "R B2 L2 U2 D' F R' F2 D R2 D2 B2 R2 U2 R U2 L F2 R L2 U2",
+    "2026-12-17": "U D B' U' L D B R2 B2 L2 U R2 D2 L2 D R2 U B2 U B' R",
+    "2026-12-18": "L2 D2 R F2 R U2 F2 L' R F2 U B' D' F L2 D' F2 L D",
+    "2026-12-19": "F2 L B2 D2 L2 R D2 B2 D2 F2 R' F2 B' R2 D' B' D R2 U' L",
+    "2026-12-20": "F2 U' F2 D L2 U' R2 F2 U' F2 D2 R2 F' R' D' L2 B D' F' D",
+    "2026-12-21": "F R2 F' U L' B U2 F D U2 F' L2 D2 R2 L2 F R2 U2 F U2 L2",
+    "2026-12-22": "F' R' L' B2 L' D F L F2 L2 F D2 B2 R2 U2 B2 R2 D2 B U B",
+    "2026-12-23": "U2 R2 D' L2 B2 D2 L2 D2 L' F2 D2 L' F2 L2 B D2 B D' R' F L'",
+    "2026-12-24": "U L' F2 U' F U' D B2 R2 F' U2 B' L2 B R2 B U2 F U2 R' F'",
+    "2026-12-25": "R' L' D' B2 U2 L' B' U D' F2 U R2 F2 L2 D' R2 B2 U R2 F U2",
+    "2026-12-26": "D L B2 D' F R' B' U' F2 D R2 F2 D2 F2 D F2 U' F2 R' B2 R'",
+    "2026-12-27": "R D2 L U2 L F L R2 D' R2 D2 R2 F2 D2 F2 U F2 R2 U' B'",
+    "2026-12-28": "R' F2 D' B2 L' D2 F' D2 F2 R' D2 F2 R L2 F2 L D2 L' D",
+    "2026-12-29": "R2 L D' L F' U' D' L2 F R2 U2 L2 U F2 U R2 U L2 U2 R2 U'",
+    "2026-12-30": "L' D' R' F U L' B F2 R F2 D2 B2 R D2 R' U2 R' F2 R B U'",
+    "2026-12-31": "L' F' R B' L F2 R U' L U2 R2 L2 D' F2 U2 B2 R2 U' R2 U2 R2",
+    "2027-01-01": "F D2 F2 D2 F' R2 F' U2 L2 D2 L2 F2 D' L' U' R' D2 B D R U2",
+    "2027-01-02": "L' U2 D F L U F2 B' L2 D' B2 D L2 D L2 F2 D L2 D' R2 L",
+    "2027-01-03": "F' L B U2 D' L U' F2 R B2 D2 L F2 R B2 R2 B2 R D2",
+    "2027-01-04": "R F' D R U' L' D' B R' F2 U B2 R2 U' B2 L2 D2 F2 L2 D L2",
+    "2027-01-05": "B2 D2 F2 U' F2 R2 U L2 D R2 F2 D L B2 D' L D2 L' B L2 F",
+    "2027-01-06": "D' B D2 F D B' U2 R F' L' F2 B2 R' U2 L2 U2 L' D2 B2 R' D2",
+    "2027-01-07": "R' B' U B R D L D2 B' U2 R2 D F2 L2 D' L2 U' B2 D F2 U'",
+    "2027-01-08": "B' R F2 D2 L2 R' U2 B2 L' U2 B2 R' D' F' R B R D U",
+    "2027-01-09": "U' L2 U F L2 U' B D R U2 B2 U2 L2 B2 U B2 U R2 D F2 L2",
+    "2027-01-10": "F' D R' D' L' F2 U B' L2 U' D' L2 B2 R2 B2 D B2 R2 D' R F'",
+    "2027-01-11": "L' B' U' R B' R2 B2 L U F2 R2 D R2 B2 U' R2 U L2 B2 U'",
+    "2027-01-12": "R' F U2 B U2 L' B D U2 B' U2 L2 B' D2 R2 B U2 R2 B2 L2 D",
+    "2027-01-13": "B D2 L' F' U' L' D' L B2 R' U2 B2 L D2 F2 B2 R2 B2 R' D L",
+    "2027-01-14": "F D2 B R U' L2 U' B2 U2 R' B2 D2 L2 B2 L' D2 F2 B2 L' U",
+    "2027-01-15": "R F' R' F2 U B2 D R B2 U R2 B2 U' F2 U D R2 U L2 U' F",
+    "2027-01-16": "D2 F2 L R2 F2 L R U2 R' B2 R' F' D' F2 U2 L2 R D B' F",
+    "2027-01-17": "F' D2 F2 R' D B' L' B' U2 B2 L2 U2 R2 U' L2 B2 U L2 U' F'",
+    "2027-01-18": "U2 R2 F D' R' F L2 D R' U F2 B2 L2 U2 B2 D' F2 D L2 D2 L2",
+    "2027-01-19": "B2 R2 L' U2 D' L F' U2 F R2 L' F2 B2 L' B2 D2 F2 D2 R2 D2 B2",
+    "2027-01-20": "L' F D2 B' R D R2 U' L2 F B2 L2 B R2 F' U2 R2 L2 B D2",
+    "2027-01-21": "F2 R' F D R2 D R' F' U2 R L2 U2 F2 R B2 R2 B2 U2 L' F2",
+    "2027-01-22": "R' U2 B2 F D2 B' L2 R2 U2 F' L2 U2 F' U B R2 U F2 R' F' U'",
+    "2027-01-23": "B2 L' B2 D2 F2 L2 B2 L R2 U2 L' R2 B' D' B U' B' U' L U' B",
+    "2027-01-24": "L2 B' U' B2 L U R U2 R2 B2 D R2 U B2 L2 F2 U2 F' D' L' F2",
+    "2027-01-25": "D2 R U' B' D' R2 B' D2 F' B2 R' U2 B2 R U2 D2 R F2 R U2",
+    "2027-01-26": "B R2 U' B D2 R' U2 B F2 D2 F2 R2 F2 L D2 B2 D2 L2 D2 R2 D",
+    "2027-01-27": "D R2 D F D' R U' D F' L' D' B2 U L2 U' F2 B2 R2 U F2",
+    "2027-01-28": "U D2 B2 R2 F U2 F R2 B' R2 B' L2 U2 R' B' U2 F' D' U' B D2",
+    "2027-01-29": "R F2 D B' R2 D R2 F' R B2 D2 R2 F2 B2 D' F2 U' L2 D' F2",
+    "2027-01-30": "D2 F R2 B D2 F' R2 B' U2 L2 R2 F2 D L' R D2 F' D U' F' D2",
+    "2027-01-31": "L2 B' F2 L2 R2 U' L2 F2 L2 D U R2 U' F2 L' F L' U F2 R' F'",
+    "2027-02-01": "U2 B U' L F D' R' B2 U F2 R' U2 D2 L' U2 B2 L2 F2 L B2",
+    "2027-02-02": "L2 U R U R2 L' D' F U2 F' L2 B2 U2 F2 B' R2 U2 F R2 L U'",
+    "2027-02-03": "R' F D R B' L2 U' F' L2 U F2 U2 L2 F2 B2 U L2 U' R2 F' R",
+    "2027-02-04": "U' R' U2 B L' F B2 U' D2 R' U2 F2 D' R2 D' R2 U B2 D B2 R2",
+    "2027-02-05": "D2 F' R' B D' F B2 L F D2 B D2 F' L2 B2 R2 D2 B2 D2 R'",
+    "2027-02-06": "D L2 B2 D F2 U F2 U B2 D2 R2 B2 R' D L' R2 F' U2 R B F'",
+    "2027-02-07": "R D' F B' D B' R2 F D R U2 B2 R2 B2 L' F2 U2 B2 L' D2 F",
+    "2027-02-08": "R B U2 L2 D2 F2 L' U' B' L2 F' U2 F' U2 L2 B2 D2 F U2 B D'",
+    "2027-02-09": "U2 F2 L2 F' R2 D2 L2 R2 B F2 R2 L' D2 R F2 D L' R2 B F'",
+    "2027-02-10": "L2 B2 R U' R2 F' D F R2 F2 D2 F2 U2 F2 R2 B R2 B2 D2",
+    "2027-02-11": "L' U2 R B' U F L' R2 F L2 U2 D2 B' R2 B U2 B R2 F' U' F'",
+    "2027-02-12": "R2 D' L2 B2 D F2 D U2 L2 U F2 R2 L' D B2 D B L2 B' D'",
+    "2027-02-13": "F R' U2 L2 U L' B D F' U' B2 U B2 R2 U R2 U2 B2 D R2 F2",
+    "2027-02-14": "D B' U' B R2 L B D' F L2 B2 D' R2 F2 D R2 U L2 B2 D2 L2",
+    "2027-02-15": "U' R L' U L D F' U R2 U' D2 L2 U' L2 F2 R2 U F2 L' U2 F'",
+    "2027-02-16": "F2 D2 F2 D2 L' D2 L' U2 R2 B2 D2 F2 B' D2 L D' B' R2 U'",
+    "2027-02-17": "U' F U' D B D R U' B R2 F2 R2 F' L2 B' D2 F U2 B' U2",
+    "2027-02-18": "R B2 L D' F' B D R U' L F2 D2 L2 U D2 R2 B2 D B2 U' R2",
+    "2027-02-19": "F2 R2 D2 B2 D2 R2 F2 L2 R D F U L2 R U' F' R U'",
+    "2027-02-20": "D2 B2 U' R2 L' U' F D' F2 R2 L2 B' L2 F2 U2 L2 U2 B' L2 D' R'",
+    "2027-02-21": "B R D L' U L2 U2 D R F' U2 F' U2 R2 F L2 U2 F' R2 B2 L",
+    "2027-02-22": "U' B' D' R F' R F' R B2 D' L2 B2 L2 B2 U F2 U R2 D R' F",
+    "2027-02-23": "U R' D2 L2 B' L2 U' B D F R F2 R' U2 L' B2 R' B2 D2 F2",
+    "2027-02-24": "B' R2 D2 B2 U2 B' L2 U2 B' R2 D2 R2 D' R2 U L D' L F D",
+    "2027-02-25": "U2 L2 F' R2 L' F2 R B2 U L2 F2 L' B2 L D2 B2 R U2 B2 R2 F2",
+    "2027-02-26": "B' U2 B2 R F' D L2 D R2 L2 D2 F' U2 B' L2 B U2 R2 L2 B2 R'",
+    "2027-02-27": "D' R D' L2 U2 F R' D B U' R2 L2 F2 R2 L2 F2 U F2 U2 B2 R2",
+    "2027-02-28": "B2 U2 D' B' U' F2 B2 L' U' R2 F2 B2 R2 U2 F2 R U2 D2 L' U2 F'",
+    "2027-03-01": "B D' B R2 L F' R U B U2 F2 U R2 F2 L2 B2 U' D' F2 L2 D2",
+    "2027-03-02": "B D' R2 D2 B R L2 U' L' U R2 U2 F2 D2 B2 U2 F2 R2 U' B2 U2",
+    "2027-03-03": "U2 B U' R' L D' L' B' U F2 R2 U F2 D2 R2 B2 U L2 U L",
+    "2027-03-04": "B D F2 U L2 B2 D2 B2 R2 F2 U' F2 L' U R2 D U' R' F U",
+    "2027-03-05": "R' D2 F' L2 B R' B' F2 L2 D' L2 U R2 D L2 U' F2 D B D B2",
+    "2027-03-06": "U' D R' U R' D L D B' U' F2 D B2 U' F2 U F2 U2 F2",
+    "2027-03-07": "F2 R2 U2 F' L2 B D2 B2 F' R2 U' R' B D L' U' L U2 B'",
+    "2027-03-08": "F2 D2 L2 R2 F D2 B' R2 B R2 U2 R' B' U R' B' D2 B2 L",
+    "2027-03-09": "R2 F2 R' U R D' B' D F2 U' R2 D' L2 U L2 B2 D2 L F R2 U'",
+    "2027-03-10": "F2 L R2 D2 B' R2 F2 U2 L2 F2 D2 B L2 R' B2 U L R2 B' D' L",
+    "2027-03-11": "R D' L' D F2 L' B D B2 U F2 B2 U2 B2 D' F2 L2 U' R2 L U'",
+    "2027-03-12": "U F2 D2 R L2 U L' D' F U2 F2 L' D2 L B2 D2 R' B2 U2 L2 U2",
+    "2027-03-13": "D R' F' D2 B' F U2 L2 F' L2 R2 D' B' R' F2 L2 F D'",
+    "2027-03-14": "U R U' F' D F' U2 L' D R F' D2 R2 F' L2 F2 L2 F' U2 F R2",
+    "2027-03-15": "U F' D2 L F2 U F' B2 R2 U R2 U D2 B2 D L2 U' F2 U L' D'",
+    "2027-03-16": "B2 F2 R2 B2 U F2 U' B2 U F2 U2 B D' L' U' B' F' D' U R'",
+    "2027-03-17": "U2 F' U2 R' L' U2 D2 F U L2 F2 B2 U2 B2 L2 B2 R D2 R U2 F2",
+    "2027-03-18": "R' B2 L D2 L2 B2 F2 L F2 D2 L U2 B L2 R F' U L' R D' L",
+    "2027-03-19": "U B2 R2 B2 U' L2 R2 B2 D' B2 U' R D L2 B' D L' U' F D' R'",
+    "2027-03-20": "L2 F' D' R' B' U L' D L' F2 B R2 B R2 U2 F' D2 L2 F U2 B",
+    "2027-03-21": "F' U2 R' B2 D2 L' D2 B2 L2 D2 B2 R' F2 D' R F2 L B' F' U' R2",
+    "2027-03-22": "U2 D R D F2 U R2 F' B D' F2 L B2 D2 R' U2 R' D2 R U2 R",
+    "2027-03-23": "B' U R' F' U2 L U2 D B U F2 U' L2 D2 F2 D' F2 R2 L2 U'",
+    "2027-03-24": "L2 D' F2 R' L B' D F R U2 F2 R2 U F2 U' R2 D F2 D2 R2 B2",
+    "2027-03-25": "R U' F D' F2 B2 R D2 F L2 F D2 B' L2 B' D2 F L2 R F",
+    "2027-03-26": "D2 R D2 L' U2 F2 U2 R' F2 R2 D2 L U B' R2 D U R2 U2 L' B'",
+    "2027-03-27": "F' L2 R2 D2 R2 D' L2 U' R2 U R2 B L R B' U2 B' L F'",
+    "2027-03-28": "U' L B2 U R D2 L2 F' L' F2 R2 F' R2 B R2 B' D2 L2 D2 L2 B'",
+    "2027-03-29": "D2 B' L' F' B' D2 R' L' D B F2 R2 D R2 U B2 R2 U2 L2 U2",
+    "2027-03-30": "B2 D' L2 U2 B2 U2 F' U R' U R2 D2 F2 U F2 B2 D' L2 U' R2 F2",
+    "2027-03-31": "R' L2 B' U B2 L2 F' L2 U2 D2 L D2 F2 R F2 R2 D2 B2 D F2 U",
+    "2027-04-01": "R' B R' D F2 B U' B' D' L' U L2 U' R2 L2 U2 F2 R2 L2 D2 B2",
+    "2027-04-02": "F2 U2 D F' D' R' B L' D' L' F2 R U2 F2 D2 F2 R D2 F2 R' U2",
+    "2027-04-03": "L' U' R2 B2 U' L2 U R2 B2 U' B2 D2 B2 L U' F R2 B' F U'",
+    "2027-04-04": "F2 U' R L2 D' B2 R F U' B R L B2 R B2 D2 R F2 D2 F2 R2",
+    "2027-04-05": "L B2 L2 B' U R' D L F' U2 F2 D2 L2 B2 L D2 F2 U2 B2 R' F2",
+    "2027-04-06": "R2 B D2 F' D' R2 F U D2 B2 R' B2 D2 R L2 D2 L' U2 F2 R F",
+    "2027-04-07": "F' L2 U' F' U2 D' B2 R D' F' R2 D2 B R2 L2 B2 L2 F L2 B U2",
+    "2027-04-08": "R2 D F2 D2 L U F D' R D2 R2 U2 D2 B2 R2 F' L2 U2 F R2 D2",
+    "2027-04-09": "F' B2 R' U' L D' B L2 U L2 D' L2 U D2 F2 B2 D' R2 B U2",
+    "2027-04-10": "U2 B' F2 D B2 D B2 F2 U' L2 U2 L2 U' R' F' L B F' U L2 F'",
+    "2027-04-11": "F' B' L2 D L2 D' F' B2 L U2 L B2 U2 R F2 L B2 U2 R' F R",
+    "2027-04-12": "U R2 D B' R2 B L B' U' F2 L2 U' F2 D B2 D B2 U' B2 R2 B",
+    "2027-04-13": "R D B' U' D L D B' R D2 L' B2 U2 B2 R2 B2 R2 L' D2 F2",
+    "2027-04-14": "D' F R2 D2 B U' R' L2 D F2 L' F2 L2 D2 B2 R F2 R F2",
+    "2027-04-15": "U R2 F2 R2 F' D' F2 D' R' B D2 B D2 F' L2 F U2 D2 F U2 B'",
+    "2027-04-16": "U R' F' B2 D B' D' R' L2 U' F2 R2 U2 L2 U' R2 U' B2 R2 D'",
+    "2027-04-17": "U' D' F2 B R B' R D' R' F2 U2 R2 L B2 D2 B2 D2 R' D2",
+    "2027-04-18": "D' F2 U' L2 U' L2 U' R2 D' F2 U L2 R D R' B' D' R U2 F",
+    "2027-04-19": "R' L' U' F' U2 L' U2 D B' R2 D2 L F2 D2 L F2 L U2 R F2 R",
+    "2027-04-20": "R' U B2 U' B2 R2 U F2 U B2 F2 L2 F2 L D' F U2 B' D F U'",
+    "2027-04-21": "F D2 F U' L D' R2 B' U' R2 B R2 D2 F U2 R2 F' R2 B R2 F'",
+    "2027-04-22": "U2 L U2 L' F2 R D2 B2 D2 F2 L2 R' B R2 D2 R' F' L' D R B2",
+    "2027-04-23": "R' D F2 D R' B2 R B R' F' U' F2 D' L2 U B2 L2 U2 R2 D' R2",
+    "2027-04-24": "R' U B2 F2 U F2 R2 D2 F2 R2 U2 R2 F' D' L' B' F' L R",
+    "2027-04-25": "B2 L B D F B2 D L' B U' R2 D' L2 U' R2 L2 B2 U2 D F2 L2",
+    "2027-04-26": "B2 L' D R F' B' U2 R2 U F D2 B' R2 D2 B2 L2 D2 R2 F' D2 B",
+    "2027-04-27": "U B D' B' L B' D' R' F L U2 R2 F' U2 D2 B' R2 U2 B' R2 L2",
+    "2027-04-28": "L' D' R' U D L' U D2 F U2 L2 B D2 F' U2 L2 F2 R2 F2 L' U'",
+    "2027-04-29": "U B' R F U' F' L F B L2 F2 U' B2 U2 F2 L2 D R2 D' R2 U'",
+    "2027-04-30": "F' U2 L B2 L' B2 U2 R D2 F2 R U2 R' U' F2 U L' F' D U L",
+    "2027-05-01": "R D2 R D' R U L' F D2 R2 U2 F D2 F2 L2 U2 B' U2 R2 U B'",
+    "2027-05-02": "L2 U L2 D' U' B2 R2 B2 R2 D2 F2 U' L' U' R' B L2 R B' L2",
+    "2027-05-03": "B' L F2 U' F2 L' U R2 B R' F2 R' U2 F2 U2 D2 L' D2 R' D2 F2",
+    "2027-05-04": "U' L' D2 R D' B L U2 D' F' U2 B L2 U2 F' U2 L2 U2 L2 B D2",
+    "2027-05-05": "U F' B2 D' R2 F' L R2 U L2 D2 B2 L2 U' R2 F2 U' R F' D",
+    "2027-05-06": "R L F B2 R B' R2 L' D' R L D2 R' B2 L' D2 L2 U2 L U2 D2",
+    "2027-05-07": "F' R2 U2 L2 U' R F L2 U' D' L2 F2 D' R2 L2 B2 U' L2 U B D",
+    "2027-05-08": "L2 B' L' U2 F' U' R2 B' D' R L2 U2 B U2 R2 F2 L2 B U2 F2 U2",
+    "2027-05-09": "B2 U R B2 R F2 R B2 D' L2 D R2 L2 D B2 D R2 F2 L2 B L'",
+    "2027-05-10": "L' D R2 F R D' B' U' L' F' R2 D2 F L2 U2 B' L2 B' D2 F L2",
+    "2027-05-11": "D' R D2 B2 R D2 L B D' B2 D' R2 U L2 D' F2 U' F2 R2 L",
+    "2027-05-12": "R2 F R2 B2 U' D F D R F2 R2 F2 R U2 F2 L2 B2 L U2 L' F'",
+    "2027-05-13": "D' L U2 B2 U' F L R2 D2 F' R2 U2 L2 F D2 B' R2 U2 R2 U' R2",
+    "2027-05-14": "F2 L B' R L' F L' D' U2 R2 U2 F' L2 F2 U2 D2 R2 F U2 B R'",
+    "2027-05-15": "D2 B2 U' L2 D F2 U B2 L2 U2 R2 U' R U' F R' U2 B' D2 F2 L",
+    "2027-05-16": "U L2 U' B2 L2 D' U' L2 D' F2 U' L2 R' F L2 B D B D' U F'",
+    "2027-05-17": "D2 F2 U B R' D F' B R' L2 U2 R2 U' R2 F2 D L2 F2 D L2 U'",
+    "2027-05-18": "U2 L2 U' L' F' R' B' D R2 D2 L2 F2 U' F2 U2 B2 L2 U F2 R' U2",
+    "2027-05-19": "L U' D2 R F' R' F' B L U2 F2 L2 U2 L2 U B2 D2 R2 B2 L2 B2",
+    "2027-05-20": "L' B U D2 F R' U L D2 F2 B2 D' B2 D F2 U R2 L2 B2 R",
+    "2027-05-21": "R' B R' U' F2 D' R' L2 B' L2 U F2 L2 D R2 L2 F2 U D2 R2 U2",
+    "2027-05-22": "R2 B L' F' D F' L2 D F' U L2 U L2 D2 B2 U' R2 U2 D' L2 D'",
+    "2027-05-23": "R2 U' D' F2 U' B U2 R F' D F2 D2 F2 B2 R2 U' F2 U' R2 L2",
+    "2027-05-24": "F' R U F2 L2 U B2 D' R2 F2 D2 R2 B2 D2 F' U R' D F2 U' B'",
+    "2027-05-25": "D L2 F' D2 F D2 R U' R2 D' L2 D' B2 R2 F2 U F2 U2 B2 R B",
+    "2027-05-26": "D' L' B' L2 B2 L2 F U2 B' U2 L2 R2 U2 L2 R B' L2 F D' R' U2",
+    "2027-05-27": "R' D2 B2 L2 F' L' D' F U' F L2 F' B R2 L2 B L2 D2 F2 U",
+    "2027-05-28": "U D F D2 R F2 L' F U B R2 U2 F2 D R2 U2 B2 D' F2 B2 U'",
+    "2027-05-29": "U L' U' D2 L B R' L F' D2 L2 F R2 F' U2 B' U2 B2 U2 F2 U'",
+    "2027-05-30": "U2 R2 D' F R2 U' D2 L' F2 R2 L2 B2 U' B2 D L2 U' F2 B2 D2 F",
+    "2027-05-31": "L' U D' F L D B' U2 L F2 U2 B2 L2 U' L2 U2 R2 L2 U L2 B2",
+    "2027-06-01": "D B2 L2 D' F2 U F2 L2 D2 R2 D B2 L' F' R2 B' U' L R' D F2",
+    "2027-06-02": "U2 D' F R U F' U' B D' U2 R D2 R B2 R2 B2 L F2 L' D2 R2",
+    "2027-06-03": "U' B' D2 R' F2 U2 B' L2 U L2 F2 D' B2 D' F2 B2 U' B2 D2 F'",
+    "2027-06-04": "L' D2 R' F2 R2 F2 D2 U2 R B2 D2 L2 U R2 D R' F' U' L' U' R2",
+    "2027-06-05": "L' F2 B U2 L F' B L' F2 U' L2 F2 U' R2 D2 R2 B2 U' F2 D' L'",
+    "2027-06-06": "B R2 U2 F2 D F2 R2 F2 L2 U B2 F2 L' B' U' F' D' F R D",
+    "2027-06-07": "R' L2 F2 R2 U2 R2 U' R2 D' L2 R2 B2 D2 R D L2 R2 B' F' D' L",
+    "2027-06-08": "U' R B' U F' U B U2 F2 L2 U' R2 U F2 D' F2 B2 U L U F'",
+    "2027-06-09": "R' U F' R2 L F D2 R L' F' U R2 U L2 D2 R2 D L2 F2 R2 F2",
+    "2027-06-10": "R2 F D2 R' F B2 R F' L' F2 U B2 R2 L2 U F2 U L2 U R2 L2",
+    "2027-06-11": "F U2 R D2 R2 D2 F U B R2 F' U2 F2 D2 L2 B' D2 B' D2 B' L'",
+    "2027-06-12": "F2 U F U L' U D B2 L' D2 B L2 B D2 L2 B2 U2 R2 B2 D2 F",
+    "2027-06-13": "R2 U' L D' B' R U B' U' F2 L2 D L2 B2 U2 B2 D F2 U' B2 R'",
+    "2027-06-14": "U R F' L U R' B' R F2 D' B2 U L2 D2 L2 U' F2 D R2 B' R2",
+    "2027-06-15": "B2 U2 L2 D L' D' R F' R2 U F2 B2 R2 U' R2 U D2 F2 D' F2 B",
+    "2027-06-16": "F' B' D' R' U L' B U2 L F' L2 B2 D' B2 U' B2 U R2 B2 D' R2",
+    "2027-06-17": "L2 F L2 B2 L2 F D2 R2 U2 F U2 L D' L U' L' F U L' R' D2",
+    "2027-06-18": "D2 B L2 D2 F D2 U2 L2 U2 B2 F' L2 D' R D2 U' L U' B D2 L2",
+    "2027-06-19": "F' U D' R D B' U2 F' R F U' R2 B2 U' F2 U2 D F2 R2 D' F2",
+    "2027-06-20": "F' U' D2 R' B' L U' F U F2 B2 U' L2 U B2 L2 F2 U2 B2 F' R2",
+    "2027-06-21": "D' R D' R F' D' B' R' F D2 F2 U' R2 B2 R2 F2 B2 R2 U R2 D2",
+    "2027-06-22": "D2 R U' L D2 R' B L2 U' D2 B R2 U2 R2 F2 R2 B' U2 B D2 R2",
+    "2027-06-23": "L F2 B' L' D R B' U2 B2 L2 D2 L D2 R D2 F2 R F2 L D",
+    "2027-06-24": "L B D2 R2 L' B' R' B2 D F2 U2 R2 D2 B2 R D2 B2 R2 L' U2 L2",
+    "2027-06-25": "B' D2 L' F' L2 D' R D F L R2 U2 F2 U2 B2 R2 F2 U R2 D'",
+    "2027-06-26": "L' F L' D2 F R' U L2 D L B2 D F2 U2 R2 L2 F2 U' F2 B2 U'",
+    "2027-06-27": "U R2 U2 D F' R U2 F' U2 L D' L2 B2 D' F2 D' B2 L2 D' B2 U'",
+    "2027-06-28": "U R B2 U2 L' U2 R F2 U2 L B2 R2 F2 U B F' D' B L' B R",
+    "2027-06-29": "R' D' L' F' R F L U' F R2 D2 B2 D2 R U2 R2 L F2 R' U2 L2",
+    "2027-06-30": "D' R2 U2 L' R2 D2 U2 F2 D2 L' D2 L F2 B U L' R' B' L R'",
+    "2027-07-01": "L2 F' U2 D' L' F R' D2 L' U2 F2 L2 F2 D2 F2 U R2 U2 L2 U R2",
+    "2027-07-02": "F' R F2 D2 B' U R U2 D R D2 F' U2 F' D2 R2 F D2 F' U2",
+    "2027-07-03": "R2 D2 R2 B2 L B' D B2 L2 F2 R' D2 L' D2 B2 L B2 L' B2 D",
+    "2027-07-04": "D F B2 D' F2 D F U B L' U F2 U D2 R2 B2 U' F2 B2 R2 D",
+    "2027-07-05": "L' F2 D2 B2 F2 L D2 L F2 R2 F2 U2 D F' U2 B' U' R2 F' D R'",
+    "2027-07-06": "D2 F2 L' U2 B' R2 D L B L2 U' B2 D2 L2 U' F2 D L2 F2 L2 U'",
+    "2027-07-07": "B' U2 L2 B2 D2 L2 F L2 B' D2 R2 B' U L2 F D' B U' F R U'",
+    "2027-07-08": "R2 F2 L D' L' F U B' D2 F2 R2 D' F2 U' F2 L2 U2 L2 B2 D L'",
+    "2027-07-09": "D2 F' R2 D F' D' B R' F2 U D2 B2 U L2 U' B2 U L2 U2 F",
+    "2027-07-10": "D R U2 R' B2 D F D F2 U D2 F2 B2 U' L2 B2 U2 F2 U' B' D'",
+    "2027-07-11": "R2 D' L' U2 F R' B R' L F' R2 D2 R2 B2 L2 F D2 B2 D2 B'",
+    "2027-07-12": "F B2 U B2 D' B2 L2 D' B2 U' B2 F2 L F L D L U F' R' U'",
+    "2027-07-13": "L2 B' U D2 L2 F U2 B' L2 B2 D2 F2 R B2 R U2 R D2 R2 U2 D'",
+    "2027-07-14": "R L F2 U2 F2 B' L' U R B2 D2 R' F2 B2 D2 L D2 R B2 R2",
+    "2027-07-15": "B D2 F' L2 B2 U2 F L2 R2 F2 L2 R2 U' L' B' F2 R2 B R U'",
+    "2027-07-16": "R' L D L2 F U2 B U R F2 R2 D' F2 B2 D' R2 D' L2 F2 U L'",
+    "2027-07-17": "L2 D L' U F L U2 R D L2 U' R2 D R2 F2 L2 F2 U2 R2 B' D",
+    "2027-07-18": "R F B2 U D2 L' D2 F L U' F2 D' B2 R2 L2 U F2 B2 D2 B2 U",
+    "2027-07-19": "U F2 U' F2 L2 D' F2 L2 U2 L2 U B2 F' U R2 F R D U2 F U",
+    "2027-07-20": "B U' L' F' U' F' R D2 F' L2 B2 L2 D2 F' R2 U2 R F U2",
+    "2027-07-21": "F2 D L2 B R F U F U2 B2 U2 D2 L U2 L' B2 L U2 D2 L U",
+    "2027-07-22": "F2 L2 F' L D' F' U2 F2 L' B' U' L2 U' B2 U2 L2 U' L2 D2",
+    "2027-07-23": "F2 R' L' U R2 U' F' L R2 B U2 R2 U2 F2 U2 L2 F' R2 F2 L2 R'",
+    "2027-07-24": "L U' B R2 F2 D F' L B2 D R2 D F2 U R2 F2 R2 D",
+    "2027-07-25": "F2 R2 F' L B U F' B U B2 L2 U' L2 F2 D F2 U R2 U' L' U2",
+    "2027-07-26": "F2 U' F L2 U2 F U2 B' U2 F2 D2 R2 B U2 L B' D F2 L2 R' D",
+    "2027-07-27": "F2 B U2 D R' F2 L' D U2 B' U2 L2 F' U2 F D2 F D2 B2 L2 D'",
+    "2027-07-28": "B2 U2 R' U2 L D2 F2 R B2 L2 D2 R' U' L R B L R2 U2 R",
+    "2027-07-29": "D' B2 L D2 R L2 B U L' D2 L' F2 D2 L2 F2 D2 B2 L U2 D'",
+    "2027-07-30": "U2 L B' R U' F2 B R2 F2 R' B2 R' F2 B2 U2 R' F2 L2 D2 U' F",
+    "2027-07-31": "B' D' L U2 F2 U R D2 F2 U2 D2 B' R2 L2 F R2 D2 F2 U F D'",
+    "2027-08-01": "L2 U2 L2 B2 F L2 B' L2 D2 B' F2 U B' F2 R' D U2 L' D2 U' L2",
+    "2027-08-02": "F2 U' R2 D L2 U' R2 U2 R2 F2 D2 U' B L' U2 R2 B' L B' D U'",
+    "2027-08-03": "B' U' F' R' U' B' L2 F L D' R2 F' R2 B L2 F L2 U2 F L2 F'",
+    "2027-08-04": "U R' B' U' B L' U2 B' D L B2 U' F2 U' F2 U R2 U' F2 U2 L2",
+    "2027-08-05": "L D L' F' U F B L F' L2 D' B2 L2 U' L2 F2 D F2 U2 D' F2",
+    "2027-08-06": "R' U B' D' F2 B L' F2 R' D2 B L2 D2 F R2 B L2 U2 R2 F'",
+    "2027-08-07": "F2 R U D' F U2 D R' B2 U2 F' L2 F D2 F L2 F2 R2 F' D2 L'",
+    "2027-08-08": "R2 U2 L2 B R2 U2 R2 D2 B' L2 B' F' L D' R B' D2 R' U2 F'",
+    "2027-08-09": "L2 D' R' F' D' R' B2 D R' L2 U2 R2 B2 R2 L2 D' R2 U B2 U' L2",
+    "2027-08-10": "B U' L' D' B2 R' D L B2 R D2 R B2 D2 R2 B2 L' B2 U",
+    "2027-08-11": "R2 U B' R' F' R2 L D R L2 D2 R2 U R2 B2 D' F2 B2 D B2 R2",
+    "2027-08-12": "U L' D R U' L' F2 D F' U R2 U' R2 F2 D2 L2 F2 U R2 F2 B2",
+    "2027-08-13": "D' B2 R' F' D F U' R U B2 U' B2 U B2 R2 D2 L2 U' L2 U'",
+    "2027-08-14": "R F' B D R F' L' B2 D L' F2 R' B2 R U2 D2 L2 B2 R' F",
+    "2027-08-15": "U' L B L2 U' R' F' U' B F2 D' R2 D' B2 U R2 L2 U' F2 D2 F2",
+    "2027-08-16": "D' R U' L2 U' B' D L2 D2 B' U2 R2 D2 F D2 B D2 L2 F U L'",
+    "2027-08-17": "R F2 B' R U2 R' U' R2 B2 L' F2 B2 R D2 R B2 R' B2 L' U' R",
+    "2027-08-18": "U' L' D R' F2 D R U2 L B' U2 F' R2 F2 D2 L2 U2 F' U2 D2 F2",
+    "2027-08-19": "F' U' F D' F' L D' B L' B2 D2 L U2 R' B2 D2 L B2 U2 D",
+    "2027-08-20": "U' B L2 F2 R2 B' R2 B' D2 R2 F' D2 L2 R B L B' L B D' F'",
+    "2027-08-21": "D2 B2 U' L' B2 L' F' U D2 B2 U F2 R2 U' B2 D2 R2 B2 R B L2",
+    "2027-08-22": "R2 U2 B' R' U F2 B L2 D2 F2 L2 U2 D R2 D B2 L2 F2 B' L U",
+    "2027-08-23": "R U L D' B2 L2 B L F D2 L2 D B2 U L2 U F2 R2 L2 U' F2",
+    "2027-08-24": "R2 U' F' R2 D2 L B' D U2 R2 F' U2 F2 L2 F' L2 F2 D2 R2",
+    "2027-08-25": "L2 D2 R2 B2 L D2 R' B2 R' D2 F2 D2 B' D' R2 D2 B' F' U' R B2",
+    "2027-08-26": "B' L2 F R2 B D2 B' D2 B U2 B U L B U2 L R2 U2 F2 U",
+    "2027-08-27": "R' U F' L2 F D R' L2 F' U D' F2 R2 L2 U' R2 D' R2 U' L2 D",
+    "2027-08-28": "D' L2 B' R' D R' D B' U R' U2 B2 R F2 U2 R' U2 D2 B2 L F2",
+    "2027-08-29": "D2 L2 R2 U' L2 U2 L2 F2 U F2 U2 B2 F' D' F' D' L' F' U2 L R",
+    "2027-08-30": "B' R' U' D2 B2 D2 R F U D2 R2 F2 R2 D R2 D2 R2 F2 U F2 R",
+    "2027-08-31": "L D' B' R U F B2 L' D B2 U2 B2 L' U2 R U2 R F2 B2 L U2",
+    "2027-09-01": "B' R2 F L2 U D2 F2 B' R F2 L D2 L B2 L' F2 R' D2 B2 L2",
+    "2027-09-02": "R' U' L' D' F B' U2 D' R U' L2 D' F2 U R2 D2 F2 D L2 D L2",
+    "2027-09-03": "F D2 L U B2 D' R2 L' D B U2 F2 U2 D2 F' R2 F D2 L2 B2",
+    "2027-09-04": "L2 F2 U2 R2 U2 F D2 U2 F' R2 F2 L2 U L B F' R' F' D' U'",
+    "2027-09-05": "R' U' D2 F' U' R' U2 D B2 R2 U2 B U2 F2 U2 R2 D2 F L2 B2",
+    "2027-09-06": "R2 B' U2 L' F2 D2 L D L2 U2 D2 B' D2 F U2 B' D2 F U2",
+    "2027-09-07": "U B U B L U' R D U2 R2 B D2 R2 D2 L2 B D2 F2 B U",
+    "2027-09-08": "L U R U' R' F2 R U2 F U' R2 L2 U' R2 D' R2 F2 B2 U2 R2 F",
+    "2027-09-09": "R' L U2 B' U B' U L U2 F' R2 D2 L2 B' R2 L2 F' U2 L2 F2",
+    "2027-09-10": "L' F2 U2 B R2 F2 L R2 B2 U F2 D' L2 D' R2 U2 F2 R2 U' R U",
+    "2027-09-11": "U L F' D' F' U' R U D F U2 B' U2 R2 D2 B2 L2 U2 F B2 U2",
+    "2027-09-12": "L' U' R' F2 U D' L D2 B' U' L2 U2 R2 D2 B D2 F' D2 B U2 B'",
+    "2027-09-13": "F' U2 R' L' F2 B' U B L' F' U2 F' U2 R2 B R2 L2 B' R2 F D2",
+    "2027-09-14": "U2 B' U L2 F2 D B2 D' F2 R2 U2 R2 D L2 F R D2 F R F' L'"
+  },
+  "difficulty": {
+    "2026-08-11": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-08-12": {
+      "cross": 4,
+      "faces": [
+        "D"
+      ]
+    },
+    "2026-08-13": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-08-14": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "B"
+      ]
+    },
+    "2026-08-15": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2026-08-16": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "L"
+      ]
+    },
+    "2026-08-17": {
+      "cross": 4,
+      "faces": [
+        "U",
+        "R"
+      ]
+    },
+    "2026-08-18": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "B"
+      ]
+    },
+    "2026-08-19": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-08-20": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "F"
+      ]
+    },
+    "2026-08-21": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "B"
+      ]
+    },
+    "2026-08-22": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "L"
+      ]
+    },
+    "2026-08-23": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2026-08-24": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-08-25": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L"
+      ]
+    },
+    "2026-08-26": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-08-27": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L"
+      ]
+    },
+    "2026-08-28": {
+      "cross": 3,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-08-29": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-08-30": {
+      "cross": 6,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2026-08-31": {
+      "cross": 2,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-09-01": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2026-09-02": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "B"
+      ]
+    },
+    "2026-09-03": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-09-04": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-09-05": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2026-09-06": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "B"
+      ]
+    },
+    "2026-09-07": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "B"
+      ]
+    },
+    "2026-09-08": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2026-09-09": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2026-09-10": {
+      "cross": 5,
+      "faces": [
+        "F",
+        "B"
+      ]
+    },
+    "2026-09-11": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-09-12": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-09-13": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-09-14": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2026-09-15": {
+      "cross": 3,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-09-16": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-09-17": {
+      "cross": 4,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-09-18": {
+      "cross": 4,
+      "faces": [
+        "D"
+      ]
+    },
+    "2026-09-19": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "B"
+      ]
+    },
+    "2026-09-20": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-09-21": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2026-09-22": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2026-09-23": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2026-09-24": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "L"
+      ]
+    },
+    "2026-09-25": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-09-26": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2026-09-27": {
+      "cross": 3,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-09-28": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-09-29": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-09-30": {
+      "cross": 4,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-10-01": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-10-02": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-10-03": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "F"
+      ]
+    },
+    "2026-10-04": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-10-05": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2026-10-06": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-10-07": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "F"
+      ]
+    },
+    "2026-10-08": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-10-09": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-10-10": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L",
+        "F"
+      ]
+    },
+    "2026-10-11": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2026-10-12": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-10-13": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-10-14": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-10-15": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-10-16": {
+      "cross": 3,
+      "faces": [
+        "D"
+      ]
+    },
+    "2026-10-17": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-10-18": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "F"
+      ]
+    },
+    "2026-10-19": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2026-10-20": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-10-21": {
+      "cross": 6,
+      "faces": [
+        "F",
+        "B"
+      ]
+    },
+    "2026-10-22": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-10-23": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2026-10-24": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-10-25": {
+      "cross": 4,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-10-26": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2026-10-27": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-10-28": {
+      "cross": 4,
+      "faces": [
+        "D",
+        "B"
+      ]
+    },
+    "2026-10-29": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-10-30": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "F"
+      ]
+    },
+    "2026-10-31": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R"
+      ]
+    },
+    "2026-11-01": {
+      "cross": 4,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-11-02": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-11-03": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2026-11-04": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-11-05": {
+      "cross": 3,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-11-06": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2026-11-07": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L"
+      ]
+    },
+    "2026-11-08": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-11-09": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2026-11-10": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2026-11-11": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2026-11-12": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-11-13": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2026-11-14": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2026-11-15": {
+      "cross": 4,
+      "faces": [
+        "R",
+        "B"
+      ]
+    },
+    "2026-11-16": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-11-17": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-11-18": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "B"
+      ]
+    },
+    "2026-11-19": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L",
+        "F"
+      ]
+    },
+    "2026-11-20": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "F"
+      ]
+    },
+    "2026-11-21": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-11-22": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2026-11-23": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2026-11-24": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R"
+      ]
+    },
+    "2026-11-25": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "F"
+      ]
+    },
+    "2026-11-26": {
+      "cross": 3,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-11-27": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2026-11-28": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "F"
+      ]
+    },
+    "2026-11-29": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L"
+      ]
+    },
+    "2026-11-30": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "F"
+      ]
+    },
+    "2026-12-01": {
+      "cross": 3,
+      "faces": [
+        "L"
+      ]
+    },
+    "2026-12-02": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R"
+      ]
+    },
+    "2026-12-03": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-12-04": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "L",
+        "B"
+      ]
+    },
+    "2026-12-05": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "B"
+      ]
+    },
+    "2026-12-06": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2026-12-07": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "B"
+      ]
+    },
+    "2026-12-08": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "F"
+      ]
+    },
+    "2026-12-09": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-12-10": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "B"
+      ]
+    },
+    "2026-12-11": {
+      "cross": 4,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2026-12-12": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "B"
+      ]
+    },
+    "2026-12-13": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-12-14": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-12-15": {
+      "cross": 4,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2026-12-16": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-12-17": {
+      "cross": 2,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-12-18": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-12-19": {
+      "cross": 4,
+      "faces": [
+        "U",
+        "B"
+      ]
+    },
+    "2026-12-20": {
+      "cross": 5,
+      "faces": [
+        "F",
+        "B"
+      ]
+    },
+    "2026-12-21": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "F"
+      ]
+    },
+    "2026-12-22": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2026-12-23": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "F"
+      ]
+    },
+    "2026-12-24": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "B"
+      ]
+    },
+    "2026-12-25": {
+      "cross": 4,
+      "faces": [
+        "F",
+        "B"
+      ]
+    },
+    "2026-12-26": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "F"
+      ]
+    },
+    "2026-12-27": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2026-12-28": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "B"
+      ]
+    },
+    "2026-12-29": {
+      "cross": 3,
+      "faces": [
+        "U"
+      ]
+    },
+    "2026-12-30": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2026-12-31": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-01-01": {
+      "cross": 6,
+      "faces": [
+        "R",
+        "L",
+        "B"
+      ]
+    },
+    "2027-01-02": {
+      "cross": 3,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-01-03": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-01-04": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L"
+      ]
+    },
+    "2027-01-05": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-01-06": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-01-07": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "F"
+      ]
+    },
+    "2027-01-08": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "F",
+        "B"
+      ]
+    },
+    "2027-01-09": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2027-01-10": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-01-11": {
+      "cross": 4,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-01-12": {
+      "cross": 4,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-01-13": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-01-14": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R"
+      ]
+    },
+    "2027-01-15": {
+      "cross": 4,
+      "faces": [
+        "R",
+        "B"
+      ]
+    },
+    "2027-01-16": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-01-17": {
+      "cross": 3,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-01-18": {
+      "cross": 4,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2027-01-19": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L"
+      ]
+    },
+    "2027-01-20": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-01-21": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2027-01-22": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R"
+      ]
+    },
+    "2027-01-23": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-01-24": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-01-25": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-01-26": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "B"
+      ]
+    },
+    "2027-01-27": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-01-28": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-01-29": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-01-30": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2027-01-31": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-02-01": {
+      "cross": 3,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-02-02": {
+      "cross": 3,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-02-03": {
+      "cross": 3,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-02-04": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "B"
+      ]
+    },
+    "2027-02-05": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R"
+      ]
+    },
+    "2027-02-06": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L"
+      ]
+    },
+    "2027-02-07": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-02-08": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "F",
+        "B"
+      ]
+    },
+    "2027-02-09": {
+      "cross": 3,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-02-10": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "R"
+      ]
+    },
+    "2027-02-11": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-02-12": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-02-13": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "L"
+      ]
+    },
+    "2027-02-14": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2027-02-15": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2027-02-16": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-02-17": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "B"
+      ]
+    },
+    "2027-02-18": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "F",
+        "B"
+      ]
+    },
+    "2027-02-19": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-02-20": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-02-21": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-02-22": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-02-23": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-02-24": {
+      "cross": 4,
+      "faces": [
+        "U",
+        "F"
+      ]
+    },
+    "2027-02-25": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2027-02-26": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-02-27": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-02-28": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L"
+      ]
+    },
+    "2027-03-01": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L"
+      ]
+    },
+    "2027-03-02": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-03-03": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-03-04": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-03-05": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2027-03-06": {
+      "cross": 4,
+      "faces": [
+        "U",
+        "D"
+      ]
+    },
+    "2027-03-07": {
+      "cross": 4,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-03-08": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-03-09": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2027-03-10": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D"
+      ]
+    },
+    "2027-03-11": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "L",
+        "B"
+      ]
+    },
+    "2027-03-12": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-03-13": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L"
+      ]
+    },
+    "2027-03-14": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2027-03-15": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "L"
+      ]
+    },
+    "2027-03-16": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-03-17": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-03-18": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-03-19": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-03-20": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-03-21": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2027-03-22": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "F"
+      ]
+    },
+    "2027-03-23": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-03-24": {
+      "cross": 6,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2027-03-25": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-03-26": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-03-27": {
+      "cross": 3,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-03-28": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2027-03-29": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-03-30": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "F"
+      ]
+    },
+    "2027-03-31": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-04-01": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-04-02": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-04-03": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "B"
+      ]
+    },
+    "2027-04-04": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-04-05": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-04-06": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-04-07": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R"
+      ]
+    },
+    "2027-04-08": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D"
+      ]
+    },
+    "2027-04-09": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-04-10": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "R"
+      ]
+    },
+    "2027-04-11": {
+      "cross": 3,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-04-12": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-04-13": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-04-14": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-04-15": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-04-16": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-04-17": {
+      "cross": 4,
+      "faces": [
+        "F",
+        "B"
+      ]
+    },
+    "2027-04-18": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "B"
+      ]
+    },
+    "2027-04-19": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "B"
+      ]
+    },
+    "2027-04-20": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-04-21": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "F"
+      ]
+    },
+    "2027-04-22": {
+      "cross": 3,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-04-23": {
+      "cross": 3,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-04-24": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-04-25": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2027-04-26": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-04-27": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2027-04-28": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2027-04-29": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-04-30": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-05-01": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "F"
+      ]
+    },
+    "2027-05-02": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L"
+      ]
+    },
+    "2027-05-03": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R"
+      ]
+    },
+    "2027-05-04": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L",
+        "F"
+      ]
+    },
+    "2027-05-05": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "B"
+      ]
+    },
+    "2027-05-06": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-05-07": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-05-08": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "F"
+      ]
+    },
+    "2027-05-09": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-05-10": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-05-11": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2027-05-12": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "B"
+      ]
+    },
+    "2027-05-13": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-05-14": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R"
+      ]
+    },
+    "2027-05-15": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-05-16": {
+      "cross": 4,
+      "faces": [
+        "D",
+        "R"
+      ]
+    },
+    "2027-05-17": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "F"
+      ]
+    },
+    "2027-05-18": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-05-19": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2027-05-20": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-05-21": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "F"
+      ]
+    },
+    "2027-05-22": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-05-23": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-05-24": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-05-25": {
+      "cross": 5,
+      "faces": [
+        "F",
+        "B"
+      ]
+    },
+    "2027-05-26": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "B"
+      ]
+    },
+    "2027-05-27": {
+      "cross": 4,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-05-28": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "L"
+      ]
+    },
+    "2027-05-29": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "B"
+      ]
+    },
+    "2027-05-30": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "F"
+      ]
+    },
+    "2027-05-31": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "B"
+      ]
+    },
+    "2027-06-01": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2027-06-02": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-06-03": {
+      "cross": 4,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-06-04": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-06-05": {
+      "cross": 4,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-06-06": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "B"
+      ]
+    },
+    "2027-06-07": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "F"
+      ]
+    },
+    "2027-06-08": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-06-09": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L"
+      ]
+    },
+    "2027-06-10": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "B"
+      ]
+    },
+    "2027-06-11": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "B"
+      ]
+    },
+    "2027-06-12": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2027-06-13": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-06-14": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R"
+      ]
+    },
+    "2027-06-15": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-06-16": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "R",
+        "B"
+      ]
+    },
+    "2027-06-17": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "B"
+      ]
+    },
+    "2027-06-18": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-06-19": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "L"
+      ]
+    },
+    "2027-06-20": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-06-21": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-06-22": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-06-23": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-06-24": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-06-25": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2027-06-26": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-06-27": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "F"
+      ]
+    },
+    "2027-06-28": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-06-29": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "B"
+      ]
+    },
+    "2027-06-30": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-07-01": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L"
+      ]
+    },
+    "2027-07-02": {
+      "cross": 6,
+      "faces": [
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2027-07-03": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-07-04": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-07-05": {
+      "cross": 4,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-07-06": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L"
+      ]
+    },
+    "2027-07-07": {
+      "cross": 4,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-07-08": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2027-07-09": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "B"
+      ]
+    },
+    "2027-07-10": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "F",
+        "B"
+      ]
+    },
+    "2027-07-11": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-07-12": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-07-13": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-07-14": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-07-15": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-07-16": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "B"
+      ]
+    },
+    "2027-07-17": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-07-18": {
+      "cross": 4,
+      "faces": [
+        "U",
+        "D"
+      ]
+    },
+    "2027-07-19": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-07-20": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-07-21": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-07-22": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-07-23": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-07-24": {
+      "cross": 5,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-07-25": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-07-26": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-07-27": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R"
+      ]
+    },
+    "2027-07-28": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "R",
+        "L"
+      ]
+    },
+    "2027-07-29": {
+      "cross": 3,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-07-30": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-07-31": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-08-01": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "B"
+      ]
+    },
+    "2027-08-02": {
+      "cross": 3,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-08-03": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-08-04": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-08-05": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-08-06": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D"
+      ]
+    },
+    "2027-08-07": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "F"
+      ]
+    },
+    "2027-08-08": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "L",
+        "B"
+      ]
+    },
+    "2027-08-09": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F"
+      ]
+    },
+    "2027-08-10": {
+      "cross": 3,
+      "faces": [
+        "D"
+      ]
+    },
+    "2027-08-11": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-08-12": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R"
+      ]
+    },
+    "2027-08-13": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-08-14": {
+      "cross": 5,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-08-15": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "L"
+      ]
+    },
+    "2027-08-16": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-08-17": {
+      "cross": 6,
+      "faces": [
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-08-18": {
+      "cross": 5,
+      "faces": [
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-08-19": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-08-20": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "B"
+      ]
+    },
+    "2027-08-21": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "D"
+      ]
+    },
+    "2027-08-22": {
+      "cross": 5,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-08-23": {
+      "cross": 5,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-08-24": {
+      "cross": 4,
+      "faces": [
+        "D",
+        "R",
+        "L"
+      ]
+    },
+    "2027-08-25": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "R"
+      ]
+    },
+    "2027-08-26": {
+      "cross": 5,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-08-27": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    },
+    "2027-08-28": {
+      "cross": 4,
+      "faces": [
+        "L",
+        "F"
+      ]
+    },
+    "2027-08-29": {
+      "cross": 4,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2027-08-30": {
+      "cross": 5,
+      "faces": [
+        "R"
+      ]
+    },
+    "2027-08-31": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "R",
+        "F",
+        "B"
+      ]
+    },
+    "2027-09-01": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-09-02": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "L",
+        "F"
+      ]
+    },
+    "2027-09-03": {
+      "cross": 4,
+      "faces": [
+        "U",
+        "B"
+      ]
+    },
+    "2027-09-04": {
+      "cross": 5,
+      "faces": [
+        "D",
+        "R"
+      ]
+    },
+    "2027-09-05": {
+      "cross": 4,
+      "faces": [
+        "F"
+      ]
+    },
+    "2027-09-06": {
+      "cross": 2,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-09-07": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "B"
+      ]
+    },
+    "2027-09-08": {
+      "cross": 6,
+      "faces": [
+        "U",
+        "D",
+        "R",
+        "L",
+        "F",
+        "B"
+      ]
+    },
+    "2027-09-09": {
+      "cross": 5,
+      "faces": [
+        "U",
+        "L",
+        "F"
+      ]
+    },
+    "2027-09-10": {
+      "cross": 5,
+      "faces": [
+        "R",
+        "F"
+      ]
+    },
+    "2027-09-11": {
+      "cross": 3,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-09-12": {
+      "cross": 4,
+      "faces": [
+        "U"
+      ]
+    },
+    "2027-09-13": {
+      "cross": 4,
+      "faces": [
+        "B"
+      ]
+    },
+    "2027-09-14": {
+      "cross": 4,
+      "faces": [
+        "L"
+      ]
+    }
+  },
+  "optimal": {
+    "2026-08-11": 20,
+    "2026-08-12": 21,
+    "2026-08-13": 20,
+    "2026-08-14": 21,
+    "2026-08-15": 20,
+    "2026-08-16": 18,
+    "2026-08-17": 21,
+    "2026-08-18": 21,
+    "2026-08-19": 20,
+    "2026-08-20": 20,
+    "2026-08-21": 19,
+    "2026-08-22": 19,
+    "2026-08-23": 21,
+    "2026-08-24": 19,
+    "2026-08-25": 20,
+    "2026-08-26": 20,
+    "2026-08-27": 20,
+    "2026-08-28": 20,
+    "2026-08-29": 20,
+    "2026-08-30": 20,
+    "2026-08-31": 20,
+    "2026-09-01": 20,
+    "2026-09-02": 20,
+    "2026-09-03": 19,
+    "2026-09-04": 19,
+    "2026-09-05": 20,
+    "2026-09-06": 21,
+    "2026-09-07": 20,
+    "2026-09-08": 20,
+    "2026-09-09": 19,
+    "2026-09-10": 18,
+    "2026-09-11": 20,
+    "2026-09-12": 21,
+    "2026-09-13": 20,
+    "2026-09-14": 20,
+    "2026-09-15": 20,
+    "2026-09-16": 19,
+    "2026-09-17": 19,
+    "2026-09-18": 20,
+    "2026-09-19": 18,
+    "2026-09-20": 20,
+    "2026-09-21": 21,
+    "2026-09-22": 20,
+    "2026-09-23": 20,
+    "2026-09-24": 18,
+    "2026-09-25": 20,
+    "2026-09-26": 20,
+    "2026-09-27": 20,
+    "2026-09-28": 20,
+    "2026-09-29": 20,
+    "2026-09-30": 21,
+    "2026-10-01": 21,
+    "2026-10-02": 21,
+    "2026-10-03": 19,
+    "2026-10-04": 20,
+    "2026-10-05": 20,
+    "2026-10-06": 21,
+    "2026-10-07": 18,
+    "2026-10-08": 20,
+    "2026-10-09": 20,
+    "2026-10-10": 20,
+    "2026-10-11": 19,
+    "2026-10-12": 21,
+    "2026-10-13": 20,
+    "2026-10-14": 20,
+    "2026-10-15": 19,
+    "2026-10-16": 20,
+    "2026-10-17": 19,
+    "2026-10-18": 19,
+    "2026-10-19": 20,
+    "2026-10-20": 20,
+    "2026-10-21": 19,
+    "2026-10-22": 19,
+    "2026-10-23": 20,
+    "2026-10-24": 20,
+    "2026-10-25": 17,
+    "2026-10-26": 20,
+    "2026-10-27": 20,
+    "2026-10-28": 20,
+    "2026-10-29": 20,
+    "2026-10-30": 20,
+    "2026-10-31": 20,
+    "2026-11-01": 20,
+    "2026-11-02": 20,
+    "2026-11-03": 20,
+    "2026-11-04": 20,
+    "2026-11-05": 20,
+    "2026-11-06": 20,
+    "2026-11-07": 19,
+    "2026-11-08": 18,
+    "2026-11-09": 20,
+    "2026-11-10": 20,
+    "2026-11-11": 21,
+    "2026-11-12": 21,
+    "2026-11-13": 19,
+    "2026-11-14": 19,
+    "2026-11-15": 20,
+    "2026-11-16": 22,
+    "2026-11-17": 20,
+    "2026-11-18": 21,
+    "2026-11-19": 20,
+    "2026-11-20": 20,
+    "2026-11-21": 19,
+    "2026-11-22": 20,
+    "2026-11-23": 21,
+    "2026-11-24": 20,
+    "2026-11-25": 20,
+    "2026-11-26": 20,
+    "2026-11-27": 20,
+    "2026-11-28": 20,
+    "2026-11-29": 20,
+    "2026-11-30": 20,
+    "2026-12-01": 20,
+    "2026-12-02": 20,
+    "2026-12-03": 18,
+    "2026-12-04": 20,
+    "2026-12-05": 20,
+    "2026-12-06": 21,
+    "2026-12-07": 21,
+    "2026-12-08": 19,
+    "2026-12-09": 19,
+    "2026-12-10": 19,
+    "2026-12-11": 20,
+    "2026-12-12": 20,
+    "2026-12-13": 20,
+    "2026-12-14": 20,
+    "2026-12-15": 19,
+    "2026-12-16": 20,
+    "2026-12-17": 21,
+    "2026-12-18": 21,
+    "2026-12-19": 19,
+    "2026-12-20": 20,
+    "2026-12-21": 20,
+    "2026-12-22": 21,
+    "2026-12-23": 21,
+    "2026-12-24": 18,
+    "2026-12-25": 18,
+    "2026-12-26": 21,
+    "2026-12-27": 19,
+    "2026-12-28": 20,
+    "2026-12-29": 19,
+    "2026-12-30": 20,
+    "2026-12-31": 20,
+    "2027-01-01": 19,
+    "2027-01-02": 20,
+    "2027-01-03": 20,
+    "2027-01-04": 20,
+    "2027-01-05": 20,
+    "2027-01-06": 20,
+    "2027-01-07": 20,
+    "2027-01-08": 21,
+    "2027-01-09": 19,
+    "2027-01-10": 21,
+    "2027-01-11": 19,
+    "2027-01-12": 20,
+    "2027-01-13": 21,
+    "2027-01-14": 20,
+    "2027-01-15": 20,
+    "2027-01-16": 20,
+    "2027-01-17": 19,
+    "2027-01-18": 20,
+    "2027-01-19": 19,
+    "2027-01-20": 20,
+    "2027-01-21": 19,
+    "2027-01-22": 20,
+    "2027-01-23": 20,
+    "2027-01-24": 21,
+    "2027-01-25": 20,
+    "2027-01-26": 20,
+    "2027-01-27": 21,
+    "2027-01-28": 20,
+    "2027-01-29": 21,
+    "2027-01-30": 19,
+    "2027-01-31": 19,
+    "2027-02-01": 20,
+    "2027-02-02": 19,
+    "2027-02-03": 21,
+    "2027-02-04": 20,
+    "2027-02-05": 18,
+    "2027-02-06": 20,
+    "2027-02-07": 21,
+    "2027-02-08": 21,
+    "2027-02-09": 20,
+    "2027-02-10": 18,
+    "2027-02-11": 21,
+    "2027-02-12": 19,
+    "2027-02-13": 20,
+    "2027-02-14": 20,
+    "2027-02-15": 20,
+    "2027-02-16": 20,
+    "2027-02-17": 19,
+    "2027-02-18": 20,
+    "2027-02-19": 18,
+    "2027-02-20": 21,
+    "2027-02-21": 20,
+    "2027-02-22": 20,
+    "2027-02-23": 21,
+    "2027-02-24": 20,
+    "2027-02-25": 20,
+    "2027-02-26": 20,
+    "2027-02-27": 20,
+    "2027-02-28": 20,
+    "2027-03-01": 20,
+    "2027-03-02": 21,
+    "2027-03-03": 20,
+    "2027-03-04": 21,
+    "2027-03-05": 20,
+    "2027-03-06": 20,
+    "2027-03-07": 20,
+    "2027-03-08": 20,
+    "2027-03-09": 21,
+    "2027-03-10": 21,
+    "2027-03-11": 20,
+    "2027-03-12": 20,
+    "2027-03-13": 21,
+    "2027-03-14": 20,
+    "2027-03-15": 21,
+    "2027-03-16": 20,
+    "2027-03-17": 20,
+    "2027-03-18": 21,
+    "2027-03-19": 20,
+    "2027-03-20": 20,
+    "2027-03-21": 21,
+    "2027-03-22": 20,
+    "2027-03-23": 20,
+    "2027-03-24": 19,
+    "2027-03-25": 20,
+    "2027-03-26": 20,
+    "2027-03-27": 20,
+    "2027-03-28": 20,
+    "2027-03-29": 20,
+    "2027-03-30": 20,
+    "2027-03-31": 20,
+    "2027-04-01": 20,
+    "2027-04-02": 21,
+    "2027-04-03": 20,
+    "2027-04-04": 19,
+    "2027-04-05": 20,
+    "2027-04-06": 21,
+    "2027-04-07": 20,
+    "2027-04-08": 20,
+    "2027-04-09": 20,
+    "2027-04-10": 20,
+    "2027-04-11": 20,
+    "2027-04-12": 20,
+    "2027-04-13": 20,
+    "2027-04-14": 21,
+    "2027-04-15": 20,
+    "2027-04-16": 20,
+    "2027-04-17": 20,
+    "2027-04-18": 20,
+    "2027-04-19": 21,
+    "2027-04-20": 20,
+    "2027-04-21": 20,
+    "2027-04-22": 20,
+    "2027-04-23": 20,
+    "2027-04-24": 19,
+    "2027-04-25": 20,
+    "2027-04-26": 21,
+    "2027-04-27": 20,
+    "2027-04-28": 21,
+    "2027-04-29": 20,
+    "2027-04-30": 20,
+    "2027-05-01": 20,
+    "2027-05-02": 20,
+    "2027-05-03": 20,
+    "2027-05-04": 20,
+    "2027-05-05": 20,
+    "2027-05-06": 19,
+    "2027-05-07": 20,
+    "2027-05-08": 20,
+    "2027-05-09": 20,
+    "2027-05-10": 21,
+    "2027-05-11": 20,
+    "2027-05-12": 20,
+    "2027-05-13": 20,
+    "2027-05-14": 18,
+    "2027-05-15": 20,
+    "2027-05-16": 20,
+    "2027-05-17": 20,
+    "2027-05-18": 20,
+    "2027-05-19": 20,
+    "2027-05-20": 20,
+    "2027-05-21": 20,
+    "2027-05-22": 20,
+    "2027-05-23": 19,
+    "2027-05-24": 20,
+    "2027-05-25": 20,
+    "2027-05-26": 20,
+    "2027-05-27": 20,
+    "2027-05-28": 20,
+    "2027-05-29": 20,
+    "2027-05-30": 19,
+    "2027-05-31": 21,
+    "2027-06-01": 19,
+    "2027-06-02": 20,
+    "2027-06-03": 20,
+    "2027-06-04": 20,
+    "2027-06-05": 21,
+    "2027-06-06": 21,
+    "2027-06-07": 21,
+    "2027-06-08": 20,
+    "2027-06-09": 20,
+    "2027-06-10": 20,
+    "2027-06-11": 20,
+    "2027-06-12": 19,
+    "2027-06-13": 19,
+    "2027-06-14": 19,
+    "2027-06-15": 19,
+    "2027-06-16": 19,
+    "2027-06-17": 20,
+    "2027-06-18": 21,
+    "2027-06-19": 21,
+    "2027-06-20": 21,
+    "2027-06-21": 20,
+    "2027-06-22": 21,
+    "2027-06-23": 21,
+    "2027-06-24": 21,
+    "2027-06-25": 20,
+    "2027-06-26": 19,
+    "2027-06-27": 21,
+    "2027-06-28": 21,
+    "2027-06-29": 19,
+    "2027-06-30": 20,
+    "2027-07-01": 20,
+    "2027-07-02": 20,
+    "2027-07-03": 20,
+    "2027-07-04": 19,
+    "2027-07-05": 20,
+    "2027-07-06": 20,
+    "2027-07-07": 19,
+    "2027-07-08": 21,
+    "2027-07-09": 20,
+    "2027-07-10": 20,
+    "2027-07-11": 20,
+    "2027-07-12": 21,
+    "2027-07-13": 20,
+    "2027-07-14": 20,
+    "2027-07-15": 17,
+    "2027-07-16": 20,
+    "2027-07-17": 20,
+    "2027-07-18": 20,
+    "2027-07-19": 19,
+    "2027-07-20": 21,
+    "2027-07-21": 20,
+    "2027-07-22": 20,
+    "2027-07-23": 18,
+    "2027-07-24": 20,
+    "2027-07-25": 20,
+    "2027-07-26": 20,
+    "2027-07-27": 20,
+    "2027-07-28": 20,
+    "2027-07-29": 20,
+    "2027-07-30": 21,
+    "2027-07-31": 21,
+    "2027-08-01": 20,
+    "2027-08-02": 17,
+    "2027-08-03": 20,
+    "2027-08-04": 19,
+    "2027-08-05": 20,
+    "2027-08-06": 20,
+    "2027-08-07": 20,
+    "2027-08-08": 20,
+    "2027-08-09": 20,
+    "2027-08-10": 20,
+    "2027-08-11": 19,
+    "2027-08-12": 19,
+    "2027-08-13": 19,
+    "2027-08-14": 21,
+    "2027-08-15": 21,
+    "2027-08-16": 20,
+    "2027-08-17": 21,
+    "2027-08-18": 19,
+    "2027-08-19": 21,
+    "2027-08-20": 19,
+    "2027-08-21": 20,
+    "2027-08-22": 21,
+    "2027-08-23": 22,
+    "2027-08-24": 20,
+    "2027-08-25": 20,
+    "2027-08-26": 21,
+    "2027-08-27": 20,
+    "2027-08-28": 19,
+    "2027-08-29": 20,
+    "2027-08-30": 21,
+    "2027-08-31": 20,
+    "2027-09-01": 20,
+    "2027-09-02": 20,
+    "2027-09-03": 20,
+    "2027-09-04": 19,
+    "2027-09-05": 20,
+    "2027-09-06": 19,
+    "2027-09-07": 20,
+    "2027-09-08": 20,
+    "2027-09-09": 17,
+    "2027-09-10": 20,
+    "2027-09-11": 20,
+    "2027-09-12": 19,
+    "2027-09-13": 20,
+    "2027-09-14": 21
+  }
+}
