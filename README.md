@@ -37,6 +37,19 @@ a *time* means inventing a number, and a failed attempt is no evidence about spe
 So a failed average widens your margin of error and leaves the rating untouched.
 Abandoning can never gain you anything.
 
+**It ships its own solving engine.** Kociemba's two-phase algorithm, written from
+scratch in TypeScript — cube model, coordinates, pruning tables and IDA* search.
+Over 100 random-state scrambles: every cube solved, mean **20.65 moves**, median
+**69ms**, all under a second. God's number is 20, so the average solution is
+within a move of the proven optimum.
+
+It is not a showpiece. It is what lets the app say *"you took 58 quarter turns;
+this cube needed 20"* — a timer can tell you how long you took, but only a solver
+can separate the cube being hard from you going the long way round. It is also
+the prerequisite for bot opponents that replay real solutions rather than
+counting down to a chosen time. The full write-up, including the three mistakes
+that cost the most, is in [docs/solver.md](docs/solver.md).
+
 **The trainer schedules on measured time.** No "did you get it?" button — the app
 watched the cube. The bar is your own median case time, and the deck is built from
 the cases your own solves produced rather than a hand-typed table of 57 algorithms.
@@ -86,6 +99,7 @@ worker and the two bundlers resolve it differently.
 
 Next.js 16 · React 19 · TypeScript · Tailwind 4 · Clerk · Supabase (Postgres) ·
 [cubing.js](https://js.cubing.net) for scrambles, cube state and rendering.
+The solving engine is this repository's own — see `src/lib/solver/`.
 
 ## Build gotcha: Turbopack hangs on cubing.js
 

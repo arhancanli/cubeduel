@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Scratch benchmark files, never committed.
+_*.mts
+_*.mjs

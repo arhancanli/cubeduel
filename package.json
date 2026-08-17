@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/lib/*.test.ts",
+    "test": "tsx --test src/lib/*.test.ts src/lib/solver/*.test.ts",
     "dailies": "node scripts/generate-dailies.mjs",
     "pool": "node scripts/generate-pool.mjs",
     "check:bundle": "node scripts/check-bundle.mjs",

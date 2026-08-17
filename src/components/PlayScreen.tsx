@@ -27,6 +27,14 @@ import { useSolveSession } from "@/lib/useSolveSession";
  */
 export function PlayScreen({ initialScramble }: { initialScramble?: string | null }) {
   const [copied, setCopied] = useState(false);
+  /**
+   * How many moves this scramble actually needed.
+   *
+   * The one thing a timer can never tell you. "22 seconds" says nothing about
+   * whether the cube was hard or you went the long way round; "you used 58 moves
+   * and it needed 20" says exactly which.
+   */
+  const [optimal, setOptimal] = useState<number | null>(null);
 
   // Consumed once: a challenge link pins the first scramble, then the session
   // continues with fresh ones rather than trapping the player on that puzzle.
@@ -37,12 +45,26 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
     const pinned = pinnedScrambleRef.current;
     pinnedScrambleRef.current = null;
     setCopied(false);
+    setOptimal(null);
     return pinned ?? (await nextScramble("333"));
   }, []);
 
   const session = useSolveSession({
     nextScramble: supplyScramble,
     onSolved: ({ scramble, recording, analysis, source }) => {
+      // Fire and forget. Practice works offline and signed out, so failing to
+      // reach the solver must cost nothing — the line simply does not appear.
+      void fetch("/api/solve", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ scramble }),
+      })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((data: { optimalMoves?: number } | null) => {
+          if (typeof data?.optimalMoves === "number") setOptimal(data.optimalMoves);
+        })
+        .catch(() => {});
+
       recordSolve({
         scramble,
         durationMs: recording.durationMs,
@@ -123,7 +145,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
           </p>
         </div>
 
-        {recording ? <SolveReport recording={recording} /> : null}
+        {recording ? <SolveReport recording={recording} optimal={optimal} /> : null}
         {splits && splits.length > 0 ? <SolveBreakdown splits={splits} /> : null}
 
         <div className="flex flex-wrap items-center justify-center gap-3">
@@ -196,9 +218,24 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
  * on; move count, turn speed and pause time separate "my hands are slow" from
  * "I don't know what to do next", which are opposite problems with opposite fixes.
  */
-function SolveReport({ recording }: { recording: SolveRecording }) {
+function SolveReport({
+  recording,
+  optimal,
+}: {
+  recording: SolveRecording;
+  optimal: number | null;
+}) {
   const { stats } = recording;
   const pausedPct = Math.round(stats.pausedFraction * 100);
+  // Quarter turns, because keyboard input can only produce quarter turns and a
+  // half turn is two presses. The solver answers in half turns, where R2 is one
+  // move, so comparing the raw numbers would flatter the solver and mislead the
+  // cuber. Doubling the solver's count is the honest floor in the same metric.
+  const optimalQuarterTurns = optimal === null ? null : optimal * 2;
+  const ratio =
+    optimalQuarterTurns && optimalQuarterTurns > 0
+      ? stats.moveCount / optimalQuarterTurns
+      : null;
 
   return (
     <div className="flex flex-col items-center gap-3">
@@ -207,7 +244,19 @@ function SolveReport({ recording }: { recording: SolveRecording }) {
         <Metric label="tps" value={stats.tps.toFixed(2)} />
         <Metric label="longest pause" value={formatMs(stats.longestPauseMs)} />
         <Metric label="paused" value={`${pausedPct}%`} />
+        {optimal !== null ? (
+          <Metric label="shortest possible" value={String(optimal)} />
+        ) : null}
       </div>
+
+      {ratio !== null ? (
+        <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">
+          This cube can be solved in {optimal} moves. You used {stats.moveCount}{" "}
+          quarter turns — about {ratio.toFixed(1)}× the shortest route. Every
+          method takes more than the minimum; CFOP typically runs three to four
+          times it, so this is a measure of your method, not a mistake.
+        </p>
+      ) : null}
       <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">
         {pausedPct >= 40
           ? "Most of that solve was spent deciding, not turning. Recognition is the thing to drill, not hand speed."
