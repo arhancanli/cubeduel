@@ -64,6 +64,14 @@ the prerequisite for bot opponents that replay real solutions rather than
 counting down to a chosen time. The full write-up, including the three mistakes
 that cost the most, is in [docs/solver.md](docs/solver.md).
 
+**It refuses to predict.** Set a goal — sub-20, sub-15 — and the app tracks it,
+which mostly means telling you that your times are *not* changing in a way that
+stands out from normal variation, so there is no honest way to say when you will
+get there. A projection appears only when the improvement clears twice the
+standard error of the difference between halves of your history. Every other
+timer fits a line through noise and reads a date off it; someone congratulated
+for random drift learns the wrong lesson about whatever they changed that week.
+
 **The trainer schedules on measured time.** No "did you get it?" button — the app
 watched the cube. The bar is your own median case time, and the deck is built from
 the cases your own solves produced rather than a hand-typed table of 57 algorithms.

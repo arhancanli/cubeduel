@@ -221,14 +221,33 @@ export interface Trend {
  * congratulated for random drift learns the wrong lesson about what worked.
  */
 export function totalTimeTrend(solves: readonly StoredSolve[]): Trend {
-  const usable = analysable(solves).filter((s) => s.durationMs > 0);
+  // Split-gated on purpose: this is the trend shown beside the phase analysis,
+  // and it should describe the same solves that analysis is drawn from.
+  return compareHalves(
+    analysable(solves)
+      .filter((s) => s.durationMs > 0)
+      .map((s) => s.durationMs),
+  );
+}
+
+/**
+ * The significance test itself, over plain numbers.
+ *
+ * Extracted so there is exactly ONE definition of "this change is real" in the
+ * app. The goal tracker needs the same rule over a different set of solves — a
+ * cuber who only ever uses the stopwatch has times but no phase splits, and
+ * still deserves to be told honestly whether they are getting faster — and two
+ * copies of a statistical test drift apart the first time one is tuned.
+ */
+export function compareHalves(values: readonly number[]): Trend {
+  const usable = values.filter((v) => v > 0);
   if (usable.length < MIN_SOLVES_FOR_TREND) {
     return { kind: "insufficient", deltaMs: 0, earlierN: usable.length, recentN: 0 };
   }
 
   const mid = Math.floor(usable.length / 2);
-  const earlier = usable.slice(0, mid).map((s) => s.durationMs);
-  const recent = usable.slice(mid).map((s) => s.durationMs);
+  const earlier = usable.slice(0, mid);
+  const recent = usable.slice(mid);
 
   const earlierMean = mean(earlier);
   const recentMean = mean(recent);

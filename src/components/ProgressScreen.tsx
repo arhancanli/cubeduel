@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { CaseCoach } from "@/components/CaseCoach";
+import { GoalPanel } from "@/components/GoalPanel";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
 import {
@@ -61,6 +62,7 @@ export function ProgressScreen() {
   return (
     <Shell>
       <div className="flex w-full max-w-2xl flex-col gap-10">
+        <GoalPanel solves={solves} />
         <Recommendation diagnosis={diagnosis} />
         {aggregates.length > 0 ? <PhaseTable aggregates={aggregates} /> : null}
         <CaseCoach solves={solves} />
