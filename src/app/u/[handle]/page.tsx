@@ -103,6 +103,21 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
             value={String(stats.rankedSolves)}
             note={`${WINDOW_SIZE} per rating update`}
           />
+          {/*
+            Shown beside the rating but never folded into it. A duel result says
+            who was faster on one cube; the rating says how fast this player is.
+            Presenting them as one number would imply the ladder counts races,
+            which it deliberately does not.
+          */}
+          <Stat
+            label="duels"
+            value={
+              stats.duelWins + stats.duelLosses === 0
+                ? "—"
+                : `${stats.duelWins}W ${stats.duelLosses}L`
+            }
+            note="does not affect rating"
+          />
         </section>
 
         {stats.rating !== null && !stats.established ? (

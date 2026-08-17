@@ -151,6 +151,9 @@ export interface ProfileStats {
   rank: number | null;
   rankedSolves: number;
   bestSingleMs: number | null;
+  /** Duel record. Kept apart from the rating, which duels deliberately do not move. */
+  duelWins: number;
+  duelLosses: number;
   recent: {
     durationMs: number;
     penalty: string;
@@ -167,7 +170,7 @@ export async function profileStats(
   event = "333",
   pool: RatingPool = "keyboard",
 ): Promise<ProfileStats> {
-  const [ratingRow, best, recent, history] = await Promise.all([
+  const [ratingRow, best, recent, history, duels] = await Promise.all([
     db()
       .from("ratings")
       .select("*")
@@ -199,6 +202,11 @@ export async function profileStats(
       .eq("pool", pool)
       .order("at", { ascending: true })
       .limit(200),
+    db()
+      .from("duels")
+      .select("outcome")
+      .eq("profile_id", profileId)
+      .not("outcome", "is", null),
   ]);
 
   const rating = ratingRow.data;
@@ -230,6 +238,8 @@ export async function profileStats(
     rank,
     rankedSolves: rating?.solve_count ?? 0,
     bestSingleMs: best.data?.duration_ms ?? null,
+    duelWins: duels.data?.filter((d) => d.outcome === "win").length ?? 0,
+    duelLosses: duels.data?.filter((d) => d.outcome === "loss").length ?? 0,
     recent:
       recent.data?.map((row) => ({
         durationMs: row.duration_ms,
