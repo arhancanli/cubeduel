@@ -99,8 +99,8 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 192 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 4 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk sign-up driving a ranked solve end to end. |
+| `npm test` | 261 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 7 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk sign-up driving a ranked solve and a duel end to end, plus an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
@@ -349,11 +349,49 @@ solved — otherwise every OLL time would silently include a PLL, and every sche
 decision after that would be made on a number measuring the wrong thing. `e2e/train.py`
 drives this in a real browser.
 
+### Duels (`src/lib/server/duels.ts`)
+
+Racing a bot, with one decision holding it up: the opponent's **entire
+trajectory** — every move and the millisecond it lands on — is written to the
+database before the player turns a single face. It cannot speed up when it is
+losing, and that is checkable rather than promised: the row is timestamped from
+before the race began. Rubber-banding is the usual way racing games lie, and an
+app claiming its ratings mean something cannot also do that.
+
+Committing the trajectory also removes the need for realtime entirely. It is
+handed to the browser at the start, so the opponent's progress renders locally
+from the real move stream — no polling, no live channel, which is what made this
+shippable on a deny-all architecture.
+
+The bot replays a genuine solution to the scramble being raced, and its move
+stream passes the same verifier that judges human solves. It is **not** a
+simulated human: the engine finds ~20 moves where CFOP takes 55, so it turns far
+more slowly than a person to hit the same time. Its time is honest and its
+technique is not, and the screen says exactly that.
+
+Duel results deliberately do not move the rating. You solve at the same speed
+whether or not somebody is racing you, so a second path to the same number would
+double the ways to move it without adding information.
+
+### Goals and the coach (`src/lib/coach.ts`)
+
+Set a target and the app tracks it, which mostly means refusing to predict. A
+projection appears only when the improvement clears twice the standard error of
+the difference between halves of the history; everything inside that band reports
+as **no clear change**. Every other timer fits a line through noise and reads a
+date off it, and someone congratulated for random drift learns the wrong lesson
+about whatever they changed that week.
+
+The plan ranks cases by the time they would give back **per solve** — `excessMs`
+is a total across the whole sample, and quoting it directly would overstate the
+benefit by the size of that sample — then says plainly when algorithms cannot
+close the gap: *"roughly 40% of the 2.6s you need; the rest has to come from
+turning faster or pausing less."*
+
 ## Not built yet
 
-- **Duels.** The 1v1 mode the name promises. Ratings and verification exist now, so
-  there is finally something real to race for; it needs matchmaking and a live
-  channel for opponent progress.
+- **Duels against other people.** Racing a bot works; racing a human needs
+  matchmaking and a live channel, and needs a population before it needs code.
 - **Behavioural anti-cheat.** Verification proves a solve is real, not human. Catching
   assistance needs analysis across many results, not a check on one.
 - **Smart cubes are still unverified against hardware.** The Bluetooth path is written
