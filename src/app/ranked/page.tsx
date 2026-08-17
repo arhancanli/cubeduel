@@ -9,7 +9,7 @@ import { currentRating, pendingResultCount } from "@/lib/server/ranked";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 
 export const metadata: Metadata = {
-  title: "Ranked — cubeduel",
+  title: "Ranked",
   description:
     "Solve server-issued scrambles for a rating that means something. Every solve is verified against the scramble it was issued for.",
 };

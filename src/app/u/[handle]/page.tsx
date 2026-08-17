@@ -19,10 +19,10 @@ export async function generateMetadata(
   if (!isDatabaseConfigured()) return { title: "cubeduel" };
 
   const profile = await profileByHandle(handle);
-  if (!profile) return { title: "Player not found — cubeduel" };
+  if (!profile) return { title: "Player not found" };
 
   return {
-    title: `${profile.display_name} (@${profile.handle}) — cubeduel`,
+    title: `${profile.display_name} (@${profile.handle})`,
     description: `Speedcubing rating, personal bests and verified solves for @${profile.handle}.`,
   };
 }

@@ -8,7 +8,7 @@ import { handleRejectionReason } from "@/lib/handle";
 import { ensureProfile, updateHandle } from "@/lib/server/profiles";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 
-export const metadata: Metadata = { title: "Settings — cubeduel" };
+export const metadata: Metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
 
 /**

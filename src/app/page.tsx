@@ -3,9 +3,13 @@ import type { Metadata } from "next";
 import { LandingScreen } from "@/components/LandingScreen";
 
 export const metadata: Metadata = {
-  title: "cubeduel — find out where your solve actually goes",
+  // Absolute, not templated: this is the root and appending "· cubeduel" to a
+  // title that already begins with it reads as a stutter in a browser tab.
+  title: {
+    absolute: "cubeduel — a rating that actually means something",
+  },
   description:
-    "A speedcubing timer that breaks every solve into cross, F2L, OLL and PLL, so you practise the part that's actually slow. WCA scrambles, a daily scramble, and keyboard cubing. No account needed.",
+    "Speedcubing with a real ladder. The server hands you a scramble nobody has seen and replays your solve to prove it happened. Every solve is split into cross, F2L, OLL and PLL, so you practise the part that is actually slow. No account needed to solve.",
 };
 
 export default function Home() {

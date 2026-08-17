@@ -4,7 +4,7 @@ import { PlayScreen } from "@/components/PlayScreen";
 import { parseScrambleParam } from "@/lib/scrambleParam";
 
 export const metadata: Metadata = {
-  title: "Play — cubeduel",
+  title: "Play",
   description:
     "Cube with your keyboard or a Bluetooth smart cube. The clock starts on your first turn and stops the moment the cube is solved.",
 };

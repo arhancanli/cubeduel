@@ -8,7 +8,7 @@ import { ensureProfile } from "@/lib/server/profiles";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 
 export const metadata: Metadata = {
-  title: "Duel — cubeduel",
+  title: "Duel",
   description:
     "Race a bot that replays a real solution to the same scramble, at a pace fixed before you start.",
 };

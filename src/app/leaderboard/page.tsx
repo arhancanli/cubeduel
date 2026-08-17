@@ -10,7 +10,7 @@ import dailies from "@/data/dailies.json";
 import { todayNumber } from "@/lib/daily";
 
 export const metadata: Metadata = {
-  title: "Leaderboard — cubeduel",
+  title: "Leaderboard",
   description:
     "The global keyboard-cubing ladder and today's daily scramble, from verified solves only.",
 };

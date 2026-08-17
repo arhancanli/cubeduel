@@ -5,8 +5,21 @@ import dailies from "@/data/dailies.json";
 import { dayNumber, utcDayKey } from "@/lib/daily";
 
 export const metadata: Metadata = {
-  title: "Daily scramble — cubeduel",
+  title: "Daily scramble",
   description: "One scramble. One attempt. The same cube for everyone, every day.",
+  // This is the link that gets pasted into group chats, so it carries its own
+  // card text rather than inheriting the site-wide one.
+  openGraph: {
+    title: "cubeduel daily",
+    description:
+      "One scramble. One attempt. The same cube for everyone, resetting at midnight UTC.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "cubeduel daily",
+    description:
+      "One scramble. One attempt. The same cube for everyone, resetting at midnight UTC.",
+  },
 };
 
 /**

@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 
 import { HistorySync } from "@/components/HistorySync";
+import { SITE_URL } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -16,9 +17,41 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "cubeduel — speedcubing timer",
+  // Absolute origin, without which every Open Graph image is ignored: scrapers
+  // do not resolve relative URLs.
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "cubeduel — a rating that actually means something",
+    // Every page states what it is, then where it is.
+    template: "%s · cubeduel",
+  },
   description:
-    "A speedcubing timer with WCA scrambles, a shared daily scramble, and head-to-head duels.",
+    "Speedcubing with server-verified solves. The server issues a scramble nobody has seen, replays your solve to prove it happened, and only then does it count. Plus phase analysis, a case trainer and duels.",
+  applicationName: "cubeduel",
+  keywords: [
+    "speedcubing",
+    "rubik's cube timer",
+    "WCA scrambles",
+    "CFOP analysis",
+    "OLL PLL trainer",
+    "cube solver",
+  ],
+  openGraph: {
+    type: "website",
+    siteName: "cubeduel",
+    title: "cubeduel — a rating that actually means something",
+    description:
+      "Server-verified speedcubing. Every solve is replayed against the scramble it was issued for.",
+    url: SITE_URL,
+  },
+  twitter: {
+    // The large card, because the whole growth mechanic is a pasted link.
+    card: "summary_large_image",
+    title: "cubeduel — a rating that actually means something",
+    description:
+      "Server-verified speedcubing, phase analysis, a case trainer and duels.",
+  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
