@@ -15,6 +15,7 @@ export type NavKey =
   | "daily"
   | "play"
   | "ranked"
+  | "duel"
   | "train"
   | "leaderboard"
   | "progress";
@@ -22,6 +23,7 @@ export type NavKey =
 const LINKS: { key: NavKey; href: string; label: string }[] = [
   { key: "play", href: "/play", label: "Play" },
   { key: "ranked", href: "/ranked", label: "Ranked" },
+  { key: "duel", href: "/duel", label: "Duel" },
   { key: "daily", href: "/daily", label: "Daily" },
   { key: "train", href: "/train", label: "Train" },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard" },

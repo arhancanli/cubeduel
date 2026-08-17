@@ -184,6 +184,48 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["rating_events"]["Insert"]>;
         Relationships: [];
       };
+      duels: {
+        Row: {
+          id: string;
+          profile_id: string;
+          event: string;
+          scramble: string;
+          bot_id: string;
+          bot_rating: number;
+          bot_duration_ms: number;
+          bot_moves: Json;
+          seed: number;
+          issued_at: string;
+          expires_at: string;
+          status: string;
+          solve_id: string | null;
+          player_duration_ms: number | null;
+          player_penalty: string | null;
+          outcome: string | null;
+          completed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          profile_id: string;
+          event?: string;
+          scramble: string;
+          bot_id: string;
+          bot_rating: number;
+          bot_duration_ms: number;
+          bot_moves: Json;
+          seed: number;
+          issued_at?: string;
+          expires_at: string;
+          status?: string;
+          solve_id?: string | null;
+          player_duration_ms?: number | null;
+          player_penalty?: string | null;
+          outcome?: string | null;
+          completed_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["duels"]["Insert"]>;
+        Relationships: [];
+      };
       daily_results: {
         Row: {
           profile_id: string;

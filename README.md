@@ -37,6 +37,20 @@ a *time* means inventing a number, and a failed attempt is no evidence about spe
 So a failed average widens your margin of error and leaves the rating untouched.
 Abandoning can never gain you anything.
 
+**Duels have an opponent that cannot cheat.** Racing a bot, where the bot's
+*entire trajectory* — every move and the millisecond it lands on — is written to
+the database before you turn a single face. It therefore cannot speed up when it
+is losing, and that is not a promise in a comment: the row is timestamped from
+before the race started. Because the trajectory is fixed, it is handed to the
+browser at the start and the opponent's progress renders locally from the real
+move stream — no polling, no realtime channel.
+
+The bot replays a genuine solution to the scramble you are racing, and its move
+stream passes the same verifier that judges human solves. What it is *not* is a
+simulated human: its solution is ~20 moves where CFOP takes 55, so it turns much
+more slowly than a person would. Its time is honest; its technique is not human,
+and the screen says so.
+
 **It ships its own solving engine.** Kociemba's two-phase algorithm, written from
 scratch in TypeScript — cube model, coordinates, pruning tables and IDA* search.
 Over 100 random-state scrambles: every cube solved, mean **20.65 moves**, median
