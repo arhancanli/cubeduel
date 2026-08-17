@@ -99,6 +99,9 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="play" />
+      {/* The page title, for assistive tech. This screen is deliberately
+          chrome-free — a visible heading beside the clock would be noise. */}
+      <h1 className="sr-only">Keyboard cubing</h1>
 
       <div className="flex flex-1 flex-col items-center gap-6 px-6 pb-10">
         <div

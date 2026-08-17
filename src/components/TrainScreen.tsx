@@ -114,6 +114,9 @@ export function TrainScreen() {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="train" />
+      {/* The page title, for assistive tech. This screen is deliberately
+          chrome-free — a visible heading beside the clock would be noise. */}
+      <h1 className="sr-only">Case trainer</h1>
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center gap-6 px-6 pb-16 pt-2">
         {cards === null ? (
           <p className="pt-20 text-sm text-muted-dim">Building your deck…</p>

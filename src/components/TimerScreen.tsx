@@ -228,6 +228,9 @@ export function TimerScreen() {
       {...touchHandlers}
     >
       <SiteHeader active="timer" fade={chromeHidden} trailing="3×3" />
+      {/* The page title, for assistive tech. This screen is deliberately
+          chrome-free — a visible heading beside the clock would be noise. */}
+      <h1 className="sr-only">Speedcubing timer</h1>
 
       {/*
         Scramble, clock and stats form one centred stack instead of three things

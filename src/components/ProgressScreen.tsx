@@ -205,6 +205,9 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="progress" />
+      {/* The page title, for assistive tech. This screen is deliberately
+          chrome-free — a visible heading beside the clock would be noise. */}
+      <h1 className="sr-only">Your progress</h1>
       <div className="flex flex-1 justify-center px-6 py-8">{children}</div>
     </main>
   );

@@ -446,6 +446,10 @@ function Shell({
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="daily" fade={hideChrome} trailing={`daily #${dayNumber} · ${dayKey}`} />
+      {/* The round has several stages with their own headings; this names the
+          page itself, which none of them do. Hidden because the date already
+          sits in the header and repeating it would be clutter. */}
+      <h1 className="sr-only">{`Daily scramble #${dayNumber}`}</h1>
       <div className="flex flex-1 items-center justify-center px-6 pb-16">{children}</div>
     </main>
   );

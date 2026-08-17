@@ -182,6 +182,9 @@ function Shell({ children }: { children: React.ReactNode }) {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="leaderboard" />
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-6 pb-20 pt-6">
+        {/* A visible heading, not a hidden one: this page is a document rather
+            than a solving surface, and it opened on an h2 with nothing above it. */}
+        <h1 className="text-2xl font-medium tracking-tight">Leaderboard</h1>
         {children}
       </div>
     </main>

@@ -108,8 +108,25 @@ with sync_playwright() as p:
     check("every solve is listed", page.locator("footer span").count() == 5)
     ao5_val = page.locator("div:has(> span:text-is('ao5')) > span").last.inner_text().strip()
     check("ao5 appears once five solves exist", ao5_val not in ("—", ""), f"ao5 = {ao5_val}")
+    # Asserted against the solves actually recorded, not against a hardcoded
+    # "0.90". The run length is driven by a wall-clock wait, so the recorded time
+    # is 900ms plus whatever the scheduler adds — and truncated to hundredths,
+    # 10ms of jitter is the difference between 0.90 and 0.91. That made this fail
+    # about one run in three, which is worse than not having the check: a flaky
+    # test is one people learn to re-run rather than read.
+    listed = []
+    for i in range(page.locator("footer span").count()):
+        text = page.locator("footer span").nth(i).inner_text().strip().rstrip("+")
+        try:
+            listed.append(float(text))
+        except ValueError:
+            pass
     best_val = page.locator("div:has(> span:text-is('best')) > span").last.inner_text().strip()
-    check("best single is tracked", best_val == "0.90", f"best = {best_val}")
+    check(
+        "best single is the fastest solve recorded",
+        listed and abs(float(best_val) - min(listed)) < 0.005,
+        f"best = {best_val}, solves = {sorted(listed)}",
+    )
 
     print("\n== personal best ==")
     do_solve(page, hold_ms=400, run_ms=600)
