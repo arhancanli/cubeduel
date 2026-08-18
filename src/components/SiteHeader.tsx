@@ -16,6 +16,7 @@ export type NavKey =
   | "play"
   | "ranked"
   | "duel"
+  | "rush"
   | "train"
   | "leaderboard"
   | "progress";
@@ -42,6 +43,7 @@ interface NavLink {
  */
 const COMPETE: NavLink[] = [
   { key: "ranked", href: "/ranked", label: "Ranked" },
+  { key: "rush", href: "/rush", label: "Rush" },
   { key: "duel", href: "/duel", label: "Duel" },
   { key: "daily", href: "/daily", label: "Daily" },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard" },

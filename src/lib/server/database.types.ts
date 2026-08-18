@@ -272,6 +272,66 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["challenges"]["Insert"]>;
         Relationships: [];
       };
+      rush_runs: {
+        Row: {
+          id: string;
+          profile_id: string;
+          event: string;
+          source: string;
+          pace_ms: number;
+          started_at: string;
+          expires_at: string;
+          ended_at: string | null;
+          status: string;
+          current_scramble: string | null;
+          current_issued_at: string | null;
+          score: number;
+          misses: number;
+          best_streak: number;
+        };
+        Insert: {
+          id?: string;
+          profile_id: string;
+          event?: string;
+          source?: string;
+          pace_ms: number;
+          started_at?: string;
+          expires_at: string;
+          ended_at?: string | null;
+          status?: string;
+          current_scramble?: string | null;
+          current_issued_at?: string | null;
+          score?: number;
+          misses?: number;
+          best_streak?: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["rush_runs"]["Insert"]>;
+        Relationships: [];
+      };
+      rush_solves: {
+        Row: {
+          run_id: string;
+          position: number;
+          solve_id: string | null;
+          duration_ms: number;
+          penalty: string;
+          target_ms: number;
+          cleared: boolean;
+          at: string;
+        };
+        Insert: {
+          run_id: string;
+          position: number;
+          solve_id?: string | null;
+          duration_ms: number;
+          penalty: string;
+          target_ms: number;
+          cleared: boolean;
+          at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["rush_solves"]["Insert"]>;
+        Relationships: [];
+      };
       daily_results: {
         Row: {
           profile_id: string;

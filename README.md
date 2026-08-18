@@ -51,6 +51,20 @@ simulated human: its solution is ~20 moves where CFOP takes 55, so it turns much
 more slowly than a person would. Its time is honest; its technique is not human,
 and the screen says so.
 
+**Rush: the target tightens until you miss three.** Every other mode measures you
+after the fact. This one puts a number on screen before you turn a face and
+shrinks it every time you beat it, which is the situation a competition round
+actually is and the one thing a timer can never reproduce. The target starts from
+*your own* pace, so it is equally hard at every level — a fixed number would be a
+lazy solve for somebody averaging eight seconds and unreachable for somebody
+averaging forty. Nothing else in cubing has this; the closest thing anywhere is
+Puzzle Rush, which is the most-played mode on chess.com.
+
+The score is replayed on the server from the stored solves, never taken from the
+browser. Each solve in a run is verified against the scramble the server issued
+for it, exactly as a ranked one is — the mode is fast, but it is not less checked
+for being fast.
+
 **Four events, and a rating that means the same thing on each.** 2x2, 3x3, 4x4
 and 5x5, each a separate ladder — because they are separate skills, and one
 number covering a world-class 3x3 and a beginner 5x5 would describe neither. Each
@@ -129,10 +143,11 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 319 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 9 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 334 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 10 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
+| `npm run integration:rush` | live database | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
 | `npm run integration:events` | live database | Every event's ranked path end to end: a server-issued 4x4 scramble, solved, verified against a 4x4 and stored — plus a check that the scales really do differ, since 25 seconds is world class on 4x4 and nowhere near it on 3x3. |
 | `npm run integration:profile-race` | live database | Eight concurrent first visits for the same new account, including the path where every candidate handle is taken. Exists because a new player's first page load could render "Something broke", intermittently enough to look like a fluke. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
