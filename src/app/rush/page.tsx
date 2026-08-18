@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { RushScreen } from "@/components/RushScreen";
 import { SiteHeader } from "@/components/SiteHeader";
-import { DEFAULT_EVENT } from "@/lib/events";
+import { EVENT_IDS, type EventId } from "@/lib/events";
 import { ensureProfile } from "@/lib/server/profiles";
 import { bestRun } from "@/lib/server/rush";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
@@ -44,13 +44,19 @@ export default async function RushPage() {
     );
   }
 
-  const best = await bestRun(profile.id, DEFAULT_EVENT);
-  return (
-    <RushScreen
-      event={DEFAULT_EVENT}
-      best={best ? { score: best.score, bestStreak: best.bestStreak } : null}
-    />
-  );
+  // Every event's best, loaded together. Four small indexed reads cost less than
+  // a round trip when somebody switches, and switching is the first thing anyone
+  // does on a page that offers a choice.
+  const bests = Object.fromEntries(
+    await Promise.all(
+      EVENT_IDS.map(async (id) => {
+        const best = await bestRun(profile.id, id);
+        return [id, best ? { score: best.score, bestStreak: best.bestStreak } : null] as const;
+      }),
+    ),
+  ) as Record<EventId, { score: number; bestStreak: number } | null>;
+
+  return <RushScreen bests={bests} />;
 }
 
 function Gate({ title, children }: { title: string; children: React.ReactNode }) {

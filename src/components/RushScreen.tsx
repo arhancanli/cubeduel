@@ -7,7 +7,7 @@ import { CubeView } from "@/components/CubeView";
 import { KeyMapHint } from "@/components/KeyMapHint";
 import { MovePad } from "@/components/MovePad";
 import { SiteHeader } from "@/components/SiteHeader";
-import { EVENTS, type EventId } from "@/lib/events";
+import { DEFAULT_EVENT, EVENTS, EVENT_IDS, type EventId } from "@/lib/events";
 import { formatMs } from "@/lib/format";
 import { RUSH_LIVES, type RushState } from "@/lib/rush";
 import { useLatest } from "@/lib/useLatest";
@@ -53,12 +53,18 @@ interface Outcome {
 }
 
 export function RushScreen({
-  event,
-  best,
+  bests,
 }: {
-  event: EventId;
-  best: { score: number; bestStreak: number } | null;
+  bests: Record<EventId, { score: number; bestStreak: number } | null>;
 }) {
+  /**
+   * The puzzle this run is on.
+   *
+   * Locked once a run is live: the run's targets were built from this event's
+   * pace and its scrambles are for this puzzle, so switching mid-run would ask
+   * somebody to solve a 4x4 against a 3x3 target.
+   */
+  const [event, setEvent] = useState<EventId>(DEFAULT_EVENT);
   const runIdRef = useRef<string | null>(null);
   const submittedRef = useRef(false);
 
@@ -76,7 +82,15 @@ export function RushScreen({
    * gated on one can simply fail to appear.
    */
   const [queued, setQueued] = useState(false);
-  const [record, setRecord] = useState(best);
+  const [records, setRecords] = useState(bests);
+  const record = records[event];
+  const setRecord = useCallback(
+    (next: (prev: { score: number; bestStreak: number } | null) => { score: number; bestStreak: number } | null) => {
+      setRecords((all) => ({ ...all, [eventRef.current]: next(all[eventRef.current]) }));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   // Held so the mount-stable callbacks below can read the current scramble
   // without being rebuilt, which would tear down the solve session mid-run.
@@ -197,7 +211,13 @@ export function RushScreen({
 
       <div className="flex flex-1 flex-col items-center gap-6 px-6 pb-12">
         {!started ? (
-          <Intro event={event} best={record} onStart={begin} />
+          <Intro
+            event={event}
+            best={record}
+            bests={records}
+            onSelect={setEvent}
+            onStart={begin}
+          />
         ) : (
           <>
             <Scoreboard state={state} target={target} solving={solving} />
@@ -339,10 +359,14 @@ function Scoreboard({
 function Intro({
   event,
   best,
+  bests,
+  onSelect,
   onStart,
 }: {
   event: EventId;
   best: { score: number; bestStreak: number } | null;
+  bests: Record<EventId, { score: number; bestStreak: number } | null>;
+  onSelect: (event: EventId) => void;
   onStart: () => void;
 }) {
   return (
@@ -358,6 +382,25 @@ function Intro({
         edge of what you can do right now, which is the only place anybody
         improves.
       </p>
+
+      <div className="flex justify-center gap-1" role="group" aria-label="Event">
+        {EVENT_IDS.map((id) => (
+          <button
+            key={id}
+            type="button"
+            aria-pressed={id === event}
+            onClick={() => onSelect(id)}
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              id === event ? "bg-surface-hi text-foreground" : "text-muted-dim hover:text-muted"
+            }`}
+          >
+            {EVENTS[id].name}
+            {bests[id] ? (
+              <span className="tnum ml-1.5 opacity-60">{bests[id]!.score}</span>
+            ) : null}
+          </button>
+        ))}
+      </div>
 
       {best ? (
         <p className="tnum text-xs text-muted">

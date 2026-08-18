@@ -258,3 +258,72 @@ export async function profileStats(
         .map((row) => ({ at: row.at, rating: row.rating_after as number })) ?? [],
   };
 }
+
+export interface RushEntry {
+  rank: number;
+  handle: string;
+  displayName: string;
+  score: number;
+  bestStreak: number;
+  event: string;
+  at: string;
+}
+
+/**
+ * The best Rush run each player has finished.
+ *
+ * One row per player, not per run — a board where somebody appears eight times
+ * because they had a good afternoon tells you about their afternoon rather than
+ * about the field.
+ *
+ * Rush is the one board here that can honestly mix events. A rating cannot: a
+ * 3000 on 5x5 and a 3000 on 3x3 mean the same standard but the times behind them
+ * are nothing alike, so a combined rating board would be comparing scales. A
+ * Rush score is a count of solves held under a target derived from the player's
+ * own pace, so it already means "how far past yourself could you hold it" — which
+ * is the same question whichever puzzle was in their hands.
+ */
+export async function rushBoard(event?: string, limit = 100): Promise<RushEntry[]> {
+  let query = db()
+    .from("rush_runs")
+    .select("score, best_streak, event, ended_at, profiles!inner(handle, display_name)")
+    .eq("status", "finished")
+    // A zero-solve run is a run somebody started and did not clear once. It is
+    // not a result, and a board full of them is noise.
+    .gt("score", 0)
+    .order("score", { ascending: false })
+    .order("best_streak", { ascending: false })
+    // Deliberately over-fetched: the best-per-player pass below collapses rows,
+    // so fetching exactly `limit` would return fewer than `limit` players.
+    .limit(limit * 5);
+
+  if (event) query = query.eq("event", event);
+
+  const { data, error } = await query;
+
+  // An outage that renders as an empty board is indistinguishable from nobody
+  // having played, which is the failure nobody investigates.
+  if (error) throw new Error(`Could not load the rush board: ${error.message}`);
+  if (!data) return [];
+
+  const best = new Map<string, RushEntry>();
+  for (const row of data) {
+    const profile = row.profiles as unknown as { handle: string; display_name: string };
+    const existing = best.get(profile.handle);
+    if (existing && existing.score >= row.score) continue;
+    best.set(profile.handle, {
+      rank: 0,
+      handle: profile.handle,
+      displayName: profile.display_name,
+      score: row.score,
+      bestStreak: row.best_streak,
+      event: row.event,
+      at: row.ended_at ?? "",
+    });
+  }
+
+  return [...best.values()]
+    .sort((a, b) => b.score - a.score || b.bestStreak - a.bestStreak)
+    .slice(0, limit)
+    .map((entry, index) => ({ ...entry, rank: index + 1 }));
+}

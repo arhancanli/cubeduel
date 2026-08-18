@@ -11,6 +11,7 @@
  * It cleans up after itself.
  */
 import { OPENING_SLACK, RUSH_LIVES } from "../src/lib/rush";
+import { rushBoard } from "../src/lib/server/boards";
 import { startRun, submitRushSolve, bestRun } from "../src/lib/server/rush";
 import { db } from "../src/lib/server/supabase";
 
@@ -213,6 +214,26 @@ async function main() {
       .single();
     check("the run is marked finished", row?.status === "finished", String(row?.status));
     check("its stored score matches the replay", row?.score === 3, String(row?.score));
+  }
+
+  console.log("\n== the run reaches the leaderboard ==");
+  {
+    // An empty board and a broken board look identical, so this checks the row
+    // actually arrives rather than that the query merely returns.
+    const board = await rushBoard();
+    const mine = board.find((e) => e.handle === HANDLE);
+    check("the finished run is on the board", mine !== undefined,
+      `${board.length} entries`);
+    check("with the score the server computed", mine?.score === 3, String(mine?.score));
+    check("and the event it was played on", mine?.event === "333", String(mine?.event));
+
+    const filtered = await rushBoard("333");
+    check("filtering by event finds it too",
+      filtered.some((e) => e.handle === HANDLE), `${filtered.length} entries`);
+
+    const other = await rushBoard("555");
+    check("and filtering by a different event does not",
+      !other.some((e) => e.handle === HANDLE), `${other.length} entries`);
   }
 
   console.log("\n== only one run at a time ==");

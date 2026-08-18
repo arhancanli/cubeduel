@@ -4,7 +4,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
 import { ESTABLISHED_DEVIATION, WINDOW_SIZE, msForRating } from "@/lib/rating";
-import { dailyBoard, ratingBoard } from "@/lib/server/boards";
+import { dailyBoard, ratingBoard, rushBoard } from "@/lib/server/boards";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 import dailies from "@/data/dailies.json";
 import { todayNumber } from "@/lib/daily";
@@ -39,18 +39,20 @@ export default async function LeaderboardPage() {
   // entire value is being believed.
   let board: Awaited<ReturnType<typeof ratingBoard>> | null = null;
   let daily: Awaited<ReturnType<typeof dailyBoard>> | null = null;
+  let rush: Awaited<ReturnType<typeof rushBoard>> | null = null;
   let failed = false;
 
   try {
-    [board, daily] = await Promise.all([
+    [board, daily, rush] = await Promise.all([
       ratingBoard("333", "keyboard"),
       dailyBoard(day),
+      rushBoard(),
     ]);
   } catch {
     failed = true;
   }
 
-  if (failed || board === null || daily === null) {
+  if (failed || board === null || daily === null || rush === null) {
     return (
       <Shell>
         <section className="w-full">
@@ -121,6 +123,49 @@ export default async function LeaderboardPage() {
           issued for. A rating appears only once it is precise enough to mean
           something — before that a player is unranked rather than badly ranked.
         </p>
+      </section>
+
+      <section className="w-full">
+        <header className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+          <h2 className="text-lg font-medium tracking-tight">Rush</h2>
+          <p className="text-xs text-muted-dim">Best run · every event</p>
+        </header>
+
+        {rush.length === 0 ? (
+          <p className="max-w-xl text-sm leading-relaxed text-muted">
+            No runs finished yet. Rush sets a target from your own pace and
+            tightens it every time you beat it — the score is how many you held.
+          </p>
+        ) : (
+          <ol className="divide-y divide-border overflow-hidden rounded-lg border border-border">
+            {rush.map((entry) => (
+              <li
+                key={`${entry.handle}-${entry.at}`}
+                className="flex items-center gap-4 bg-surface px-4 py-2.5 text-sm"
+              >
+                <span className="tnum w-6 shrink-0 text-right text-muted-dim">
+                  {entry.rank}
+                </span>
+                <Link
+                  href={`/u/${entry.handle}`}
+                  className="min-w-0 flex-1 truncate transition-colors hover:text-foreground"
+                >
+                  {entry.displayName}
+                  <span className="ml-2 font-mono text-xs text-muted-dim">
+                    {entry.handle}
+                  </span>
+                </Link>
+                <span className="shrink-0 text-xs text-muted-dim">{entry.event}</span>
+                <span className="tnum shrink-0 text-xs text-muted-dim">
+                  streak {entry.bestStreak}
+                </span>
+                <span className="tnum w-10 shrink-0 text-right font-medium">
+                  {entry.score}
+                </span>
+              </li>
+            ))}
+          </ol>
+        )}
       </section>
 
       <section className="w-full">

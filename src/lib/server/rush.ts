@@ -4,7 +4,6 @@ import { DEFAULT_EVENT, EVENTS, eventOf, type EventId } from "../events";
 import { msForRating, poolForSource, type RatingPool } from "../rating";
 import {
   applySolve,
-  nextTarget,
   referencePace,
   replayRush,
   startRush,
@@ -62,7 +61,7 @@ async function freshScramble(event: string): Promise<string> {
  * start, because opening too easy and letting the tightening find someone is far
  * better than opening too hard and having them bounce.
  */
-export async function paceFor(
+async function paceFor(
   profileId: string,
   event: EventId,
   pool: RatingPool,
@@ -341,11 +340,6 @@ async function endRun(runId: string, state: RushState): Promise<void> {
   if (error) throw new Error(`Could not close the run: ${error.message}`);
 }
 
-/** Gives up on a run the player walked away from. */
-export async function abandonRun(profileId: string): Promise<void> {
-  await closeOpenRuns(profileId);
-}
-
 export interface RushBest {
   score: number;
   bestStreak: number;
@@ -374,9 +368,4 @@ export async function bestRun(
     bestStreak: data.best_streak,
     at: data.ended_at ?? "",
   };
-}
-
-/** Used by the next target the client shows before it has submitted anything. */
-export function openingTarget(paceMs: number, event: EventId): number {
-  return nextTarget(0, paceMs, event);
 }
