@@ -182,6 +182,41 @@ export function LandingScreen() {
         </div>
       </section>
 
+      {/* Rush — the mode nothing else in cubing has. */}
+      <section className="border-t border-border">
+        <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 px-6 py-28 text-center">
+          <Reveal className="flex flex-col items-center gap-4">
+            <p className="text-[10px] uppercase tracking-widest text-muted-dim">
+              Under pressure
+            </p>
+            <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
+              A target that keeps tightening.
+            </h2>
+            <p className="max-w-xl text-balance text-base leading-relaxed text-muted">
+              Every timer tells you your average afterwards. None of them ever put
+              you in the position of needing <em>this</em> solve to be fast — which
+              is what a competition round actually is. In Rush the number is on
+              screen before you turn a face, and it shrinks every time you beat it.
+              Three misses ends the run.
+            </p>
+            <p className="max-w-xl text-balance text-sm leading-relaxed text-muted-dim">
+              The target comes from your own pace, so it is the same difficulty
+              whether you average eight seconds or forty. A fixed number would be a
+              lazy solve for one and unreachable for the other; this finds the edge
+              of what you can do today, which is the only place anybody improves.
+            </p>
+          </Reveal>
+          <Reveal delayMs={120}>
+            <Link
+              href="/rush"
+              className="rounded-lg border border-border px-7 py-3.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+            >
+              Start a run
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
       {/* The daily */}
       <section className="border-t border-border">
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 px-6 py-28 text-center">
