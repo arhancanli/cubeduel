@@ -1,3 +1,5 @@
+import { DEFAULT_EVENT, EVENTS, type EventId } from "./events";
+
 import { trimmedAverage, type Timed } from "./stats";
 
 /**
@@ -64,18 +66,37 @@ import { trimmedAverage, type Timed } from "./stats";
 // The scale
 // ---------------------------------------------------------------------------
 
-export const ANCHOR_FAST_SECONDS = 5;
 export const ANCHOR_FAST_RATING = 3000;
-export const ANCHOR_MID_SECONDS = 15;
 export const ANCHOR_MID_RATING = 2000;
 
 /**
- * Rating points per natural-log-second. Derived from the two anchors rather than
- * typed in, so moving an anchor cannot silently leave the scale inconsistent.
+ * The 3x3 anchors, kept as named constants because they are quoted throughout
+ * the docs and the UI. Every event has its own pair — see `events.ts` for why a
+ * single ratio cannot be right for both 2x2 and 5x5 — and these are simply the
+ * 3x3 entry, unchanged from when 3x3 was the only event.
  */
-export const SCALE_K =
-  (ANCHOR_FAST_RATING - ANCHOR_MID_RATING) /
-  Math.log(ANCHOR_MID_SECONDS / ANCHOR_FAST_SECONDS);
+export const ANCHOR_FAST_SECONDS = EVENTS["333"].worldClassMs / 1000;
+export const ANCHOR_MID_SECONDS = EVENTS["333"].strongMs / 1000;
+
+/**
+ * Rating points per natural-log-second, for one event.
+ *
+ * Derived from that event's two anchors rather than typed in, so moving an
+ * anchor cannot silently leave the scale inconsistent. It differs per event on
+ * purpose: 3000 and 2000 mean the same standard of play everywhere, and the
+ * amount of time that separates those two standards is not the same on a 2x2 as
+ * on a 5x5.
+ */
+export function scaleK(event: EventId = DEFAULT_EVENT): number {
+  const def = EVENTS[event];
+  return (
+    (ANCHOR_FAST_RATING - ANCHOR_MID_RATING) /
+    Math.log(def.strongMs / def.worldClassMs)
+  );
+}
+
+/** The 3x3 constant, for the many call sites that predate multi-event. */
+export const SCALE_K = scaleK("333");
 
 /**
  * Ratings do not go below this. Without a floor the log scale runs negative for
@@ -97,20 +118,28 @@ export const RATING_FLOOR = 100;
  * these; this is the backstop that makes the function total no matter what
  * reaches it.
  */
-export const MIN_PLAUSIBLE_MS = 1000;
+export const MIN_PLAUSIBLE_MS = EVENTS["333"].minPlausibleMs;
 
-/** The rating a given average time is worth. */
-export function ratingForMs(ms: number): number {
-  const seconds = Math.max(ms, MIN_PLAUSIBLE_MS) / 1000;
+/** The rating a given average time is worth, on a given event. */
+export function ratingForMs(ms: number, event: EventId = DEFAULT_EVENT): number {
+  const def = EVENTS[event];
+  const k = scaleK(event);
+  const seconds = Math.max(ms, def.minPlausibleMs) / 1000;
   const raw =
-    ANCHOR_FAST_RATING - SCALE_K * Math.log(seconds / ANCHOR_FAST_SECONDS);
+    ANCHOR_FAST_RATING - k * Math.log(seconds / (def.worldClassMs / 1000));
   return Math.max(RATING_FLOOR, raw);
 }
 
-/** Nothing can rate above this, however corrupt the record. */
-export const RATING_CEILING =
-  ANCHOR_FAST_RATING -
-  SCALE_K * Math.log(MIN_PLAUSIBLE_MS / 1000 / ANCHOR_FAST_SECONDS);
+/** Nothing can rate above this on a given event, however corrupt the record. */
+export function ratingCeiling(event: EventId = DEFAULT_EVENT): number {
+  const def = EVENTS[event];
+  return (
+    ANCHOR_FAST_RATING -
+    scaleK(event) * Math.log(def.minPlausibleMs / def.worldClassMs)
+  );
+}
+
+export const RATING_CEILING = ratingCeiling("333");
 
 /**
  * The average time a rating means — the inverse of `ratingForMs`, and the reason
@@ -120,9 +149,11 @@ export const RATING_CEILING =
  * `ratingForMs(msForRating(100))` is 100 but the time does not round-trip. That is
  * the floor doing its job, not a bug.
  */
-export function msForRating(rating: number): number {
+export function msForRating(rating: number, event: EventId = DEFAULT_EVENT): number {
+  const def = EVENTS[event];
   const seconds =
-    ANCHOR_FAST_SECONDS * Math.exp((ANCHOR_FAST_RATING - rating) / SCALE_K);
+    (def.worldClassMs / 1000) *
+    Math.exp((ANCHOR_FAST_RATING - rating) / scaleK(event));
   return seconds * 1000;
 }
 

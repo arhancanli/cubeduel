@@ -1,3 +1,4 @@
+import { DEFAULT_EVENT, EVENTS, type EventId } from "./events";
 import { isValidMove, replaySolves } from "./cubeReplay";
 
 /**
@@ -81,6 +82,15 @@ export interface VerificationInput {
   issuedAt: number | null;
   /** Server time now. */
   receivedAt: number;
+  /**
+   * Which puzzle the moves are replayed against. Defaults to 3x3.
+   *
+   * Getting this wrong fails in both directions and one of them is silent: a
+   * 4x4 solve replayed on a 3x3 is rejected, which is loud, but a 2x2 scramble
+   * replayed on a 3x3 would come out *solved* — the extra pieces were never
+   * touched, so they are still where they started.
+   */
+  event?: EventId;
 }
 
 export type VerificationResult =
@@ -116,6 +126,7 @@ export async function verifySolve(
   input: VerificationInput,
 ): Promise<VerificationResult> {
   const { scramble, moves, durationMs, issuedAt, receivedAt } = input;
+  const event = input.event ?? DEFAULT_EVENT;
 
   // --- Shape ------------------------------------------------------------
 
@@ -180,7 +191,10 @@ export async function verifySolve(
     return reject("no layer turns in the solve");
   }
 
-  if (durationMs < MIN_PLAUSIBLE_DURATION_MS) {
+  // Per event, because the floor that is unarguable for a 3x3 would reject a
+  // world-record 2x2. The single record is 0.39s there, against a 0.86s record
+  // average — a shared floor cannot serve both the scale and the verifier.
+  if (durationMs < EVENTS[event].minSolveMs) {
     return reject("solve is faster than physically possible");
   }
 
@@ -196,6 +210,7 @@ export async function verifySolve(
   const solved = await replaySolves(
     scramble,
     moves.map((m) => m.move),
+    event,
   );
   if (!solved) {
     return reject("the submitted moves do not solve the issued scramble");
