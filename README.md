@@ -99,7 +99,7 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 261 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 272 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 7 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk sign-up driving a ranked solve and a duel end to end, plus an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
@@ -303,6 +303,32 @@ a DNF ao5 leaves the rating untouched and widens the deviation. Abandoning can n
 raise a rating, and repeated failure widens the deviation until the player drops off
 the leaderboard for being unestablished. No fabricated time appears anywhere.
 
+### Inspection (`src/lib/inspection.ts`)
+
+WCA gives fifteen seconds to look at the cube before starting: over that is +2
+(A4b1), over seventeen is a DNF (A4b2), with spoken warnings at 8 and 12 seconds.
+Ranked enforces all of it.
+
+**The server measures it, and it has to.** A client-reported figure cannot work —
+the penalty only ever hurts, so there is a standing incentive to under-report, and
+nothing in the move stream reveals how long somebody stared at the cube beforehand.
+What the server does know is when it issued the scramble and, from the move
+timestamps, when the first turn happened. Inspection is the gap between them. That
+is both measurable from the server's own clock and faithful to the real rule, where
+inspection starts the moment you are allowed to look.
+
+A fixed 1.5s allowance is deducted before judging, because the server starts
+counting when it *sends* the scramble and the player cannot look until it arrives
+and paints. Being generous there is deliberate: a +2 nobody earned is far worse
+than a +2 somebody escaped, because the first makes the ladder feel arbitrary and
+the second costs almost nothing.
+
+The countdown on screen and the final verdict come from the same module, and a test
+pins them to each other at every boundary — a clock that says "+2" and then does not
+charge it is worse than showing no clock at all. `npm run integration` sits on a
+scramble past the limit and asserts the server applies a DNF the client never sent:
+a rule that is correct, unit-tested and never actually executed is not a rule.
+
 ### Verification (`src/lib/verifySolve.ts`)
 
 The server issues the scramble, so there is nothing to cherry-pick and nothing to
@@ -398,9 +424,6 @@ turning faster or pausing less."*
   and typechecked but has never been run against a GAN/GoCube/GiiKER. Treat it as
   unproven until it is. The `smartcube` rating pool exists and is deliberately separate
   from `keyboard` — they are different sports with different time scales.
-- **Timed inspection.** WCA is 15 seconds with +2/DNF overruns. Ranked and the daily
-  both currently give untimed inspection, which is fine for practice and wrong for a
-  ranked result.
 - **The trainer is keyboard-only.** `useKeyboardSolve` owns its input connection and
   cannot take an external move source, so there is no touch pad on `/train` yet.
 - **Elo-gated cube skins.** Cosmetic only. Anything that gates function behind rating

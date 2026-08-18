@@ -60,7 +60,7 @@ PUBLISHABLE = env("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY")
 FAPI = base64.b64decode(re.sub(r"^pk_(test|live)_", "", PUBLISHABLE)).decode().rstrip("$")
 
 
-def clerk(path, method="GET"):
+def clerk(path, method="GET", payload=None):
     """
     Calls Clerk's Backend API.
 
@@ -70,9 +70,11 @@ def clerk(path, method="GET"):
     """
     req = urllib.request.Request(
         f"https://api.clerk.com/v1/{path}",
+        data=json.dumps(payload).encode() if payload is not None else None,
         method=method,
         headers={
             "Authorization": f"Bearer {SECRET}",
+            "Content-Type": "application/json",
             "User-Agent": (
                 "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
@@ -147,39 +149,75 @@ def solve_scramble(page, scramble, pace_ms):
             page.wait_for_timeout(pace_ms)
 
 
-def sign_up(page):
+def create_account():
     """
-    Creates a real account through the real Clerk widget.
+    Creates the test account through Clerk's Backend API.
 
-    Every `Continue` here is `.last`, not `.first`: the modal keeps earlier
-    steps mounted, so `.first` clicks a button belonging to a screen that is no
-    longer showing and silently does nothing.
+    The suite used to sign up through the widget, which stopped working: the
+    instance has bot protection on, so submitting the sign-up form renders a
+    Cloudflare Turnstile challenge that headless Chromium cannot solve. No
+    request is ever made — the form simply never submits — so the failure
+    surfaced as "still gated" and read like a broken app.
+
+    Clerk's testing tokens are meant to bypass exactly this, and are still
+    attached to every frontend call below, but they do not suppress the widget
+    on this instance: `/v1/environment` reports bot protection enabled with or
+    without one.
+
+    Creating the user server-side and signing in through the real widget keeps
+    what this suite exists to prove. The seam under test is a Clerk session
+    travelling from the browser, through the proxy, into a route handler and out
+    to Postgres — sign-in exercises every part of that. What is lost is coverage
+    of Clerk's own sign-up form, which is Clerk's code, not this app's.
+    """
+    clerk(
+        "users",
+        method="POST",
+        payload={
+            "email_address": [EMAIL],
+            "password": PASSWORD,
+            # The password is a fixed test string and deliberately not a strong
+            # one; Clerk's breach check would otherwise reject it.
+            "skip_password_checks": True,
+        },
+    )
+
+
+def sign_in(page):
+    """
+    Signs in through the real widget.
+
+    Every `Continue` is `.last`, not `.first`: the modal keeps earlier steps
+    mounted, so `.first` clicks a button belonging to a screen that is no longer
+    showing and silently does nothing.
     """
     page.locator("button:has-text('Sign in')").first.click()
-    page.wait_for_timeout(4000)
-    page.locator("text=Sign up").last.click()
-    page.wait_for_timeout(3000)
+    page.wait_for_timeout(5000)
 
-    page.locator("input[name='emailAddress']").first.fill(EMAIL)
-    page.locator("input[name='password']").first.fill(PASSWORD)
-    page.wait_for_timeout(800)
+    page.locator("input[name='identifier']").last.fill(EMAIL)
+    page.wait_for_timeout(500)
     page.locator("button:has-text('Continue')").last.click()
-    page.wait_for_timeout(8000)
+    page.wait_for_timeout(6000)
 
-    # A `+clerk_test` address on a development instance always takes this code.
-    if "Verify your email" in page.inner_text("body"):
+    page.locator("input[name='password']").last.fill(PASSWORD)
+    page.wait_for_timeout(500)
+    page.locator("button:has-text('Continue')").last.click()
+    page.wait_for_timeout(9000)
+
+    # Clerk asks for an emailed code the first time an account signs in from an
+    # unrecognised device, which is every run. A `+clerk_test` address always
+    # takes 424242 and no mail is sent.
+    if "Check your email" in page.inner_text("body"):
         code = page.locator("input[inputmode='numeric']")
         if code.count():
             code.first.click()
             page.wait_for_timeout(300)
-        page.keyboard.type("424242", delay=150)
-        page.wait_for_timeout(6000)
+        page.keyboard.type("424242", delay=140)
+        page.wait_for_timeout(7000)
         cont = page.locator("button:has-text('Continue')")
         if cont.count() and cont.last.is_visible():
             cont.last.click()
-        page.wait_for_timeout(6000)
-
-
+            page.wait_for_timeout(6000)
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     page = browser.new_page(viewport={"width": 1440, "height": 1000})
@@ -200,8 +238,9 @@ with sync_playwright() as p:
     page.wait_for_timeout(2500)
     check("duelling is gated behind an account", "Sign in to duel" in page.inner_text("body"))
 
-    print("\n== signing up ==")
-    sign_up(page)
+    print("\n== signing in ==")
+    create_account()
+    sign_in(page)
     page.goto(BASE + "/duel", wait_until="domcontentloaded")
     page.wait_for_timeout(4000)
     body_text = page.inner_text("body")

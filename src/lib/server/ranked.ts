@@ -9,6 +9,7 @@ import {
   type RatingState,
 } from "../rating";
 import type { Timed } from "../stats";
+import { combinePenalties, judgeInspection } from "../inspection";
 import type { Penalty } from "../types";
 import { ATTEMPT_TTL_MS, verifySolve, type SubmittedMove } from "../verifySolve";
 import { db } from "./supabase";
@@ -121,6 +122,11 @@ export type SubmissionResult =
       durationMs: number;
       moveCount: number;
       tps: number;
+      /** After inspection is taken into account. */
+      penalty: Penalty;
+      inspectionMs: number;
+      /** Why a penalty was applied, empty when none was. */
+      inspectionReason: string;
       /** Present only on the fifth attempt, when a window closed. */
       rating: RatingResult | null;
       attemptsUntilRating: number;
@@ -193,6 +199,10 @@ export async function submitAttempt(
       durationMs: input.durationMs,
       moveCount: 0,
       tps: 0,
+      // Already a DNF; inspection cannot make it worse.
+      penalty: "DNF" as Penalty,
+      inspectionMs: 0,
+      inspectionReason: "",
       rating,
       attemptsUntilRating: await countUntilRating(attempt),
     };
@@ -219,6 +229,17 @@ export async function submitAttempt(
     return { accepted: false, reason: verdict.reason };
   }
 
+  // Inspection, measured from the server's own clock.
+  //
+  // The scramble was sent at `issuedAt` and the first turn happened
+  // `durationMs` before the submission arrived, so the gap between them is how
+  // long the player looked at the cube. That is the WCA rule stated faithfully —
+  // inspection begins the moment you are allowed to see it — and it is the only
+  // version that can be enforced, since the penalty only ever hurts and a
+  // client-reported figure would always be under-reported.
+  const inspection = judgeInspection(receivedAt - input.durationMs - issuedAt);
+  const penalty = combinePenalties(input.penalty, inspection.penalty);
+
   const solvedAt = new Date(receivedAt).toISOString();
   const { data: solve, error: solveError } = await db()
     .from("solves")
@@ -228,7 +249,7 @@ export async function submitAttempt(
       event: attempt.event,
       scramble: attempt.scramble,
       duration_ms: input.durationMs,
-      penalty: input.penalty,
+      penalty,
       move_count: verdict.moveCount,
       tps: verdict.tps,
       source: input.source,
@@ -252,7 +273,7 @@ export async function submitAttempt(
   await recordResult(attempt, {
     solveId: solve?.id ?? null,
     durationMs: input.durationMs,
-    penalty: input.penalty,
+    penalty,
   });
 
   const rating = await rateReadyWindows(
@@ -266,6 +287,9 @@ export async function submitAttempt(
     durationMs: input.durationMs,
     moveCount: verdict.moveCount,
     tps: verdict.tps,
+    penalty,
+    inspectionMs: inspection.inspectionMs,
+    inspectionReason: inspection.reason,
     rating,
     attemptsUntilRating: await countUntilRating(attempt),
   };

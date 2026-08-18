@@ -174,11 +174,52 @@ async function main() {
       instant.accepted ? "ACCEPTED" : instant.reason);
   }
 
-  // Those two refusals were recorded as DNFs, so the first window will contain
-  // two of them and must fail.
-  console.log("\n== window 1: two refusals and three real solves ==");
+  console.log("\n== inspection is enforced, by the server's own clock ==");
+  {
+    // A rule that is correct, unit-tested and never executes is not a rule. This
+    // proves the branch actually fires on the real submit path: sit on the
+    // scramble past the WCA limit, then solve it honestly, and watch the server
+    // apply a penalty the client never asked for.
+    const attempt = await issueAttempt(profile.id, "333", "keyboard");
+    seen.add(attempt.scramble);
+
+    const solution = solutionFor(attempt.scramble);
+    const gap = Math.round(SOLVE_MS / Math.max(1, solution.length - 1));
+    const moves = stream(solution, gap);
+    const durationMs = moves[moves.length - 1].atMs;
+
+    // Loiter well past 17 seconds before the first turn.
+    await new Promise((resolve) => setTimeout(resolve, 19_000 + durationMs));
+
+    const result = await submitAttempt({
+      profileId: profile.id,
+      attemptId: attempt.attemptId,
+      clientId: `probe_inspect_${Date.now()}`,
+      moves,
+      durationMs,
+      // The client claims a clean solve. The server should disagree.
+      penalty: "OK",
+      source: "keyboard",
+    });
+
+    check("the solve itself still verifies", result.accepted,
+      result.accepted ? "" : result.reason);
+    if (result.accepted) {
+      check("a penalty was applied that the client did not send",
+        result.penalty === "DNF", `penalty = ${result.penalty}`);
+      check("inspection was measured, not guessed",
+        result.inspectionMs > 17_000,
+        `${(result.inspectionMs / 1000).toFixed(1)}s`);
+      check("the reason cites the regulation", /A4b2/.test(result.inspectionReason),
+        result.inspectionReason);
+    }
+  }
+
+  // Those three refusals were recorded as DNFs, so the first window will
+  // contain three of them and must fail.
+  console.log("\n== window 1: three refusals and two real solves ==");
   let lastResult: Awaited<ReturnType<typeof submitAttempt>> | null = null;
-  for (let i = 1; i <= WINDOW_SIZE - 2; i++) {
+  for (let i = 1; i <= WINDOW_SIZE - 3; i++) {
     lastResult = await honestSolve(profile.id, `solve ${i}`);
   }
 
@@ -221,8 +262,8 @@ async function main() {
   check("the rating persisted", stored.rating !== null,
     stored.rating ? `${Math.round(stored.rating)} ±${Math.round(stored.deviation)}` : "none");
 
-  // Two rejection probes, then (WINDOW_SIZE - 2) + WINDOW_SIZE honest solves.
-  const issued = 2 + (WINDOW_SIZE - 2) + WINDOW_SIZE;
+  // Three rejection probes, then (WINDOW_SIZE - 3) + WINDOW_SIZE honest solves.
+  const issued = 3 + (WINDOW_SIZE - 3) + WINDOW_SIZE;
   check("every issued scramble was unique", seen.size === issued,
     `${seen.size} distinct of ${issued}`);
 

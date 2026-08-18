@@ -1,12 +1,16 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
 import { KeyMapHint } from "@/components/KeyMapHint";
 import { MovePad } from "@/components/MovePad";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
+import {
+  INSPECTION_LIMIT_MS,
+  inspectionStateAt,
+} from "@/lib/inspection";
 import { ESTABLISHED_DEVIATION, WINDOW_SIZE, msForRating } from "@/lib/rating";
 import { useSolveSession } from "@/lib/useSolveSession";
 
@@ -46,6 +50,9 @@ interface AttemptResponse {
 interface SubmitResponse {
   accepted?: boolean;
   reason?: string;
+  penalty?: "OK" | "PLUS2" | "DNF";
+  inspectionMs?: number;
+  inspectionReason?: string;
   attemptsUntilRating?: number;
   rating?: {
     before: number | null;
@@ -68,12 +75,16 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
   const [submitting, setSubmitting] = useState(false);
   /** False until the player opens their first attempt of this visit. */
   const [started, setStarted] = useState(false);
+  /** Milliseconds since the scramble arrived, while inspection is running. */
+  const [inspectionElapsed, setInspectionElapsed] = useState<number | null>(null);
+  const [verdict, setVerdict] = useState<string | null>(null);
 
   /** Ask the server for a scramble. This is the whole point of ranked. */
   const supplyScramble = useCallback(async () => {
     setStarted(true);
     setRejection(null);
     setStatus(null);
+    setVerdict(null);
     submittedRef.current = false;
     attemptIdRef.current = null;
 
@@ -92,6 +103,10 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
 
     const attempt = (await response.json()) as AttemptResponse;
     attemptIdRef.current = attempt.attemptId;
+    // Inspection starts the moment the scramble lands, because that is the
+    // moment the player is allowed to look at it — the same instant the server
+    // began counting when it sent this.
+    setInspectionElapsed(0);
     return attempt.scramble;
   }, []);
 
@@ -109,6 +124,7 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
       if (!attemptId || submittedRef.current) return;
       submittedRef.current = true;
       setSubmitting(true);
+      setInspectionElapsed(null);
 
       void fetch("/api/ranked/submit", {
         method: "POST",
@@ -133,6 +149,7 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
             return;
           }
 
+          setVerdict(body.inspectionReason || null);
           const remaining = body.attemptsUntilRating ?? WINDOW_SIZE;
           setRating((current) => ({
             ...current,
@@ -172,6 +189,35 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
     session;
   const solving = phase === "running";
 
+  /**
+   * The inspection countdown.
+   *
+   * Runs only while the attempt is armed — the first turn ends inspection and
+   * starts the solve, which is exactly the WCA boundary. Driven off
+   * `performance.now()` rather than a decrementing counter so a busy tab cannot
+   * make inspection appear shorter than it was.
+   */
+  useEffect(() => {
+    if (phase !== "armed" || inspectionElapsed === null) return;
+    const startedAt = performance.now();
+    let frame = 0;
+    const tick = () => {
+      setInspectionElapsed(performance.now() - startedAt);
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+    // Deliberately not depending on `inspectionElapsed`: it changes every frame,
+    // and re-running the effect on it would restart the clock sixty times a
+    // second and pin inspection at zero forever.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
+  const inspection =
+    phase === "armed" && inspectionElapsed !== null
+      ? inspectionStateAt(inspectionElapsed)
+      : null;
+
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="ranked" />
@@ -209,6 +255,33 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
           >
             0.00
           </div>
+          {inspection ? (
+            <div className="flex flex-col items-center gap-1">
+              <span
+                data-testid="inspection-countdown"
+                className={`tnum text-3xl font-medium ${
+                  inspection.pendingPenalty === "DNF"
+                    ? "text-danger"
+                    : inspection.pendingPenalty === "PLUS2"
+                      ? "text-holding"
+                      : "text-muted"
+                }`}
+              >
+                {(inspection.remainingMs / 1000).toFixed(1)}
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-muted-dim">
+                {inspection.pendingPenalty === "DNF"
+                  ? "inspection — DNF"
+                  : inspection.pendingPenalty === "PLUS2"
+                    ? "inspection — +2"
+                    : inspection.warningsPassed === 2
+                      ? "12 seconds"
+                      : inspection.warningsPassed === 1
+                        ? "8 seconds"
+                        : "inspection"}
+              </span>
+            </div>
+          ) : null}
           <p className="text-xs text-muted-dim">
             {phase === "armed" && "Ranked attempt live — the first turn starts the clock."}
             {phase === "running" && `${moveCount} moves`}
@@ -221,6 +294,12 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
         {lastWindow ? <WindowResult result={lastWindow} /> : null}
         {status && !lastWindow ? (
           <p className="text-sm text-muted">{status}</p>
+        ) : null}
+
+        {verdict ? (
+          <p className="max-w-md rounded-lg border border-holding/40 bg-holding/5 px-4 py-3 text-center text-xs leading-relaxed text-holding">
+            {verdict}
+          </p>
         ) : null}
 
         {rejection ? (
@@ -257,7 +336,9 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
         <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">
           Your rating moves every {WINDOW_SIZE} attempts, as a WCA average of 5.
           Starting a new attempt before finishing this one records the current one
-          as a DNF.
+          as a DNF. Inspection is WCA: {INSPECTION_LIMIT_MS / 1000} seconds from
+          the moment the scramble appears, then +2, then a DNF past 17.
+          It is timed by the server, not your browser.
         </p>
 
         <MovePad onMove={session.pushMove} className="md:hidden" />
