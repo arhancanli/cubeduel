@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "tables:build": "tsx scripts/build-solver-tables.mts",
-    "prebuild": "npm run tables:build",
+    "demo:build": "tsx scripts/build-demo-solves.mts",
+    "prebuild": "npm run tables:build && npm run demo:build",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",

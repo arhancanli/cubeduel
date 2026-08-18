@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { CubeView } from "@/components/CubeView";
+import { SolverDemo } from "@/components/SolverDemo";
 import { Reveal } from "@/components/Reveal";
 import { ScrollSolve } from "@/components/ScrollSolve";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -25,8 +25,6 @@ import { loadHistory } from "@/lib/solveHistory";
  * **Anyone who has already solved here should not be sold to again.** If there is
  * local history the page leads with "Continue" and the pitch moves out of the way.
  */
-
-const HERO_SCRAMBLE = "F2 U2 B' L2 B' R2 F' U2 F2 R2 U2 F R' D' L F R B' F2 R2 D'";
 
 export function LandingScreen() {
   const [returningSolves, setReturningSolves] = useState<number | null>(null);
@@ -77,12 +75,13 @@ export function LandingScreen() {
           </p>
         </Reveal>
 
+        {/* A cube that solves itself, rather than one sitting there scrambled.
+            The scramble is WCA random-state, the solution comes from the solver
+            in this repository, and the two numbers underneath were measured
+            when it was generated. It is the one claim on this page a visitor
+            can check. */}
         <Reveal delayMs={220} className="w-full">
-          <CubeView
-            scramble={HERO_SCRAMBLE}
-            backView="none"
-            className="mx-auto h-[34vh] max-h-80 min-h-48 w-full max-w-md"
-          />
+          <SolverDemo />
         </Reveal>
       </section>
 

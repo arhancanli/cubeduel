@@ -20,14 +20,37 @@ export type NavKey =
   | "leaderboard"
   | "progress";
 
-const LINKS: { key: NavKey; href: string; label: string }[] = [
-  { key: "play", href: "/play", label: "Play" },
+interface NavLink {
+  key: NavKey;
+  href: string;
+  label: string;
+}
+
+/**
+ * Two groups, because they are two different activities.
+ *
+ * **Compete** puts something on the record: a rating moves, a result is
+ * published, an opponent is waiting. **Practice** does not — nothing there is
+ * recorded against you, and that is the point of it.
+ *
+ * A flat list of eight said nothing about which was which, so the two audiences
+ * this platform serves — somebody grinding toward a national final, and somebody
+ * who wants to get from a minute to thirty seconds — had to work out for
+ * themselves which half of the nav was theirs. Separating them is not decoration:
+ * it is the difference between "everything here is being judged" and "this bit
+ * is yours to fail in".
+ */
+const COMPETE: NavLink[] = [
   { key: "ranked", href: "/ranked", label: "Ranked" },
   { key: "duel", href: "/duel", label: "Duel" },
   { key: "daily", href: "/daily", label: "Daily" },
-  { key: "train", href: "/train", label: "Train" },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard" },
+];
+
+const PRACTICE: NavLink[] = [
+  { key: "play", href: "/play", label: "Play" },
   { key: "timer", href: "/timer", label: "Timer" },
+  { key: "train", href: "/train", label: "Train" },
   { key: "progress", href: "/progress", label: "Progress" },
 ];
 
@@ -63,21 +86,14 @@ export function SiteHeader({
         {trailing ? (
           <span className="hidden shrink-0 text-muted-dim sm:inline">{trailing}</span>
         ) : null}
-        {LINKS.map((link) =>
-          link.key === active ? (
-            <span key={link.key} className="shrink-0 text-foreground">
-              {link.label}
-            </span>
-          ) : (
-            <Link
-              key={link.key}
-              href={link.href}
-              className="shrink-0 text-muted transition-colors hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ),
-        )}
+        <NavGroup label="Compete" links={COMPETE} active={active} />
+
+        {/* A rule rather than a gap: on a horizontally scrolling nav a gap wide
+            enough to read as a separator is a gap wide enough to push a
+            destination off screen. */}
+        <span aria-hidden="true" className="h-3 w-px shrink-0 bg-border" />
+
+        <NavGroup label="Practice" links={PRACTICE} active={active} />
       </nav>
 
       <div className="shrink-0">
@@ -117,5 +133,45 @@ function AuthControl() {
         Sign in
       </button>
     </SignInButton>
+  );
+}
+
+/**
+ * One half of the nav.
+ *
+ * The label is visible from `sm` up and always present for assistive tech, so a
+ * screen reader announces "Compete" before the four things you can compete at,
+ * rather than eight destinations in a row with no structure.
+ */
+function NavGroup({
+  label,
+  links,
+  active,
+}: {
+  label: string;
+  links: NavLink[];
+  active: NavKey;
+}) {
+  return (
+    <div className="flex shrink-0 items-center gap-4 sm:gap-5" role="group" aria-label={label}>
+      <span className="hidden shrink-0 text-[10px] uppercase tracking-widest text-muted-dim md:inline">
+        {label}
+      </span>
+      {links.map((link) =>
+        link.key === active ? (
+          <span key={link.key} className="shrink-0 text-foreground" aria-current="page">
+            {link.label}
+          </span>
+        ) : (
+          <Link
+            key={link.key}
+            href={link.href}
+            className="shrink-0 text-muted transition-colors hover:text-foreground"
+          >
+            {link.label}
+          </Link>
+        ),
+      )}
+    </div>
   );
 }

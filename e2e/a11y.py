@@ -112,6 +112,48 @@ with sync_playwright() as p:
         )
         check(f"{path}: graphics carry text alternatives", len(graphics) == 0, "; ".join(graphics[:3]))
 
+    print("\n== the nav separates competing from practising ==")
+    page.goto(BASE + "/", wait_until="domcontentloaded")
+    page.wait_for_timeout(3000)
+    groups = page.evaluate(
+        "() => [...document.querySelectorAll('nav [role=group]')].map(g => g.getAttribute('aria-label'))"
+    )
+    # Two different activities: one puts something on the record, the other does
+    # not. A screen reader should hear that structure, not eight links in a row.
+    check("the nav is grouped", groups == ["Compete", "Practice"], str(groups))
+
+    labelled = page.evaluate(
+        """() => {
+            const out = {};
+            for (const g of document.querySelectorAll('nav [role=group]')) {
+              out[g.getAttribute('aria-label')] =
+                [...g.querySelectorAll('a, span[aria-current]')].map(a => a.innerText.trim());
+            }
+            return out;
+        }"""
+    )
+    check("ranked, duels and the daily are the competitive half",
+          set(labelled.get("Compete", [])) == {"Ranked", "Duel", "Daily", "Leaderboard"},
+          str(labelled.get("Compete")))
+    check("the timer and the trainer are the practice half",
+          set(labelled.get("Practice", [])) == {"Play", "Timer", "Train", "Progress"},
+          str(labelled.get("Practice")))
+
+    print("\n== the landing page demonstrates the solver ==")
+    players = page.locator("twisty-player").count()
+    check("a cube is on the landing page", players >= 1, f"{players} players")
+    import hashlib
+    el = page.locator("twisty-player").first
+    frames = []
+    for _ in range(3):
+        frames.append(hashlib.sha1(el.screenshot()).hexdigest()[:10])
+        page.wait_for_timeout(800)
+    # A still cube proves nothing. The claim is that the engine solves it.
+    check("and it is actually solving, not sitting there", len(set(frames)) > 1, str(frames))
+    body_now = page.inner_text("body")
+    check("the move count and search time are stated",
+          "moves" in body_now and "ms to find" in body_now)
+
     print("\n== keyboard ==")
     page.goto(BASE + "/", wait_until="domcontentloaded")
     page.wait_for_timeout(2000)
