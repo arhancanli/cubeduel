@@ -357,7 +357,7 @@ export async function currentRating(
   event: string,
   pool: RatingPool,
 ): Promise<RatingState> {
-  const { data } = await db()
+  const { data, error } = await db()
     .from("ratings")
     .select("*")
     .eq("profile_id", profileId)
@@ -365,6 +365,17 @@ export async function currentRating(
     .eq("pool", pool)
     .maybeSingle();
 
+  // The most damaging discarded error in this file, and the reason it is worth
+  // checking every one of them. `rateReadyWindows` feeds this straight into
+  // `applyWindow` and then writes the result: a read that failed would look
+  // exactly like an unrated player, and an established rating would be
+  // overwritten with a fresh one — permanent damage to the core record from a
+  // transient failure.
+  if (error) {
+    throw new Error(`Could not read the current rating: ${error.message}`);
+  }
+
+  // Absence is different, and genuinely means unrated.
   if (!data) return UNRATED;
 
   return {
@@ -396,7 +407,7 @@ export async function rateReadyWindows(
 
   // Bounded so a bug upstream cannot turn one request into an unbounded loop.
   for (let guard = 0; guard < 50; guard++) {
-    const { data: pending } = await db()
+    const { data: pending, error: pendingError } = await db()
       .from("ranked_attempts")
       .select("id, duration_ms, penalty, completed_at")
       .eq("profile_id", profileId)
@@ -406,6 +417,14 @@ export async function rateReadyWindows(
       .not("completed_at", "is", null)
       .order("completed_at", { ascending: true })
       .limit(WINDOW_SIZE);
+
+    // Breaking on an error would mean the rating quietly does not move. That is
+    // self-healing if the failure is transient — the window is retried on the
+    // next submission — but if it is not transient, ratings stop updating for
+    // everyone and nothing anywhere says so.
+    if (pendingError) {
+      throw new Error(`Could not read pending results: ${pendingError.message}`);
+    }
 
     if (!pending || pending.length < WINDOW_SIZE) break;
 

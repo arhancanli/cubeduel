@@ -193,7 +193,7 @@ export async function finishDuel(input: DuelFinishInput): Promise<DuelResult> {
   const effective = durationMs + (input.penalty === "PLUS2" ? 2000 : 0);
   const outcome: "win" | "loss" = effective < duel.bot_duration_ms ? "win" : "loss";
 
-  const { data: solve } = await db()
+  const { data: solve, error: solveError } = await db()
     .from("solves")
     .insert({
       profile_id: duel.profile_id,
@@ -213,6 +213,12 @@ export async function finishDuel(input: DuelFinishInput): Promise<DuelResult> {
     })
     .select("id")
     .single();
+
+  // Same rule as ranked: an outcome recorded against a solve that was never
+  // stored is a win with no evidence behind it.
+  if (solveError) {
+    throw new Error(`Could not store the verified solve: ${solveError.message}`);
+  }
 
   await recordOutcome(duel.id, outcome, {
     durationMs,

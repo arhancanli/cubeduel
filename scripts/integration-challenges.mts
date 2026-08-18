@@ -182,6 +182,40 @@ async function main() {
     bobResult.accepted && bobResult.theirs?.durationMs != null,
     bobResult.accepted ? JSON.stringify(bobResult.theirs) : "");
 
+  console.log("\n== the solves behind the result actually exist ==");
+  {
+    // This is the check that was missing, and its absence hid a real bug for as
+    // long as the feature existed: `solves.mode` had no 'challenge' value, so
+    // every insert failed the check constraint, the error was discarded, and the
+    // challenge recorded a winner with no solve attached. Everything visible
+    // still looked right — the outcome was computed from a verified move stream
+    // — which is exactly why nothing caught it.
+    const { data: rows } = await db()
+      .from("challenges")
+      .select("challenger_solve_id, opponent_solve_id")
+      .eq("id", id)
+      .single();
+
+    check("both solve ids were recorded",
+      Boolean(rows?.challenger_solve_id) && Boolean(rows?.opponent_solve_id),
+      `challenger=${rows?.challenger_solve_id ?? "null"} opponent=${rows?.opponent_solve_id ?? "null"}`);
+
+    const ids = [rows?.challenger_solve_id, rows?.opponent_solve_id].filter(Boolean) as string[];
+    const { data: solves } = await db()
+      .from("solves")
+      .select("id, mode, verified, scramble")
+      .in("id", ids);
+
+    check("both solves are stored", (solves?.length ?? 0) === 2, `${solves?.length ?? 0} of 2`);
+    check("they are marked verified", (solves ?? []).every((s) => s.verified === true));
+    check("they are labelled as challenge solves",
+      (solves ?? []).every((s) => s.mode === "challenge"),
+      (solves ?? []).map((s) => s.mode).join(", "));
+    check("and they carry the scramble that was actually issued",
+      new Set((solves ?? []).map((s) => s.scramble)).size === 1,
+      `${new Set((solves ?? []).map((s) => s.scramble)).size} distinct scrambles`);
+  }
+
   console.log("\n== both sides agree on the result ==");
   {
     const forAlice = (await listChallenges(alice.id)).find((c) => c.id === id);

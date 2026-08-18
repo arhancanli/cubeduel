@@ -90,7 +90,7 @@ async function settle(row: ChallengeRow, now: number): Promise<ChallengeRow> {
   const decision = resolve(stateOf(row), now);
   if (!decision.settled) return row;
 
-  const { data } = await db()
+  const { data, error } = await db()
     .from("challenges")
     .update({
       status: decision.status,
@@ -102,8 +102,14 @@ async function settle(row: ChallengeRow, now: number): Promise<ChallengeRow> {
     .select("*")
     .maybeSingle();
 
-  // If the guard matched nothing somebody else settled it first, which is a
-  // correct outcome rather than an error — their answer and ours agree, because
+  // A failed write here used to fall through to the line below, which hands back
+  // a row claiming a settlement that was never stored — so both players would be
+  // shown a winner the database has no record of, and the next read would
+  // contradict it.
+  if (error) throw new Error(`Could not settle the challenge: ${error.message}`);
+
+  // Matching nothing is different: somebody else settled it first, which is a
+  // correct outcome rather than a failure. Their answer and ours agree, because
   // both came from the same pure function over the same row.
   return (data as ChallengeRow | null) ?? { ...row, status: decision.status, winner: decision.winner };
 }
@@ -140,13 +146,20 @@ export async function createChallenge(
   // Cheap and honest rate limit. Not about load — an inbox that can be used as a
   // weapon is a feature people turn off, and the cap is what stops one player
   // burying another.
-  const { count } = await db()
+  const { count, error: countError } = await db()
     .from("challenges")
     .select("id", { count: "exact", head: true })
     .eq("challenger_id", challengerId)
     .eq("status", "pending");
 
-  if ((count ?? 0) >= MAX_OUTGOING_PENDING) {
+  // This one failed open. An error left `count` null, `?? 0` read that as "none
+  // pending", and the cap that stops one player burying another simply stopped
+  // existing — for exactly as long as the database was unhappy.
+  if (countError || count === null) {
+    return { ok: false, reason: "Could not check your open challenges. Try again." };
+  }
+
+  if (count >= MAX_OUTGOING_PENDING) {
     return {
       ok: false,
       reason: `You already have ${MAX_OUTGOING_PENDING} challenges waiting. Finish some first.`,
@@ -406,7 +419,7 @@ export async function submitSide(input: SubmitInput): Promise<SubmitResult> {
   const inspection = judgeInspection(receivedAt - durationMs - startedAt);
   const penalty = combinePenalties(input.penalty, inspection.penalty);
 
-  const { data: solve } = await db()
+  const { data: solve, error: solveError } = await db()
     .from("solves")
     .insert({
       profile_id: input.profileId,
@@ -426,6 +439,15 @@ export async function submitSide(input: SubmitInput): Promise<SubmitResult> {
     })
     .select("id")
     .single();
+
+  // The result is about to be written against this solve. Recording it with no
+  // solve stored would produce a head-to-head win nobody can inspect — and a
+  // result whose evidence does not exist is exactly what this app claims cannot
+  // happen. The ranked path has always refused here; this one used to discard
+  // the error and record the win anyway.
+  if (solveError) {
+    throw new Error(`Could not store the verified solve: ${solveError.message}`);
+  }
 
   return finish(
     row,
