@@ -5,6 +5,7 @@ import { buildTables, solveScramble } from "../solver";
 import type { Penalty } from "../types";
 import { ATTEMPT_TTL_MS, verifySolve, type SubmittedMove } from "../verifySolve";
 import { db } from "./supabase";
+import { raise } from "./schema";
 
 /**
  * Racing a bot.
@@ -258,13 +259,19 @@ export interface DuelRecord {
 }
 
 export async function duelRecord(profileId: string): Promise<DuelRecord> {
-  const { data } = await db()
+  const { data, error } = await db()
     .from("duels")
     .select("outcome, completed_at")
     .eq("profile_id", profileId)
     .not("outcome", "is", null)
     .order("completed_at", { ascending: false })
     .limit(200);
+
+  // Discarding this error rendered a record of `0W · 0L` during an outage, which
+  // is indistinguishable from a real new player and so gets investigated by
+  // nobody. A missing table is reported separately, because that one is a setup
+  // step rather than a failure.
+  if (error) raise(error, "duels", "Could not load your duel record");
 
   const rows = data ?? [];
   return {

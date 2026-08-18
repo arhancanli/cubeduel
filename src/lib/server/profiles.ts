@@ -2,16 +2,11 @@ import "server-only";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 
-import {
-  fallbackHandle,
-  handleCandidates,
-  isValidHandle,
-  sanitizeHandle,
-} from "../handle";
+import { isValidHandle } from "../handle";
 import { db } from "./supabase";
-import type { Row } from "./database.types";
+import { createProfileFor, profileFor, type Profile } from "./profileStore";
 
-export type Profile = Row<"profiles">;
+export type { Profile };
 
 /**
  * Clerk owns who someone is; this table owns who they are *here* — the handle,
@@ -26,14 +21,7 @@ export type Profile = Row<"profiles">;
 export async function currentProfile(): Promise<Profile | null> {
   const { userId } = await auth();
   if (!userId) return null;
-
-  const { data } = await db()
-    .from("profiles")
-    .select("*")
-    .eq("clerk_user_id", userId)
-    .maybeSingle();
-
-  return data ?? null;
+  return profileFor(userId);
 }
 
 /**
@@ -44,12 +32,16 @@ export async function currentProfile(): Promise<Profile | null> {
  * Clerk knows and can be changed later in settings. Being made to invent a
  * permanent public name before seeing a single screen is exactly the friction
  * that kills conversion.
+ *
+ * The creation itself — and the concurrency it has to survive — lives in
+ * `profileStore.ts`, which knows nothing about Clerk and can therefore be tested
+ * without a browser.
  */
 export async function ensureProfile(): Promise<Profile | null> {
   const { userId } = await auth();
   if (!userId) return null;
 
-  const existing = await currentProfile();
+  const existing = await profileFor(userId);
   if (existing) return existing;
 
   // Only now is a Clerk Backend API call worth making — it is rate-limited and
@@ -60,48 +52,7 @@ export async function ensureProfile(): Promise<Profile | null> {
     user?.username ||
     "Cuber";
 
-  const seed =
-    sanitizeHandle(user?.username ?? "") ??
-    sanitizeHandle(displayName) ??
-    fallbackHandle(userId);
-
-  // First-come-first-served on the name itself, then numbered variants. Trying
-  // them one at a time and letting the unique index arbitrate is what makes this
-  // correct under concurrency — a "is it taken?" check followed by an insert is
-  // a race, and handles are permanent enough that losing one hurts.
-  for (const handle of handleCandidates(seed)) {
-    if (!isValidHandle(handle)) continue;
-
-    const { data, error } = await db()
-      .from("profiles")
-      .insert({ clerk_user_id: userId, handle, display_name: displayName })
-      .select("*")
-      .single();
-
-    if (data) return data;
-
-    // 23505 is a unique violation. On `clerk_user_id` it means another request
-    // for this same player won the race, and its profile is the right answer.
-    if (error?.code === "23505") {
-      const raced = await currentProfile();
-      if (raced) return raced;
-      continue; // The handle was taken by someone else; try the next one.
-    }
-
-    if (error) throw new Error(`Could not create profile: ${error.message}`);
-  }
-
-  // Every candidate collided, which for a numbered sequence means something is
-  // badly wrong rather than unlucky. Fall back to a name that cannot collide.
-  const unique = fallbackHandle(userId);
-  const { data, error } = await db()
-    .from("profiles")
-    .insert({ clerk_user_id: userId, handle: unique, display_name: displayName })
-    .select("*")
-    .single();
-
-  if (error) throw new Error(`Could not create profile: ${error.message}`);
-  return data;
+  return createProfileFor(userId, displayName, user?.username ?? null);
 }
 
 /** Public lookup for `/u/<handle>`. Case-insensitive, since URLs get retyped. */

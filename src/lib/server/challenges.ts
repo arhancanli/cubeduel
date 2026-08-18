@@ -13,6 +13,7 @@ import { combinePenalties, judgeInspection } from "../inspection";
 import type { Penalty } from "../types";
 import { verifySolve, type SubmittedMove } from "../verifySolve";
 import { db } from "./supabase";
+import { raise } from "./schema";
 
 /**
  * Head-to-head challenges, against a person rather than a bot.
@@ -252,7 +253,7 @@ export async function listChallenges(profileId: string, limit = 20): Promise<Cha
 
   // An outage that renders as "you have no challenges" is the worst failure this
   // list has: it is indistinguishable from the truth and nobody investigates it.
-  if (error) throw new Error(`Could not load challenges: ${error.message}`);
+  if (error) raise(error, "challenges", "Could not load challenges");
 
   const now = Date.now();
   const rows = await Promise.all((data as ChallengeRow[]).map((row) => settle(row, now)));

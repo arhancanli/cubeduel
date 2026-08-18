@@ -5,6 +5,7 @@ import { DuelScreen } from "@/components/DuelScreen";
 import { SiteHeader } from "@/components/SiteHeader";
 import { listChallenges } from "@/lib/server/challenges";
 import { duelRecord } from "@/lib/server/duels";
+import { MissingTableError } from "@/lib/server/schema";
 import { ensureProfile } from "@/lib/server/profiles";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 
@@ -46,10 +47,30 @@ export default async function DuelPage() {
     );
   }
 
-  const [record, challenges] = await Promise.all([
-    duelRecord(profile.id),
-    listChallenges(profile.id),
-  ]);
+  let record: Awaited<ReturnType<typeof duelRecord>>;
+  let challenges: Awaited<ReturnType<typeof listChallenges>>;
+
+  try {
+    [record, challenges] = await Promise.all([
+      duelRecord(profile.id),
+      listChallenges(profile.id),
+    ]);
+  } catch (error) {
+    // Only a missing table is caught. Applying `0001` and stopping is the most
+    // likely thing to go wrong when cloning this repo, and without this the page
+    // is a stack trace rather than an instruction. Every other failure is
+    // rethrown, because an outage that renders as a tidy explanation is an
+    // outage nobody investigates.
+    if (!(error instanceof MissingTableError)) throw error;
+    return (
+      <Gate title="Duels need a migration that has not been applied.">
+        The <code className="font-mono text-foreground">{error.table}</code>{" "}
+        table does not exist in this database. Apply everything in{" "}
+        <code className="font-mono text-foreground">supabase/migrations</code> in
+        filename order — all three are needed.
+      </Gate>
+    );
+  }
 
   return (
     <DuelScreen

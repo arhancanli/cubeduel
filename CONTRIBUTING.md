@@ -14,7 +14,8 @@ npm run build && npm run check:bundle
 ```
 
 CI runs exactly these on every pull request. The browser and database suites
-(`npm run e2e`, `npm run integration`) need a running server and real credentials,
+(`npm run e2e` and the three `integration` scripts) need a running server and
+real credentials,
 so they are not in CI — run them locally if you touch the solve loop, the ranked
 path, or anything that talks to Postgres.
 

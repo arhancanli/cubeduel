@@ -23,6 +23,22 @@ That includes being able to:
 - make an abandoned or failed attempt cost nothing
 - read the scramble pool, another player's pending attempt, or any table directly
 
+Head-to-head challenges add two more, because both are advantages that cannot be
+earned by solving faster:
+
+- **reading a challenge scramble before your own half is open.** Both players are
+  supposed to see it for the first time when their attempt starts. Anything that
+  reveals it earlier — the API, a page's initial props, a cached response — hands
+  one player study time the other did not get.
+- **reading the other player's time before you have both finished.** Knowing you
+  need 12.40 tells you exactly how much risk to take, so a solve attempted at a
+  known target is not the same event as one attempted blind.
+
+Both are decided in one place (`visibleTo` in `src/lib/challenge.ts`) that every
+read goes through, and both are mutation-tested in
+`scripts/integration-challenges.mts` — each guarantee is broken in turn to confirm
+the suite catches it. If you find a path around that function, it is a report.
+
 Two real examples, both already fixed, to show the kind of thing that qualifies:
 
 - `REVOKE EXECUTE ... FROM public` on the rating function did **not** stop `anon`,
@@ -43,6 +59,8 @@ Two real examples, both already fixed, to show the kind of thing that qualifies:
   submitted move stream is replayed against the stored scramble, never against one
   the client sends.
 - **Attempts are single-use**, expire, and are recorded as a DNF if abandoned.
+- **Opening your half of a challenge stamps a time that is never moved**, so
+  closing the tab and returning does not buy a fresh fifteen seconds of inspection.
 
 ## What is knowingly not solved
 

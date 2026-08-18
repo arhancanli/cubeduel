@@ -51,6 +51,16 @@ simulated human: its solution is ~20 moves where CFOP takes 55, so it turns much
 more slowly than a person would. Its time is honest; its technique is not human,
 and the screen says so.
 
+**You can challenge a real person.** Pick somebody, and you both solve the same
+scramble whenever it suits you — no lobby, no waiting for two people to be online
+in the same second. Two rules make it fair, and both are things the server refuses
+to send rather than promises in a comment: neither of you sees the scramble until
+you open your own attempt, and neither time is shown until you have both finished.
+Going second is otherwise a real advantage, because knowing you need 12.40 tells
+you exactly how much risk to take. Both rules were mutation-tested — each
+guarantee broken in turn to confirm the suite catches it. See
+[Challenges](#challenges-srclibchallengets).
+
 **It ships its own solving engine.** Kociemba's two-phase algorithm, written from
 scratch in TypeScript — cube model, coordinates, pruning tables and IDA* search.
 Over 100 random-state scrambles: every cube solved, mean **20.65 moves**, median
@@ -89,8 +99,12 @@ the trainer are entirely local — `localStorage` is the source of truth and the
 works offline. Accounts, ranked, leaderboards and profiles need Clerk and Supabase;
 without them those pages say so plainly instead of breaking.
 
-To enable them, apply [`supabase/migrations/0001_initial_schema.sql`](supabase/migrations/0001_initial_schema.sql)
-to a fresh Supabase project and fill in `.env.local`.
+To enable them, apply everything in [`supabase/migrations/`](supabase/migrations)
+to a fresh Supabase project **in filename order**, then fill in `.env.local`. All
+three are needed: `0001` is the core schema, `0002` adds duels and `0003` adds
+challenges, and each page that depends on a missing table degrades to a "not
+available" gate rather than an error, so a partial apply looks like a working app
+with features quietly switched off.
 
 ## How it is tested
 
@@ -103,6 +117,7 @@ in the commit history was caught by exactly one of them.
 | `npm run e2e` | 9 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
+| `npm run integration:profile-race` | live database | Eight concurrent first visits for the same new account, including the path where every candidate handle is taken. Exists because a new player's first page load could render "Something broke", intermittently enough to look like a fluke. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
 The e2e suite exists because of one specific failure mode: an anonymous request
