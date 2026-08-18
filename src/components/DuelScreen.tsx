@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
+import { MovePad } from "@/components/MovePad";
 import { KeyMapHint } from "@/components/KeyMapHint";
 import { SiteHeader } from "@/components/SiteHeader";
 import { BOTS, botProgressAt, type BotProfile } from "@/lib/bot";
@@ -218,6 +219,8 @@ export function DuelScreen({ record }: { record: { wins: number; losses: number 
                 {phase === "solved" && result && (result.outcome === "win" ? "You won" : "You lost")}
               </p>
             </div>
+
+            <MovePad onMove={session.pushMove} className="md:hidden" />
 
             {/* The opponent, moving at exactly the pace it committed to. */}
             <div className="w-full max-w-md">

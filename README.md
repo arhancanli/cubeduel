@@ -100,7 +100,7 @@ in the commit history was caught by exactly one of them.
 | | | |
 |---|---|---|
 | `npm test` | 272 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 7 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk sign-up driving a ranked solve and a duel end to end, plus an accessibility pass over every page. |
+| `npm run e2e` | 8 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
@@ -424,8 +424,6 @@ turning faster or pausing less."*
   and typechecked but has never been run against a GAN/GoCube/GiiKER. Treat it as
   unproven until it is. The `smartcube` rating pool exists and is deliberately separate
   from `keyboard` — they are different sports with different time scales.
-- **The trainer is keyboard-only.** `useKeyboardSolve` owns its input connection and
-  cannot take an external move source, so there is no touch pad on `/train` yet.
 - **Elo-gated cube skins.** Cosmetic only. Anything that gates function behind rating
   turns a skill ladder into a paywall with extra steps.
 - **Events beyond 3x3.** The schema is keyed by event throughout; only `333` is wired.

@@ -58,6 +58,18 @@ export function useKeyboardSolve({
   const onSolvedRef = useLatest(onSolved);
   const onMoveRef = useLatest(onMove);
 
+  /**
+   * The move handler, held so a caller can drive it directly.
+   *
+   * Everything a solve needs — the tracker, the recorder, the clock — is set up
+   * inside the effect below, which used to mean the keyboard was the only thing
+   * that could reach it. That is why the daily and the trainer had no touch
+   * input: not a design decision, just a closure nothing else could get at.
+   */
+  const handleMoveRef = useRef<((move: string, timestamp: number) => void) | null>(
+    null,
+  );
+
   /** Elapsed milliseconds right now, for a live display. */
   const elapsed = useCallback(
     () => recorderRef.current!.elapsedAt(performance.now()),
@@ -84,7 +96,7 @@ export function useKeyboardSolve({
       }
       sourceRef.current = puzzle;
 
-      puzzle.onMove((move, timestamp) => {
+      const handleMove = (move: string, timestamp: number) => {
         const wasRunning = recorder.getPhase() === "running";
         tracker.applyMove(move);
         const solved =
@@ -118,7 +130,10 @@ export function useKeyboardSolve({
           if (node && format) node.textContent = format(done.durationMs);
           onSolvedRef.current(done);
         }
-      });
+      };
+
+      handleMoveRef.current = handleMove;
+      puzzle.onMove(handleMove);
     })();
 
     return () => {
@@ -127,8 +142,21 @@ export function useKeyboardSolve({
       rafRef.current = null;
       sourceRef.current?.disconnect();
       sourceRef.current = null;
+      handleMoveRef.current = null;
     };
   }, [active, scramble, completion, displayRef, format, onMoveRef, onSolvedRef]);
 
-  return { running, moveCount, elapsed };
+  /**
+   * Applies a move from something that is not a key press.
+   *
+   * Same path as a keyboard turn, deliberately: the touch pad must not be a
+   * second implementation that can drift from the one being timed. A no-op
+   * before the solve is connected, which is the correct answer to a tap that
+   * arrives early.
+   */
+  const pushMove = useCallback((move: string) => {
+    handleMoveRef.current?.(move, performance.now());
+  }, []);
+
+  return { running, moveCount, elapsed, pushMove };
 }

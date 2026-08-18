@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
 import { DailyMemory, readDailyStats } from "@/components/DailyMemory";
+import { MovePad } from "@/components/MovePad";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
   buildDailyShare,
@@ -289,7 +290,8 @@ export function DailyRound({
                 }}
                 className="rounded-lg border border-border px-6 py-3 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
               >
-                Solve on the keyboard
+                <span className="md:hidden">Solve here</span>
+                <span className="hidden md:inline">Solve on the keyboard</span>
               </button>
             </div>
             <p className="max-w-sm text-xs leading-relaxed text-muted-dim">
@@ -360,9 +362,13 @@ export function DailyRound({
           >
             0.00
           </div>
+          {mode === "keyboard" ? (
+            <MovePad onMove={keyboard.pushMove} className="md:hidden" />
+          ) : null}
+
           <p className={`text-xs text-muted-dim ${solving ? "solving-hidden" : "solving-visible"}`}>
             {mode === "keyboard"
-              ? "Turn the cube with your keyboard — J U · F U' · I R · K R' · D L · E L' · H F · G F' · S D · L D' · W B · O B'. The clock starts on your first turn and stops when it's solved."
+              ? "Turn the cube with the buttons, or with your keyboard — J U · F U' · I R · K R' · D L · E L' · H F · G F' · S D · L D' · W B · O B'. The clock starts on your first turn and stops when it's solved."
               : "Hold space — or press and hold anywhere — until it turns green, then release."}
           </p>
         </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 
 import { CubeView } from "@/components/CubeView";
 import { KeyMapHint } from "@/components/KeyMapHint";
+import { MovePad } from "@/components/MovePad";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs, formatRunning } from "@/lib/format";
 import { useKeyboardSolve } from "@/lib/useKeyboardSolve";
@@ -165,7 +166,7 @@ function Drill({
 }) {
   const done = lastResult !== null;
 
-  const { moveCount } = useKeyboardSolve({
+  const { moveCount, pushMove } = useKeyboardSolve({
     scramble: card.setupAlg,
     active: !done,
     // An OLL drill ends when the top is one colour. Waiting for a full solve
@@ -233,19 +234,11 @@ function Drill({
         </button>
       ) : null}
 
-      {/*
-        No touch pad here yet. `useKeyboardSolve` owns its own input connection
-        and exposes no way to push a move into it, so a MovePad would render a
-        row of buttons that silently do nothing. Drilling is keyboard-only until
-        that hook takes an external move source.
-      */}
+      {done ? null : <MovePad onMove={pushMove} className="md:hidden" />}
+
       <div className="mt-2 hidden md:block">
         <KeyMapHint activeCode={null} />
       </div>
-
-      <p className="text-center text-xs text-muted-dim md:hidden">
-        Drilling needs a keyboard for now.
-      </p>
     </>
   );
 }
