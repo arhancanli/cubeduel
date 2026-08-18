@@ -161,3 +161,21 @@ async function waitForProfile(userId: string, attempts = 4): Promise<Profile | n
   }
   return null;
 }
+
+/**
+ * Removes a player entirely, on account deletion.
+ *
+ * Every table that references a profile does so with `on delete cascade`, so
+ * this one statement takes the solves, ratings, attempts, duels and challenges
+ * with it. That is the intended behaviour rather than an accident of the schema:
+ * somebody who deletes their account has asked to be gone, and leaving their
+ * solves behind attached to a dangling id would be keeping the data while losing
+ * the ability to ever answer for it.
+ *
+ * Idempotent. Clerk retries webhooks, and deleting an already-deleted player has
+ * to be a success or the retries never stop.
+ */
+export async function deleteProfileFor(userId: string): Promise<void> {
+  const { error } = await db().from("profiles").delete().eq("clerk_user_id", userId);
+  if (error) throw new Error(`Could not delete profile: ${error.message}`);
+}

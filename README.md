@@ -101,10 +101,17 @@ without them those pages say so plainly instead of breaking.
 
 To enable them, apply everything in [`supabase/migrations/`](supabase/migrations)
 to a fresh Supabase project **in filename order**, then fill in `.env.local`. All
-three are needed: `0001` is the core schema, `0002` adds duels and `0003` adds
-challenges, and each page that depends on a missing table degrades to a "not
-available" gate rather than an error, so a partial apply looks like a working app
-with features quietly switched off.
+of them are needed — `0001` is the core schema, later ones add duels, challenges
+and a constraint fix — and a page whose table is missing renders a gate naming the
+migration rather than an error, so a partial apply looks like a working app with
+features quietly switched off.
+
+If you are running this for real, also set `CLERK_WEBHOOK_SECRET` and point a
+Clerk `user.deleted` webhook at `/api/webhooks/clerk`. Without it, deleting an
+account leaves the profile, its public page and its rating in place — which is
+not what the person who deleted it asked for. The route refuses everything while
+the secret is unset, so a missing variable never leaves an unauthenticated delete
+endpoint open.
 
 ## How it is tested
 
@@ -113,7 +120,7 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 290 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 302 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 9 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
