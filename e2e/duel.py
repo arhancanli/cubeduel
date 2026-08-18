@@ -251,7 +251,13 @@ with sync_playwright() as p:
         print("\n  Cannot continue without a session.")
     else:
         print("\n== the opponent roster ==")
-        check("opponents are listed", "Pick an opponent" in body_text)
+        check("opponents are listed", "Or race a bot" in body_text)
+        # Challenges sit above the bots on this page: racing a person is the
+        # better game, and the bots are what is always available when nobody has
+        # answered yet.
+        check("challenging a person is offered first",
+              "Challenge a player" in body_text
+              and body_text.index("Challenge a player") < body_text.index("Or race a bot"))
         check("each states a rating and a time", "Metronome" in body_text and "Blitz" in body_text)
         check("the commitment is stated before racing",
               "recorded as a loss" in body_text,
