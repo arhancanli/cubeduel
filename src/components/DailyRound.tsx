@@ -150,11 +150,11 @@ export function DailyRound({
           // A solve that cannot be split is still a solve. Dropping it would bias
           // the record toward clean CFOP solves.
           .catch(() =>
-            store({ splits: [], ollCase: null, pllCase: null, ollSetup: null, pllSetup: null }),
+            store({ splits: [], ollCase: null, pllCase: null, ollSetup: null, pllSetup: null, crossFace: null }),
           );
       } else {
         // Hand-timed: no move stream, so nothing to split.
-        store({ splits: [], ollCase: null, pllCase: null, ollSetup: null, pllSetup: null });
+        store({ splits: [], ollCase: null, pllCase: null, ollSetup: null, pllSetup: null, crossFace: null });
       }
 
       setEntry(getEntry(dayKey));

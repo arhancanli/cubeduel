@@ -35,6 +35,8 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
    * and it needed 20" says exactly which.
    */
   const [optimal, setOptimal] = useState<number | null>(null);
+  /** Shortest cross available on the face they actually built on. */
+  const [optimalCross, setOptimalCross] = useState<number | null>(null);
 
   // Consumed once: a challenge link pins the first scramble, then the session
   // continues with fresh ones rather than trapping the player on that puzzle.
@@ -46,6 +48,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
     pinnedScrambleRef.current = null;
     setCopied(false);
     setOptimal(null);
+    setOptimalCross(null);
     return pinned ?? (await nextScramble("333"));
   }, []);
 
@@ -57,12 +60,17 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
       void fetch("/api/solve", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ scramble }),
+        body: JSON.stringify({ scramble, crossFace: analysis.crossFace }),
       })
         .then((r) => (r.ok ? r.json() : null))
-        .then((data: { optimalMoves?: number } | null) => {
-          if (typeof data?.optimalMoves === "number") setOptimal(data.optimalMoves);
-        })
+        .then(
+          (data: { optimalMoves?: number; optimalCrossMoves?: number | null } | null) => {
+            if (typeof data?.optimalMoves === "number") setOptimal(data.optimalMoves);
+            if (typeof data?.optimalCrossMoves === "number") {
+              setOptimalCross(data.optimalCrossMoves);
+            }
+          },
+        )
         .catch(() => {});
 
       recordSolve({
@@ -148,7 +156,14 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
           </p>
         </div>
 
-        {recording ? <SolveReport recording={recording} optimal={optimal} /> : null}
+        {recording ? (
+          <SolveReport
+            recording={recording}
+            optimal={optimal}
+            optimalCross={optimalCross}
+            crossMoves={splits?.find((s) => s.phase === "cross")?.moveCount ?? null}
+          />
+        ) : null}
         {splits && splits.length > 0 ? <SolveBreakdown splits={splits} /> : null}
 
         <div className="flex flex-wrap items-center justify-center gap-3">
@@ -224,9 +239,13 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
 function SolveReport({
   recording,
   optimal,
+  optimalCross,
+  crossMoves,
 }: {
   recording: SolveRecording;
   optimal: number | null;
+  optimalCross: number | null;
+  crossMoves: number | null;
 }) {
   const { stats } = recording;
   const pausedPct = Math.round(stats.pausedFraction * 100);
@@ -240,6 +259,17 @@ function SolveReport({
       ? stats.moveCount / optimalQuarterTurns
       : null;
 
+  // Cross efficiency is the one number here a CFOP solver can act on this
+  // afternoon. Total move count says "your method is long", which is true of
+  // every method; the cross is the part you plan during inspection, so wasted
+  // moves there are a decision rather than a limitation.
+  //
+  // The comparison is against the best cross on the face they ACTUALLY built,
+  // not the easiest of the six — measuring a white-cross solver against a
+  // colour-neutral optimum reports their colour neutrality, not their cross.
+  const crossWaste =
+    crossMoves !== null && optimalCross !== null ? crossMoves - optimalCross : null;
+
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
@@ -250,7 +280,21 @@ function SolveReport({
         {optimal !== null ? (
           <Metric label="shortest possible" value={String(optimal)} />
         ) : null}
+        {crossWaste !== null ? (
+          <Metric
+            label="cross"
+            value={`${crossMoves}/${optimalCross}`}
+          />
+        ) : null}
       </div>
+
+      {crossWaste !== null ? (
+        <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">
+          {crossWaste <= 0
+            ? `Your cross was optimal — ${optimalCross} moves was the shortest available on that face. Nothing to win back there.`
+            : `Your cross took ${crossMoves} quarter turns; the shortest on that face was ${optimalCross}. That is ${crossWaste} ${crossWaste === 1 ? "move" : "moves"} spent before F2L even starts, and the cross is the one phase you can plan entirely during inspection.`}
+        </p>
+      ) : null}
 
       {ratio !== null ? (
         <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">

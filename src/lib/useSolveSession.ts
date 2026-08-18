@@ -237,6 +237,7 @@ export function useSolveSession(options: SolveSessionOptions): SolveSession {
               pllCase: null,
               ollSetup: null,
               pllSetup: null,
+  crossFace: null,
             }),
           );
       }

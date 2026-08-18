@@ -1,5 +1,5 @@
 import { jsonError } from "@/lib/server/apiAuth";
-import { summariseScramble } from "@/lib/server/solveService";
+import { optimalCross, summariseScramble } from "@/lib/server/solveService";
 
 /**
  * How many moves a scramble actually needs.
@@ -33,9 +33,9 @@ function rateLimited(): boolean {
 }
 
 export async function POST(request: Request) {
-  let body: { scramble?: unknown } | null = null;
+  let body: { scramble?: unknown; crossFace?: unknown } | null = null;
   try {
-    body = (await request.json()) as { scramble?: unknown };
+    body = (await request.json()) as { scramble?: unknown; crossFace?: unknown };
   } catch {
     return jsonError("Malformed request.", 400);
   }
@@ -54,7 +54,13 @@ export async function POST(request: Request) {
     return jsonError("That is not a scramble this engine can solve.", 422);
   }
 
-  return Response.json(summary, {
+  // Answered in the same round trip when the caller says which face they built
+  // on, because the two numbers are read together and a second request would
+  // just be a second cold start.
+  const face = typeof body.crossFace === "string" ? body.crossFace : null;
+  const optimalCrossMoves = face ? await optimalCross(scramble, face) : null;
+
+  return Response.json({ ...summary, optimalCrossMoves, crossFace: face }, {
     headers: {
       // The answer for a scramble is a mathematical fact and never changes, so
       // it can be cached hard by anything between here and the browser.

@@ -210,6 +210,17 @@ export interface SolveAnalysis {
    */
   ollSetup: string | null;
   pllSetup: string | null;
+  /**
+   * The face the cross was actually built on, e.g. "D".
+   *
+   * The analysis already works this out — it reads the solve against all six and
+   * keeps whichever reading finishes the first two layers earliest — but it used
+   * to throw the answer away. It is the only fair basis for judging cross
+   * efficiency: comparing a white-cross solver's eleven moves against the best
+   * cross available on *any* face measures their colour neutrality, not their
+   * cross.
+   */
+  crossFace: string | null;
 }
 
 const NO_ANALYSIS: SolveAnalysis = {
@@ -218,6 +229,7 @@ const NO_ANALYSIS: SolveAnalysis = {
   pllCase: null,
   ollSetup: null,
   pllSetup: null,
+  crossFace: null,
 };
 
 /**
@@ -469,6 +481,6 @@ export async function analyzeSolve(
   }
 
   if (best === null) return NO_ANALYSIS;
-  const { splits, ollCase, pllCase, ollSetup, pllSetup } = best;
-  return { splits, ollCase, pllCase, ollSetup, pllSetup };
+  const { splits, ollCase, pllCase, ollSetup, pllSetup, crossFace } = best;
+  return { splits, ollCase, pllCase, ollSetup, pllSetup, crossFace };
 }

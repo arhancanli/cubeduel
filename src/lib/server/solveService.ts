@@ -2,6 +2,8 @@ import "server-only";
 
 import { isValidScramble } from "../scrambleParam";
 import { buildTables, solveScramble, type SolveResult } from "../solver";
+import { buildCrossTable, crossDistance } from "../crossSolver";
+import { derivePieceGroups } from "../cfop";
 
 /**
  * The solving engine, as a server-side service.
@@ -93,4 +95,69 @@ export function summariseScramble(scramble: string): SolveSummary | null {
     cached: false,
     computeMs: result.elapsedMs,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Cross efficiency
+// ---------------------------------------------------------------------------
+
+/**
+ * Optimal cross tables, one per face, built on first use.
+ *
+ * A table is 186KB and takes about 1.7 seconds to build locally, so this cannot
+ * happen in the browser and cannot happen per request. Six faces is 1.1MB if a
+ * process ever sees all of them, which it will not — almost every cuber builds
+ * on the same face every solve.
+ *
+ * The honest cost: measured on the deployment, a cold function answering its
+ * first cross query takes about 11 seconds — serverless cold start, plus the
+ * solver's own pruning tables, plus this. Warm it is 600ms. That is acceptable
+ * only because the caller is fire-and-forget: the solve report is already on
+ * screen and complete, and this line appears when it appears. It would not be
+ * acceptable for anything a player waits on, and if it ever becomes so the fix
+ * is to pre-generate these the way the dailies are.
+ */
+const crossTables = new Map<string, Uint8Array>();
+const crossSlots = new Map<string, number[]>();
+
+async function crossTableFor(face: string): Promise<{ table: Uint8Array; slots: number[] }> {
+  const cached = crossTables.get(face);
+  const slots = crossSlots.get(face);
+  if (cached && slots) return { table: cached, slots };
+
+  const { puzzles } = await import("cubing/puzzles");
+  const kpuzzle = await puzzles["3x3x3"].kpuzzle();
+  const solved = kpuzzle.defaultPattern();
+  const groups = derivePieceGroups(solved as never, face);
+
+  const table = buildCrossTable(solved as never, groups.crossEdges);
+  crossTables.set(face, table);
+  crossSlots.set(face, groups.crossEdges);
+  return { table, slots: groups.crossEdges };
+}
+
+/**
+ * The shortest cross available on the face the solver actually used.
+ *
+ * Deliberately that face and not the best of the six. Comparing a white-cross
+ * solver against the easiest cross on any face measures their colour neutrality,
+ * which is a different skill and not the one the number is claiming to describe.
+ */
+export async function optimalCross(
+  scramble: string,
+  face: string,
+): Promise<number | null> {
+  const normalised = scramble.trim().replace(/\s+/g, " ");
+  if (!isValidScramble(normalised)) return null;
+  if (!/^[UDLRFB]$/.test(face)) return null;
+
+  try {
+    const { table, slots } = await crossTableFor(face);
+    const { puzzles } = await import("cubing/puzzles");
+    const kpuzzle = await puzzles["3x3x3"].kpuzzle();
+    const pattern = kpuzzle.defaultPattern().applyAlg(normalised);
+    return crossDistance(table, pattern as never, slots);
+  } catch {
+    return null;
+  }
 }
