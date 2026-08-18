@@ -20,6 +20,20 @@ const nextConfig: NextConfig = {
    * its own file layout intact.
    */
   serverExternalPackages: ["cubing"],
+
+  /**
+   * The precomputed solver tables are read from disk at runtime, so they have to
+   * be traced into the function bundle — nothing imports them, so the compiler
+   * cannot see the dependency on its own.
+   *
+   * If this is ever wrong the solver still works: the loader returns null on any
+   * failure and the tables are computed instead. That costs about two seconds on
+   * a cold start, which is exactly the regression this file exists to prevent,
+   * so it is worth checking the deployed cold latency after touching it.
+   */
+  outputFileTracingIncludes: {
+    "/api/**": [".solver-cache/**"],
+  },
 };
 
 export default nextConfig;

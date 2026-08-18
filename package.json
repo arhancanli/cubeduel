@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "tables:build": "tsx scripts/build-solver-tables.mts",
+    "prebuild": "npm run tables:build",
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",

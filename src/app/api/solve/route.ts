@@ -1,5 +1,5 @@
 import { jsonError } from "@/lib/server/apiAuth";
-import { optimalCross, summariseScramble } from "@/lib/server/solveService";
+import { optimalCross, summariseScramble, tableBuildMs } from "@/lib/server/solveService";
 
 /**
  * How many moves a scramble actually needs.
@@ -60,7 +60,7 @@ export async function POST(request: Request) {
   const face = typeof body.crossFace === "string" ? body.crossFace : null;
   const optimalCrossMoves = face ? await optimalCross(scramble, face) : null;
 
-  return Response.json({ ...summary, optimalCrossMoves, crossFace: face }, {
+  return Response.json({ ...summary, optimalCrossMoves, crossFace: face, tableBuildMs: tableBuildMs() }, {
     headers: {
       // The answer for a scramble is a mathematical fact and never changes, so
       // it can be cached hard by anything between here and the browser.

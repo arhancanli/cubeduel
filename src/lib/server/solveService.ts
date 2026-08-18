@@ -50,6 +50,16 @@ function remember(scramble: string, result: SolveResult): void {
  * rather than throwing: the caller is an HTTP handler and a malformed input is a
  * rejection, not a fault.
  */
+/**
+ * How long the tables took on this instance: 0 when they were loaded from the
+ * precomputed file, and over a second when they had to be computed.
+ */
+let lastTableBuildMs: number | null = null;
+
+export function tableBuildMs(): number | null {
+  return lastTableBuildMs;
+}
+
 export function summariseScramble(scramble: string): SolveSummary | null {
   const normalised = scramble.trim().replace(/\s+/g, " ");
   if (!isValidScramble(normalised)) return null;
@@ -67,7 +77,11 @@ export function summariseScramble(scramble: string): SolveSummary | null {
   // The tables are built once per process. Doing it here rather than at module
   // load keeps the cost on the first request that actually needs a solve instead
   // of on every cold start, including the ones that only serve pages.
-  buildTables();
+  // Reported in the response so a regression here is visible rather than
+  // inferred from latency. Loading the precomputed tables is ~30ms; computing
+  // them is 1.2-2.7s, and the difference is the whole cold-start story.
+  const tables = buildTables();
+  lastTableBuildMs = tables.buildMs;
 
   let result: SolveResult | null;
   try {

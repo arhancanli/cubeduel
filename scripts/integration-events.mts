@@ -10,7 +10,7 @@
  *
  * It cleans up after itself.
  */
-import { EVENTS, EVENT_IDS, type EventId } from "../src/lib/events";
+import { EVENTS, EVENT_IDS } from "../src/lib/events";
 import { ratingForMs } from "../src/lib/rating";
 import { issueAttempt, submitAttempt } from "../src/lib/server/ranked";
 import { db } from "../src/lib/server/supabase";

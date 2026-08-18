@@ -43,3 +43,8 @@ next-env.d.ts
 # Scratch benchmark files, never committed.
 _*.mts
 _*.mjs
+
+# Generated before every build from the current solver source. Never committed:
+# a stale pruning table is not a slow solver but a wrong one, because the search
+# trusts those numbers as lower bounds and prunes away the real solution.
+.solver-cache/
