@@ -4,6 +4,7 @@ import { buildBotSolve, botById, type BotProfile } from "../bot";
 import { buildTables, solveScramble } from "../solver";
 import type { Penalty } from "../types";
 import { ATTEMPT_TTL_MS, verifySolve, type SubmittedMove } from "../verifySolve";
+import { eventOf } from "../events";
 import { db } from "./supabase";
 import { raise } from "./schema";
 
@@ -177,6 +178,7 @@ export async function finishDuel(input: DuelFinishInput): Promise<DuelResult> {
     durationMs,
     issuedAt,
     receivedAt,
+    event: eventOf(duel.event).id,
   });
 
   if (!verdict.verified) {

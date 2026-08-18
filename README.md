@@ -2,7 +2,7 @@
 
 **A speedcubing platform with a rating that means something.**
 
-[cubeduel.vercel.app](https://cubeduel.vercel.app) · 3x3 · no account needed to solve
+[cubeduel.vercel.app](https://cubeduel.vercel.app) · 2x2 · 3x3 · 4x4 · 5x5 · no account needed to solve
 
 The server hands you a scramble nobody has ever seen, replays your solve to prove
 it happened, and only then does it count. On top of that sits the analysis a timer
@@ -50,6 +50,15 @@ stream passes the same verifier that judges human solves. What it is *not* is a
 simulated human: its solution is ~20 moves where CFOP takes 55, so it turns much
 more slowly than a person would. Its time is honest; its technique is not human,
 and the screen says so.
+
+**Four events, and a rating that means the same thing on each.** 2x2, 3x3, 4x4
+and 5x5, each a separate ladder — because they are separate skills, and one
+number covering a world-class 3x3 and a beginner 5x5 would describe neither. Each
+event fixes its own two landmarks against real WCA results, so 3000 is world
+class and 2000 is a strong club cuber whichever puzzle earned it. A single shared
+scale cannot do that: the gap between a world-class 5x5 and a competent one is
+nothing like the factor of three that separates them on 3x3, because much more of
+a big-cube solve is mechanical work nobody can skip.
 
 **You can challenge a real person.** Pick somebody, and you both solve the same
 scramble whenever it suits you — no lobby, no waiting for two people to be online
@@ -120,10 +129,11 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 302 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 319 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 9 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
+| `npm run integration:events` | live database | Every event's ranked path end to end: a server-issued 4x4 scramble, solved, verified against a 4x4 and stored — plus a check that the scales really do differ, since 25 seconds is world class on 4x4 and nowhere near it on 3x3. |
 | `npm run integration:profile-race` | live database | Eight concurrent first visits for the same new account, including the path where every candidate handle is taken. Exists because a new player's first page load could render "Something broke", intermittently enough to look like a fluke. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
@@ -489,7 +499,6 @@ turning faster or pausing less."*
   from `keyboard` — they are different sports with different time scales.
 - **Elo-gated cube skins.** Cosmetic only. Anything that gates function behind rating
   turns a skill ladder into a paywall with extra steps.
-- **Events beyond 3x3.** The schema is keyed by event throughout; only `333` is wired.
 
 ---
 

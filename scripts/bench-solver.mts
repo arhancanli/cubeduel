@@ -87,7 +87,10 @@ function quantile(sorted: number[], q: number): number {
 
 console.log(`\nBuilding tables…`);
 const t0 = performance.now();
-const tables = buildTables();
+// Called for its side effect: it warms the module-level cache, so the one-off
+// cost lands here and is reported separately instead of on whichever solve
+// happened to run first.
+buildTables();
 const buildMs = performance.now() - t0;
 console.log(`  ready in ${buildMs.toFixed(0)}ms\n`);
 

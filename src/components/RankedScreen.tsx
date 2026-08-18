@@ -2,6 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 
+
 import { CubeView } from "@/components/CubeView";
 import { InspectionCountdown } from "@/components/InspectionCountdown";
 import { KeyMapHint } from "@/components/KeyMapHint";
@@ -9,7 +10,9 @@ import { MovePad } from "@/components/MovePad";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
 import { INSPECTION_LIMIT_MS } from "@/lib/inspection";
+import { DEFAULT_EVENT, EVENTS, EVENT_IDS, type EventId } from "@/lib/events";
 import { ESTABLISHED_DEVIATION, WINDOW_SIZE, msForRating } from "@/lib/rating";
+import { useLatest } from "@/lib/useLatest";
 import { useSolveSession } from "@/lib/useSolveSession";
 
 /**
@@ -30,6 +33,8 @@ import { useSolveSession } from "@/lib/useSolveSession";
  * The second is the one people are owed a warning about, so it is on screen
  * before the first turn rather than in a help page nobody opens.
  */
+
+export type RankedStanding = RankedRating;
 
 export interface RankedRating {
   rating: number | null;
@@ -62,11 +67,37 @@ interface SubmitResponse {
   } | null;
 }
 
-export function RankedScreen({ initial }: { initial: RankedRating }) {
+export function RankedScreen({
+  standings,
+}: {
+  standings: Record<EventId, RankedStanding>;
+}) {
   const attemptIdRef = useRef<string | null>(null);
   const submittedRef = useRef(false);
 
-  const [rating, setRating] = useState<RankedRating>(initial);
+  /**
+   * The event being played.
+   *
+   * Each event is a separate ladder with its own rating, because they are
+   * separate skills — a world-class 3x3 solver can be a beginner on 5x5, and a
+   * single number covering both would describe neither.
+   */
+  const [event, setEvent] = useState<EventId>(DEFAULT_EVENT);
+  const eventRef = useLatest(event);
+
+  const [ratings, setRatings] = useState(standings);
+  const rating = ratings[event];
+  const setRating = useCallback(
+    (next: RankedRating | ((prev: RankedRating) => RankedRating)) => {
+      setRatings((all) => {
+        const key: EventId = eventRef.current;
+        const current = all[key];
+        const value = typeof next === "function" ? next(current) : next;
+        return { ...all, [key]: value };
+      });
+    },
+    [eventRef],
+  );
   const [status, setStatus] = useState<string | null>(null);
   const [rejection, setRejection] = useState<string | null>(null);
   const [lastWindow, setLastWindow] = useState<SubmitResponse["rating"]>(null);
@@ -87,7 +118,7 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
     const response = await fetch("/api/ranked/attempt", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ event: "333", source: "keyboard" }),
+      body: JSON.stringify({ event: eventRef.current, source: "keyboard" }),
     });
 
     if (!response.ok) {
@@ -104,7 +135,10 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
     // began counting when it sent this. The countdown itself keys off the
     // session phase, so nothing has to be started here.
     return attempt.scramble;
-  }, []);
+    // The ref object is stable for the life of the component, so listing it
+    // changes nothing at runtime — it only tells the rule what it cannot see
+    // through a custom hook.
+  }, [eventRef]);
 
   const session = useSolveSession({
     nextScramble: supplyScramble,
@@ -190,7 +224,18 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
 
       <div className="flex flex-1 flex-col items-center gap-6 px-6 pb-10">
         <div className={solving ? "opacity-0" : "opacity-100 transition-opacity"}>
-          <RatingBar rating={rating} />
+          <EventPicker
+            selected={event}
+            standings={ratings}
+            // Locked once an attempt is open. Switching mid-attempt would leave
+            // the open scramble belonging to one ladder and the next submission
+            // to another, and the abandoned one is recorded as a DNF — so the
+            // control would quietly cost a rating on a ladder the player had
+            // just navigated away from.
+            disabled={phase !== "idle" || started}
+            onSelect={setEvent}
+          />
+          <RatingBar rating={rating} event={event} />
         </div>
 
         <div
@@ -302,7 +347,7 @@ export function RankedScreen({ initial }: { initial: RankedRating }) {
  * bare number would be one more opaque score; "1738 · sub-20 pace" is a number
  * that teaches its own units.
  */
-function RatingBar({ rating }: { rating: RankedRating }) {
+function RatingBar({ rating, event }: { rating: RankedRating; event: EventId }) {
   return (
     <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
       <div className="flex flex-col items-center gap-1">
@@ -315,7 +360,7 @@ function RatingBar({ rating }: { rating: RankedRating }) {
         <span className="text-[11px] text-muted-dim">
           {rating.rating === null
             ? "unrated"
-            : `${formatMs(msForRating(rating.rating), { truncate: false })} pace`}
+            : `${formatMs(msForRating(rating.rating, event), { truncate: false })} pace`}
         </span>
       </div>
 
@@ -396,6 +441,62 @@ function WindowResult({
           ? "Ranked — you appear on the leaderboard."
           : `Provisional — ±${Math.round(result.deviation)}, still settling.`}
       </p>
+    </div>
+  );
+}
+
+/**
+ * Which puzzle you are laddering on.
+ *
+ * Each event is a separate rating because they are separate skills: a
+ * world-class 3x3 solver can be a beginner on 5x5, and one number covering both
+ * would describe neither. The rating still means the same thing on each —
+ * 3000 is world class, 2000 is a strong club cuber — which is what makes the
+ * numbers comparable even though the times are not.
+ */
+function EventPicker({
+  selected,
+  standings,
+  disabled,
+  onSelect,
+}: {
+  selected: EventId;
+  standings: Record<EventId, RankedStanding>;
+  disabled: boolean;
+  onSelect: (event: EventId) => void;
+}) {
+  return (
+    <div className="mb-4 flex justify-center gap-1" role="group" aria-label="Event">
+      {EVENT_IDS.map((id) => {
+        const standing = standings[id];
+        const active = id === selected;
+        return (
+          <button
+            key={id}
+            type="button"
+            disabled={disabled}
+            aria-pressed={active}
+            onClick={() => onSelect(id)}
+            title={
+              standing.rating === null
+                ? `${EVENTS[id].longName} — unrated`
+                : `${EVENTS[id].longName} — ${Math.round(standing.rating)}`
+            }
+            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-40 ${
+              active
+                ? "bg-surface-hi text-foreground"
+                : "text-muted-dim hover:text-muted"
+            }`}
+          >
+            {EVENTS[id].name}
+            {/* The rating, small, so switching is an informed choice rather
+                than a guess about where you left off. */}
+            {standing.rating !== null ? (
+              <span className="tnum ml-1.5 opacity-60">{Math.round(standing.rating)}</span>
+            ) : null}
+          </button>
+        );
+      })}
     </div>
   );
 }

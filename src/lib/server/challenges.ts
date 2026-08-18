@@ -9,6 +9,7 @@ import {
   resolve,
   visibleTo,
 } from "../challenge";
+import { eventOf } from "../events";
 import { combinePenalties, judgeInspection } from "../inspection";
 import type { Penalty } from "../types";
 import { verifySolve, type SubmittedMove } from "../verifySolve";
@@ -400,6 +401,8 @@ export async function submitSide(input: SubmitInput): Promise<SubmitResult> {
     durationMs,
     issuedAt: startedAt,
     receivedAt,
+    // From the stored challenge, never the client.
+    event: eventOf(row.event).id,
   });
 
   if (!verdict.verified) {

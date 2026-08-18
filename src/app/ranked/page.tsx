@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { RankedScreen } from "@/components/RankedScreen";
+import { RankedScreen, type RankedStanding } from "@/components/RankedScreen";
 import { SiteHeader } from "@/components/SiteHeader";
+import { EVENT_IDS, type EventId } from "@/lib/events";
 import { UNRATED, isEstablished } from "@/lib/rating";
 import { ensureProfile } from "@/lib/server/profiles";
 import { currentRating, pendingResultCount } from "@/lib/server/ranked";
@@ -61,22 +62,32 @@ export default async function RankedPage() {
     );
   }
 
-  const [state, gathered] = await Promise.all([
-    currentRating(profile.id, "333", "keyboard"),
-    pendingResultCount(profile.id, "333", "keyboard"),
-  ]);
+  // Every event's standing, loaded together. There are four of them and each is
+  // two small indexed reads, so fetching the lot costs less than a round trip
+  // would when the player switches — and switching event is the first thing
+  // anybody does on a page like this.
+  const standings = Object.fromEntries(
+    await Promise.all(
+      EVENT_IDS.map(async (id) => {
+        const [state, gathered] = await Promise.all([
+          currentRating(profile.id, id, "keyboard"),
+          pendingResultCount(profile.id, id, "keyboard"),
+        ]);
+        return [
+          id,
+          {
+            rating: state.rating,
+            deviation: state.deviation ?? UNRATED.deviation,
+            peak: state.peak,
+            established: isEstablished(state),
+            pendingAttempts: gathered,
+          },
+        ] as const;
+      }),
+    ),
+  ) as Record<EventId, RankedStanding>;
 
-  return (
-    <RankedScreen
-      initial={{
-        rating: state.rating,
-        deviation: state.deviation ?? UNRATED.deviation,
-        peak: state.peak,
-        established: isEstablished(state),
-        pendingAttempts: gathered,
-      }}
-    />
-  );
+  return <RankedScreen standings={standings} />;
 }
 
 function Gate({

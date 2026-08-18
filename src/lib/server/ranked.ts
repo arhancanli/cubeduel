@@ -10,6 +10,7 @@ import {
 } from "../rating";
 import type { Timed } from "../stats";
 import { combinePenalties, judgeInspection } from "../inspection";
+import { eventOf } from "../events";
 import type { Penalty } from "../types";
 import { ATTEMPT_TTL_MS, verifySolve, type SubmittedMove } from "../verifySolve";
 import { db } from "./supabase";
@@ -216,6 +217,10 @@ export async function submitAttempt(
     durationMs: input.durationMs,
     issuedAt,
     receivedAt,
+    // From the stored attempt, never from the client: the event decides which
+    // puzzle the moves are replayed against, and letting the submitter pick it
+    // would let them choose the puzzle their solution happens to solve.
+    event: eventOf(attempt.event).id,
   });
 
   if (!verdict.verified) {
