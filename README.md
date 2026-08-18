@@ -99,9 +99,10 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 272 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 8 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 290 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 9 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
+| `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
 The e2e suite exists because of one specific failure mode: an anonymous request
@@ -303,6 +304,43 @@ a DNF ao5 leaves the rating untouched and widens the deviation. Abandoning can n
 raise a rating, and repeated failure widens the deviation until the player drops off
 the leaderboard for being unestablished. No fabricated time appears anywhere.
 
+### Challenges (`src/lib/challenge.ts`)
+
+One player against another, on the same scramble. Asynchronous on purpose: a live
+race needs two people online in the same second, and a ladder that only works at
+peak concurrency does not work at all for whoever shows up at 2am. A challenge
+sitting in an inbox is also the strongest reason an asynchronous game has to bring
+someone back — chess.com's daily games have outlived every real-time lobby that
+came and went around them.
+
+Two rules make it fair, and both are enforced by what the server refuses to send:
+
+**Neither player sees the scramble until their own attempt opens.** The challenger
+picks an opponent, not a scramble. If they could see it at creation they could
+study it and pick their moment; if the opponent could read it while it sat in
+their inbox they could study it for two days. Opening your half stamps a time that
+is never moved, so closing the tab and coming back does not buy a fresh fifteen
+seconds of inspection.
+
+**Neither time is shown until both have solved.** Going second is otherwise a real
+advantage — knowing you need 12.40 tells you exactly how much risk to take, and a
+solve attempted at a known target is not the same event as one attempted blind.
+
+Both are decided in one place (`visibleTo`) that every read goes through, because
+a rule enforced separately in four route handlers is enforced in three of them.
+And both were mutation-tested: breaking each guarantee in turn and confirming
+`npm run integration:challenges` goes red, because a fairness check that cannot
+fail is worse than none.
+
+Expiry is judged on read rather than by a scheduled job — there is no cron here,
+and a status column that is only correct when something remembered to run is worse
+than no column. A challenge that lapses with one side solved is a win for the
+player who turned up: the alternative is that ignoring a challenge you are losing
+costs nothing, and every inconvenient challenge quietly evaporates.
+
+Challenges do not move your rating, for the same reason bot duels do not: how fast
+you solve does not depend on whether somebody is racing you.
+
 ### Inspection (`src/lib/inspection.ts`)
 
 WCA gives fifteen seconds to look at the cube before starting: over that is +2
@@ -416,8 +454,11 @@ turning faster or pausing less."*
 
 ## Not built yet
 
-- **Duels against other people.** Racing a bot works; racing a human needs
-  matchmaking and a live channel, and needs a population before it needs code.
+- **Live real-time races.** Head-to-head works asynchronously (see Challenges);
+  watching an opponent's bar move in the same second needs matchmaking and a live
+  channel, and needs a population before it needs code. The `challenges` row is
+  shaped for it: both sides are symmetric and independently timestamped, so live
+  is the case where the two `started_at` values happen to coincide.
 - **Behavioural anti-cheat.** Verification proves a solve is real, not human. Catching
   assistance needs analysis across many results, not a check on one.
 - **Smart cubes are still unverified against hardware.** The Bluetooth path is written

@@ -226,6 +226,52 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["duels"]["Insert"]>;
         Relationships: [];
       };
+      challenges: {
+        Row: {
+          id: string;
+          challenger_id: string;
+          opponent_id: string;
+          event: string;
+          source: string;
+          scramble: string;
+          created_at: string;
+          expires_at: string;
+          status: string;
+          challenger_started_at: string | null;
+          challenger_solve_id: string | null;
+          challenger_duration_ms: number | null;
+          challenger_penalty: string | null;
+          opponent_started_at: string | null;
+          opponent_solve_id: string | null;
+          opponent_duration_ms: number | null;
+          opponent_penalty: string | null;
+          winner: string | null;
+          resolved_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          challenger_id: string;
+          opponent_id: string;
+          event?: string;
+          source?: string;
+          scramble: string;
+          created_at?: string;
+          expires_at: string;
+          status?: string;
+          challenger_started_at?: string | null;
+          challenger_solve_id?: string | null;
+          challenger_duration_ms?: number | null;
+          challenger_penalty?: string | null;
+          opponent_started_at?: string | null;
+          opponent_solve_id?: string | null;
+          opponent_duration_ms?: number | null;
+          opponent_penalty?: string | null;
+          winner?: string | null;
+          resolved_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["challenges"]["Insert"]>;
+        Relationships: [];
+      };
       daily_results: {
         Row: {
           profile_id: string;

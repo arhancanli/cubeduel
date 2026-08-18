@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
+import { ChallengePanel, type ChallengeItem } from "@/components/ChallengePanel";
 import { MovePad } from "@/components/MovePad";
 import { KeyMapHint } from "@/components/KeyMapHint";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -47,7 +48,13 @@ interface DuelFinishResponse {
   marginMs?: number;
 }
 
-export function DuelScreen({ record }: { record: { wins: number; losses: number } }) {
+export function DuelScreen({
+  record,
+  challenges,
+}: {
+  record: { wins: number; losses: number };
+  challenges: ChallengeItem[];
+}) {
   const [opponent, setOpponent] = useState<BotProfile>(BOTS[2]);
   const [duel, setDuel] = useState<DuelStartResponse | null>(null);
   const [result, setResult] = useState<DuelFinishResponse | null>(null);
@@ -168,6 +175,7 @@ export function DuelScreen({ record }: { record: { wins: number; losses: number 
             onSelect={setOpponent}
             tally={tally}
             onStart={() => void session.startRound()}
+            challenges={challenges}
           />
         ) : null}
 
@@ -281,19 +289,28 @@ function OpponentPicker({
   onSelect,
   tally,
   onStart,
+  challenges,
 }: {
   selected: BotProfile;
   onSelect: (bot: BotProfile) => void;
   tally: { wins: number; losses: number };
   onStart: () => void;
+  challenges: ChallengeItem[];
 }) {
   return (
-    <div className="flex w-full flex-col gap-6 pt-4">
+    <div className="flex w-full flex-col items-center gap-10 pt-4">
+      {/* Players first. Racing a person is the better game; the bots are what is
+          always available when nobody has answered yet, and putting them at the
+          top would say the opposite. */}
+      <ChallengePanel initial={challenges} />
+
+      <div className="flex w-full max-w-2xl flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-medium tracking-tight">Pick an opponent</h1>
+        <h1 className="text-2xl font-medium tracking-tight">Or race a bot</h1>
         <p className="text-sm text-muted">
-          Every bot races the cube you race, on a real solution to that exact
-          scramble, at a pace fixed before you start.
+          Always available, and never a wait. Every bot races the cube you race,
+          on a real solution to that exact scramble, at a pace fixed before you
+          start.
         </p>
         <p className="text-xs text-muted-dim">
           Your record: {tally.wins}W · {tally.losses}L
@@ -338,6 +355,7 @@ function OpponentPicker({
         as a loss. A duel does not move your rating: how fast you solve does not
         depend on whether somebody is racing you.
       </p>
+      </div>
     </div>
   );
 }

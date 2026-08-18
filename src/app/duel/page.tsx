@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { DuelScreen } from "@/components/DuelScreen";
 import { SiteHeader } from "@/components/SiteHeader";
+import { listChallenges } from "@/lib/server/challenges";
 import { duelRecord } from "@/lib/server/duels";
 import { ensureProfile } from "@/lib/server/profiles";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
@@ -45,8 +46,17 @@ export default async function DuelPage() {
     );
   }
 
-  const record = await duelRecord(profile.id);
-  return <DuelScreen record={{ wins: record.wins, losses: record.losses }} />;
+  const [record, challenges] = await Promise.all([
+    duelRecord(profile.id),
+    listChallenges(profile.id),
+  ]);
+
+  return (
+    <DuelScreen
+      record={{ wins: record.wins, losses: record.losses }}
+      challenges={challenges}
+    />
+  );
 }
 
 function Gate({ title, children }: { title: string; children: React.ReactNode }) {
