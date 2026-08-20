@@ -20,10 +20,121 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      users: {
+        Row: {
+          id: string;
+          email: string;
+          email_verified_at: string | null;
+          password_hash: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          email: string;
+          email_verified_at?: string | null;
+          password_hash?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["users"]["Insert"]>;
+        Relationships: [];
+      };
+      sessions: {
+        Row: {
+          id: string;
+          user_id: string;
+          token_hash: string;
+          created_at: string;
+          last_seen_at: string;
+          expires_at: string;
+          user_agent: string | null;
+          ip: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          token_hash: string;
+          created_at?: string;
+          last_seen_at?: string;
+          expires_at: string;
+          user_agent?: string | null;
+          ip?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["sessions"]["Insert"]>;
+        Relationships: [];
+      };
+      credentials: {
+        Row: {
+          id: string;
+          user_id: string;
+          credential_id: string;
+          public_key: string;
+          sign_count: number;
+          transports: string[] | null;
+          label: string | null;
+          created_at: string;
+          last_used_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          credential_id: string;
+          public_key: string;
+          sign_count?: number;
+          transports?: string[] | null;
+          label?: string | null;
+          created_at?: string;
+          last_used_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["credentials"]["Insert"]>;
+        Relationships: [];
+      };
+      email_tokens: {
+        Row: {
+          id: string;
+          user_id: string;
+          purpose: string;
+          token_hash: string;
+          expires_at: string;
+          consumed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          purpose: string;
+          token_hash: string;
+          expires_at: string;
+          consumed_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["email_tokens"]["Insert"]>;
+        Relationships: [];
+      };
+      auth_attempts: {
+        Row: {
+          id: string;
+          email: string | null;
+          ip: string | null;
+          succeeded: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          email?: string | null;
+          ip?: string | null;
+          succeeded: boolean;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["auth_attempts"]["Insert"]>;
+        Relationships: [];
+      };
       profiles: {
         Row: {
           id: string;
           clerk_user_id: string;
+          user_id: string | null;
           handle: string;
           display_name: string;
           country: string | null;
@@ -34,6 +145,7 @@ export interface Database {
         Insert: {
           id?: string;
           clerk_user_id: string;
+          user_id?: string | null;
           handle: string;
           display_name: string;
           country?: string | null;
