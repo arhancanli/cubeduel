@@ -71,6 +71,8 @@ export interface Database {
           credential_id: string;
           public_key: string;
           sign_count: number;
+          algorithm: number | null;
+          backed_up: boolean | null;
           transports: string[] | null;
           label: string | null;
           created_at: string;
@@ -82,6 +84,8 @@ export interface Database {
           credential_id: string;
           public_key: string;
           sign_count?: number;
+          algorithm?: number | null;
+          backed_up?: boolean | null;
           transports?: string[] | null;
           label?: string | null;
           created_at?: string;
@@ -110,6 +114,26 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["email_tokens"]["Insert"]>;
+        Relationships: [];
+      };
+      webauthn_challenges: {
+        Row: {
+          id: string;
+          challenge_hash: string;
+          purpose: string;
+          user_id: string | null;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          challenge_hash: string;
+          purpose: string;
+          user_id?: string | null;
+          expires_at: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["webauthn_challenges"]["Insert"]>;
         Relationships: [];
       };
       auth_attempts: {
