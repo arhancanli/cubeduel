@@ -14,6 +14,7 @@ import {
   type ClaimSummary,
 } from "@/lib/claim";
 import { formatMs } from "@/lib/format";
+import { track, trackOnce } from "@/lib/analytics";
 import { createPasskey, passkeysSupported } from "@/lib/passkeyClient";
 import { loadHistory } from "@/lib/solveHistory";
 
@@ -68,8 +69,14 @@ export function ClaimScreen() {
   // during the server render — reading it in a render body would make the two
   // passes disagree and throw a hydration error.
   useEffect(() => {
-    setSummary(summariseClaim(loadHistory()));
+    const claim = summariseClaim(loadHistory());
+    setSummary(claim);
     setCanUsePasskeys(passkeysSupported());
+
+    // Whether the page was worth showing is the interesting half. A visitor who
+    // arrives here with nothing to claim is being asked to sign up for reasons
+    // this screen cannot make, and the two cases convert very differently.
+    trackOnce("join_view", { hasClaim: claim.worthClaiming, solves: claim.solveCount });
   }, []);
 
   const headline = useMemo(
@@ -105,6 +112,8 @@ export function ClaimScreen() {
     }
 
     setBusy(false);
+    track("signup", { withPassword: Boolean(showPassword && password) });
+
     // Signed in already. The passkey step is an offer, not a gate — somebody who
     // skips it still has an account and still keeps their solves.
     setStage(canUsePasskeys ? "passkey" : "form");
@@ -119,6 +128,7 @@ export function ClaimScreen() {
     setBusy(false);
 
     if (result.ok) {
+      track("passkey_added", { at: "signup" });
       router.push("/progress");
       return;
     }

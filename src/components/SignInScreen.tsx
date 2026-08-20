@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { Reveal } from "@/components/Reveal";
 import { SiteHeader } from "@/components/SiteHeader";
+import { track } from "@/lib/analytics";
 import { passkeysSupported, signInWithPasskey } from "@/lib/passkeyClient";
 
 /**
@@ -51,6 +52,7 @@ export function SignInScreen() {
     setBusy(null);
 
     if (result.ok) {
+      track("signin", { method: "passkey" });
       // `refresh()` before navigating, so the server components re-render with
       // the new session cookie. Without it the destination can paint its
       // signed-out shell from the router cache, which reads exactly like the
@@ -82,6 +84,7 @@ export function SignInScreen() {
       return;
     }
 
+    track("signin", { method: "password" });
     router.refresh();
     router.push("/progress");
   }

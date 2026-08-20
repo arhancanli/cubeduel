@@ -615,6 +615,42 @@ benefit by the size of that sample — then says plainly when algorithms cannot
 close the gap: *"roughly 40% of the 2.6s you need; the rest has to come from
 turning faster or pausing less."*
 
+## What is measured, and what is not (`src/lib/analytics.ts`)
+
+Three questions decide whether this works, and until recently none of them
+could be answered: does somebody who arrives actually solve a cube, do they come
+back for a second session, and are they here tomorrow. `npm run retention`
+prints them.
+
+It is first-party and deliberately small. No third-party script is loaded, there
+is no page-view counter, no session replay, and no way to ask a question that
+was not decided in advance — the event names are a fixed list, and adding one is
+a reviewed code change. That constraint is the point: an analytics tool that can
+answer any question later is one that must collect everything now.
+
+- The identifier is a random value in `localStorage`. Not a cookie, not a
+  fingerprint, not derived from anything about the person. Clearing site data
+  clears it and the next visit is a new visitor.
+- **Do Not Track and Global Privacy Control are honoured.** A visitor who sets
+  either is never given an identifier and never sends an event — nothing is
+  sampled and nothing is anonymised, because nothing happens.
+- No IP address is recorded. The `events` table has no column for one, which is
+  a stronger guarantee than a policy.
+- Deleting an account deletes its events, by cascade.
+
+Two things this cost, both found by looking at the table rather than the code.
+The route validated event names against a list imported from a `"use client"`
+module, which arrives on the server as a client-reference proxy rather than an
+array — so the allowlist threw on every request and **nothing was recorded at
+all** while every screen dutifully reported events. And `join_view` landed twice
+per visit, because React invokes effects twice in development; that would have
+halved the measured conversion of the sign-up screen. Both are why the check is
+"query the database", not "the request was sent".
+
+⚠️ **Still owed before launch:** a `/privacy` page. Collecting a persistent
+visitor identifier without a user-facing disclosure is not defensible, however
+careful the implementation is, and the README is not where a visitor looks.
+
 ## Not built yet
 
 - **Live real-time races.** Head-to-head works asynchronously (see Challenges);

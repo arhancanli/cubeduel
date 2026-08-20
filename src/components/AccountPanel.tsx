@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { track } from "@/lib/analytics";
 import { createPasskey, passkeysSupported } from "@/lib/passkeyClient";
 import { forgetSession } from "@/lib/useSession";
 
@@ -67,6 +68,7 @@ export function AccountPanel({
     const result = await createPasskey(deviceName());
     setBusy(false);
     if (result.ok) {
+      track("passkey_added", { at: "settings" });
       router.refresh();
       return;
     }

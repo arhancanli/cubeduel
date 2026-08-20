@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "./analytics";
 import type { PhaseSplit } from "./cfop";
 import type { Penalty } from "./types";
 
@@ -122,6 +123,13 @@ export function recordSolve(
   };
   const solves = [...existing, entry].slice(-MAX_SOLVES);
   save({ version: 1, solves });
+
+  // Measured here rather than at the three screens that call this, for the same
+  // reason this function exists at all: every route that produces a solve comes
+  // through it, so no screen can forget. "Did somebody who landed here actually
+  // solve a cube" is the activation question, and it was unanswerable until now.
+  track("solve");
+
   return solves;
 }
 

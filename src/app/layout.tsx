@@ -1,5 +1,6 @@
 
 import { HistorySync } from "@/components/HistorySync";
+import { SessionTracker } from "@/components/SessionTracker";
 import { SITE_URL } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -73,6 +74,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         {children}
         {/* Renders nothing; pushes local history to the account in the background. */}
         <HistorySync />
+        {/* Renders nothing; counts one session per visit. Honours Do Not Track. */}
+        <SessionTracker />
       </body>
     </html>
   );

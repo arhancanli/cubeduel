@@ -20,6 +20,28 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
+      events: {
+        Row: {
+          id: string;
+          visitor: string;
+          session: string | null;
+          user_id: string | null;
+          name: string;
+          props: Json | null;
+          at: string;
+        };
+        Insert: {
+          id?: string;
+          visitor: string;
+          session?: string | null;
+          user_id?: string | null;
+          name: string;
+          props?: Json | null;
+          at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["events"]["Insert"]>;
+        Relationships: [];
+      };
       users: {
         Row: {
           id: string;
