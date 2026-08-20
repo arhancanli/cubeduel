@@ -24,6 +24,10 @@
 .DS_Store
 *.pem
 
+# Self-signed certificate for the https e2e suite. Generated on first run by
+# scripts/tls-dev.mjs; never committed.
+.tls/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
