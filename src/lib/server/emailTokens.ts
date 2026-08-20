@@ -94,7 +94,7 @@ async function issueToken(userId: string, purpose: Purpose): Promise<string | nu
 
 export type RedeemResult =
   | { ok: true; userId: string }
-  | { ok: false; reason: "unknown" | "expired" | "used" };
+  | { ok: false; reason: "unknown" | "expired" | "used"; userId?: string };
 
 /**
  * Redeems a token exactly once.
@@ -131,14 +131,21 @@ export async function redeemToken(token: string, purpose: Purpose): Promise<Rede
   // only ever for a token the caller already holds.
   const { data: existing } = await db()
     .from("email_tokens")
-    .select("consumed_at, expires_at")
+    .select("consumed_at, expires_at, user_id")
     .eq("token_hash", hashTokenForPostgrest(token))
     .eq("purpose", purpose)
     .maybeSingle();
 
   if (!existing) return { ok: false, reason: "unknown" };
-  if (existing.consumed_at) return { ok: false, reason: "used" };
-  return { ok: false, reason: "expired" };
+  // The account is carried out even on failure, so a caller can say something
+  // true about a link that was already spent. A verification link consumed by a
+  // mail client's prefetch is the ordinary case, not an attack, and telling the
+  // person "invalid link" when their address is in fact confirmed would send
+  // them hunting for a problem that does not exist.
+  if (existing.consumed_at) {
+    return { ok: false, reason: "used", userId: existing.user_id };
+  }
+  return { ok: false, reason: "expired", userId: existing.user_id };
 }
 
 // ---------------------------------------------------------------------------
@@ -177,12 +184,33 @@ export async function startEmailVerification(user: {
 
 export type VerifyOutcome =
   | { ok: true }
+  /** The link was spent, and the address really is confirmed. Say so warmly. */
+  | { ok: true; already: true }
   | { ok: false; reason: "unknown" | "expired" | "used" };
 
-/** Confirms an address from a link. */
+/**
+ * Confirms an address from a link.
+ *
+ * A spent link whose account is now verified reports success rather than
+ * failure. Mail clients and corporate link scanners fetch every URL in a
+ * message before a human sees it, so the token is very often consumed by a
+ * machine seconds before the person clicks — and "this link is invalid" for an
+ * address that is demonstrably confirmed is both alarming and untrue.
+ */
 export async function completeEmailVerification(token: string): Promise<VerifyOutcome> {
   const redeemed = await redeemToken(token, "verify");
-  if (!redeemed.ok) return redeemed;
+
+  if (!redeemed.ok) {
+    if (redeemed.reason === "used" && redeemed.userId) {
+      const { data } = await db()
+        .from("users")
+        .select("email_verified_at")
+        .eq("id", redeemed.userId)
+        .maybeSingle();
+      if (data?.email_verified_at) return { ok: true, already: true };
+    }
+    return redeemed;
+  }
 
   const marked = await markEmailVerified(redeemed.userId);
   if (!marked) {

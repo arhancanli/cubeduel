@@ -13,6 +13,7 @@ import { INSPECTION_LIMIT_MS } from "@/lib/inspection";
 import { DEFAULT_EVENT, EVENTS, EVENT_IDS, type EventId } from "@/lib/events";
 import { ESTABLISHED_DEVIATION, WINDOW_SIZE, msForRating } from "@/lib/rating";
 import { useLatest } from "@/lib/useLatest";
+import { track } from "@/lib/analytics";
 import { useSolveSession } from "@/lib/useSolveSession";
 
 /**
@@ -130,6 +131,12 @@ export function RankedScreen({
 
     const attempt = (await response.json()) as AttemptResponse;
     attemptIdRef.current = attempt.attemptId;
+
+    // Recorded on the ISSUE, not on the submit. This is the moment somebody
+    // chooses to play for the record, and the gap between issuing and
+    // submitting is itself the interesting number — an attempt that is never
+    // submitted is somebody who looked at a scramble and walked away.
+    track("ranked_attempt", { event: eventRef.current });
     // Inspection starts the moment the scramble lands, because that is the
     // moment the player is allowed to look at it — the same instant the server
     // began counting when it sent this. The countdown itself keys off the

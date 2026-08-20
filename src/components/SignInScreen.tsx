@@ -65,15 +65,30 @@ export function SignInScreen() {
     if (!result.cancelled) setError(result.error);
   }
 
-  async function usePassword(event: React.FormEvent) {
+  async function usePassword(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // Read from the form, not from React state.
+    //
+    // A controlled input's state is empty until the component hydrates, while
+    // the DOM value is whatever the person typed. Somebody who types and
+    // submits in that window passes the browser's `required` check — the DOM
+    // has a value — and sends an empty string, because the handler was reading
+    // state. On this endpoint that produces a cheerful "check your inbox" for a
+    // request that did nothing at all.
+    //
+    // `FormData` reads the DOM, so the two can never disagree.
+    const form = new FormData(event.currentTarget);
+    const submittedEmail = String(form.get("email") ?? "").trim();
+    const submittedPassword = String(form.get("password") ?? "");
+    if (!submittedEmail || !submittedPassword) return;
+
     setBusy("password");
     setError(null);
 
     const response = await fetch("/api/auth/sign-in", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email: submittedEmail, password: submittedPassword }),
     });
 
     setBusy(null);
@@ -144,6 +159,7 @@ export function SignInScreen() {
               </label>
               <input
                 id="email"
+                name="email"
                 type="email"
                 required
                 autoComplete="username webauthn"
@@ -160,6 +176,7 @@ export function SignInScreen() {
               </label>
               <input
                 id="password"
+                name="password"
                 type="password"
                 required
                 autoComplete="current-password"

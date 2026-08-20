@@ -11,6 +11,7 @@ import { DEFAULT_EVENT, EVENTS, EVENT_IDS, type EventId } from "@/lib/events";
 import { formatMs } from "@/lib/format";
 import { RUSH_LIVES, type RushState } from "@/lib/rush";
 import { useLatest } from "@/lib/useLatest";
+import { track } from "@/lib/analytics";
 import { useSolveSession } from "@/lib/useSolveSession";
 
 /**
@@ -128,6 +129,7 @@ export function RushScreen({
 
     const run = (await response.json()) as StartResponse;
     runIdRef.current = run.runId;
+    track("rush_start", { event: eventRef.current });
     setState(run.state);
     setTarget(run.targetMs);
     setLast(null);

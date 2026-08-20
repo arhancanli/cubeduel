@@ -137,35 +137,46 @@ async function main() {
     // password, or "no such user" is measurably faster and the form answers
     // "is this person registered here?" to anybody who asks.
     //
-    // Comparing the two sign-in paths directly does NOT work, and the first
-    // version of this check did exactly that and could not fail. Both paths
-    // include a round trip to a remote database that costs four to six hundred
-    // milliseconds; the hash is barely a hundred. Deleting the burn entirely
-    // moved the ratio from about 1.0 to about 1.3, well inside any threshold
-    // loose enough not to flake. Mutation-testing is what surfaced that.
+    // ## Measured pairwise, and that is the whole trick
     //
-    // So the baseline is a bare lookup for the same missing address — one round
-    // trip, no hashing. Whatever `checkCredentials` costs above that IS the
-    // hashing, and network latency cancels out of the subtraction.
-    const median = async (run: () => Promise<unknown>) => {
-      const samples: number[] = [];
-      for (let i = 0; i < 5; i++) {
-        const started = performance.now();
-        await run();
-        samples.push(performance.now() - started);
-      }
-      return samples.sort((a, b) => a - b)[2];
-    };
-
+    // Comparing the two sign-in paths directly does NOT work: both include a
+    // round trip to a database in Tokyo costing four to six hundred
+    // milliseconds against a hash of barely a hundred, so deleting the burn
+    // moves the ratio from 1.0 to about 1.3 — inside any threshold loose enough
+    // not to flake.
+    //
+    // Subtracting a bare lookup fixes the signal but not the noise. Taking the
+    // two medians in sequence means they sample different network conditions,
+    // and one run in three produced a NEGATIVE hashing time because the lookup
+    // half happened to be slower. A security check that flakes is a security
+    // check that gets ignored.
+    //
+    // So the two are interleaved and differenced per pair. Each pair shares its
+    // network conditions, the common-mode variation cancels, and what is left is
+    // the hash.
     const missing = "nobody-here-at-all@cubeduel.test";
-    const lookupOnly = await median(() => userByEmail(missing));
-    const signInAttempt = await median(() => checkCredentials(missing, "the wrong one entirely"));
-    const spentHashing = signInAttempt - lookupOnly;
+    const differences: number[] = [];
+
+    for (let i = 0; i < 7; i++) {
+      const lookupStart = performance.now();
+      await userByEmail(missing);
+      const lookup = performance.now() - lookupStart;
+
+      const signInStart = performance.now();
+      await checkCredentials(missing, "the wrong one entirely");
+      const signIn = performance.now() - signInStart;
+
+      differences.push(signIn - lookup);
+    }
+
+    differences.sort((a, b) => a - b);
+    const median = differences[Math.floor(differences.length / 2)];
 
     check(
       "an unknown address still pays for a password hash",
-      spentHashing > 50,
-      `lookup ${lookupOnly.toFixed(0)}ms, sign-in ${signInAttempt.toFixed(0)}ms, hashing ${spentHashing.toFixed(0)}ms`,
+      median > 50,
+      `median extra ${median.toFixed(0)}ms over a bare lookup ` +
+        `(range ${differences[0].toFixed(0)} to ${differences[differences.length - 1].toFixed(0)})`,
     );
   }
 
@@ -257,9 +268,18 @@ async function main() {
     check("the link confirms the address", done.ok, done.ok ? "" : done.reason);
     check("...and the account is marked verified", Boolean((await userByEmail(EMAIL))?.emailVerifiedAt));
 
-    // The reason email tokens keep a consumed flag instead of being deleted.
+    // The reason email tokens keep a consumed flag instead of being deleted —
+    // and the reason a spent one reports SUCCESS rather than failure once the
+    // address is confirmed. Mail clients and corporate link scanners fetch every
+    // URL in a message, so the token is very often consumed by a machine seconds
+    // before the person clicks. Telling them "invalid link" about an address
+    // that is demonstrably confirmed is both alarming and untrue.
     const twice = await completeEmailVerification(token!);
-    check("clicking twice says 'already used', not 'invalid'", !twice.ok && twice.reason === "used", twice.ok ? "" : twice.reason);
+    check(
+      "clicking a spent link reports the address is already confirmed",
+      twice.ok && "already" in twice && twice.already === true,
+      twice.ok ? "ok" : twice.reason,
+    );
 
     check("a token nobody issued is unknown", !(await completeEmailVerification("made-up-token")).ok);
   }

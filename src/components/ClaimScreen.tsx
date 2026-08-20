@@ -86,9 +86,17 @@ export function ClaimScreen() {
 
   const emailRef = useRef<HTMLInputElement>(null);
 
-  async function createAccount(event: React.FormEvent) {
+  async function createAccount(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (busy) return;
+
+    // Read from the form, not from React state — a controlled input's state is
+    // empty until the component hydrates while the DOM value is not, so a fast
+    // typist can pass `required` and submit nothing. See ForgotScreen.
+    const form = new FormData(event.currentTarget);
+    const submittedEmail = String(form.get("email") ?? "").trim();
+    const submittedPassword = String(form.get("password") ?? "");
+    if (!submittedEmail) return;
 
     setBusy(true);
     setError(null);
@@ -97,10 +105,10 @@ export function ClaimScreen() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email,
+        email: submittedEmail,
         // Omitted entirely rather than sent empty, so the account is created
         // with no password at all and the passkey becomes its only credential.
-        ...(showPassword && password ? { password } : {}),
+        ...(showPassword && submittedPassword ? { password: submittedPassword } : {}),
       }),
     });
 
@@ -112,7 +120,7 @@ export function ClaimScreen() {
     }
 
     setBusy(false);
-    track("signup", { withPassword: Boolean(showPassword && password) });
+    track("signup", { withPassword: Boolean(showPassword && submittedPassword) });
 
     // Signed in already. The passkey step is an offer, not a gate — somebody who
     // skips it still has an account and still keeps their solves.
@@ -277,6 +285,7 @@ export function ClaimScreen() {
                 <input
                   ref={emailRef}
                   id="email"
+                  name="email"
                   type="email"
                   required
                   autoComplete="username"
@@ -297,6 +306,7 @@ export function ClaimScreen() {
                   </label>
                   <input
                     id="password"
+                    name="password"
                     type="password"
                     autoComplete="new-password"
                     value={password}

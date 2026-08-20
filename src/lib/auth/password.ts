@@ -76,82 +76,17 @@ const KEY_LENGTH = 64;
 const SALT_LENGTH = 16;
 const MAX_MEM = 64 * 1024 * 1024;
 
-/**
- * The shortest password accepted.
- *
- * Eight, and no composition rules — no required symbol, no forced digit, no
- * mixed case. This follows NIST 800-63B, which dropped those rules after the
- * evidence came in: they push people toward `Password1!` and toward writing it
- * down, and they buy almost nothing against an attacker who is guessing from a
- * leaked list rather than from an alphabet.
- *
- * Length is the property that actually helps, so length is what is asked for,
- * and the far more useful check is the one below against passwords that are
- * already known.
- */
-export const MIN_PASSWORD_LENGTH = 8;
-
-/**
- * An upper bound, because scrypt will happily chew on a megabyte.
- *
- * This is a denial-of-service guard, not a security rule: without it, a request
- * body full of text becomes minutes of CPU. 200 covers every passphrase a person
- * will genuinely use.
- */
-export const MAX_PASSWORD_LENGTH = 200;
-
-/**
- * Passwords common enough that allowing them is the same as allowing no
- * password.
- *
- * Deliberately short. A real breach-corpus check means shipping tens of
- * megabytes or sending a hash prefix to a third party on every sign-up, and
- * neither is worth it here — but the top of the list is where the overwhelming
- * majority of real guesses land, so a small list stops most of the damage for no
- * cost. Cubing words are in it because this is a cubing site and `speedcube`
- * would otherwise be this site's `password1`.
- */
-const COMMON_PASSWORDS = new Set([
-  "password", "password1", "password123", "12345678", "123456789", "1234567890",
-  "qwertyui", "qwerty123", "iloveyou", "sunshine", "princess", "football",
-  "baseball", "welcome1", "admin123", "letmein1", "trustno1", "starwars",
-  "abc12345", "monkey12", "dragon123", "superman", "michael1", "shadow12",
-  "master12", "jennifer", "hello123", "freedom1", "whatever", "computer",
-  "cubeduel", "speedcube", "rubikscube", "rubiks123", "cubing123",
-]);
-
-export type PasswordProblem =
-  | { ok: true }
-  | { ok: false; reason: string };
-
-/**
- * Whether a password is allowed, and if not, what to tell the person.
- *
- * Returns the message rather than a code because every failure here is
- * something a human reads while mildly annoyed, and the message should say what
- * to do instead of naming a rule.
- */
-export function checkPassword(password: string): PasswordProblem {
-  if (password.length < MIN_PASSWORD_LENGTH) {
-    return {
-      ok: false,
-      reason: `Passwords need at least ${MIN_PASSWORD_LENGTH} characters.`,
-    };
-  }
-  if (password.length > MAX_PASSWORD_LENGTH) {
-    return {
-      ok: false,
-      reason: `Passwords can be at most ${MAX_PASSWORD_LENGTH} characters.`,
-    };
-  }
-  if (COMMON_PASSWORDS.has(password.toLowerCase())) {
-    return {
-      ok: false,
-      reason: "That password is one of the most commonly used ones. Pick another.",
-    };
-  }
-  return { ok: true };
-}
+// The policy — lengths, the common-password list, `checkPassword` — lives in
+// `passwordPolicy.ts`, which imports nothing. A client component importing a
+// single constant from THIS module drags `node:crypto` and `node:util` into the
+// browser bundle, where `promisify` throws on load and takes the whole page
+// with it. `/reset` rendered no form at all until that was found.
+export {
+  MAX_PASSWORD_LENGTH,
+  MIN_PASSWORD_LENGTH,
+  checkPassword,
+  type PasswordProblem,
+} from "./passwordPolicy";
 
 /**
  * Hashes a password for storage.

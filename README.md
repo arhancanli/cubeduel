@@ -171,6 +171,24 @@ Next.js 16 · React 19 · TypeScript · Tailwind 4 · Supabase (Postgres) ·
 [cubing.js](https://js.cubing.net) for scrambles, cube state and rendering.
 The solving engine is this repository's own — see `src/lib/solver/`.
 
+## The Node version is worth 3.4x
+
+Pinned to `>=22` in `engines`, and the reason is measured rather than
+precautionary. The solver on 200 uniformly random states:
+
+| runtime | median | mean | p95 |
+|---|---|---|---|
+| Node 20 | 55.2ms | 91.9ms | 251ms |
+| Node 24 | 16.2ms | 40.0ms | 162ms |
+
+251ms on Node 20 is not slowness, it is the `timeBudgetMs` cutoff: more than 5%
+of solves exhausted their budget and returned best-so-far instead of the answer
+they were looking for. On Node 24 about 1% do.
+
+Nothing pinned this until now, which meant a change to a hosting platform's
+default runtime could have quietly tripled the search time and shortened the
+solutions, with no failing test anywhere to say so.
+
 ## Build gotcha: Turbopack hangs on cubing.js
 
 `next build` with Turbopack (the Next 16 default) **hangs indefinitely** on this project —

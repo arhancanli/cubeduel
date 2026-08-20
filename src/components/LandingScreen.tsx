@@ -280,6 +280,29 @@ export function LandingScreen() {
               WCA-legal random-state scrambles. Works offline. No account needed to solve.
             </p>
           </Reveal>
+
+          {/* The only place privacy is linked from. A disclosure nobody can
+              reach is not a disclosure, and the footer is where people look. */}
+          <nav className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-dim">
+            <Link
+              href="/privacy"
+              className="underline underline-offset-4 transition-colors hover:text-foreground"
+            >
+              Privacy
+            </Link>
+            <a
+              href="https://github.com/arhancanli/cubeduel"
+              className="underline underline-offset-4 transition-colors hover:text-foreground"
+            >
+              Source
+            </a>
+            <Link
+              href="/leaderboard"
+              className="underline underline-offset-4 transition-colors hover:text-foreground"
+            >
+              Leaderboard
+            </Link>
+          </nav>
         </div>
       </footer>
     </main>
