@@ -113,14 +113,14 @@ the cases your own solves produced rather than a hand-typed table of 57 algorith
 
 ```bash
 npm install
-cp .env.example .env.local     # fill in Clerk + Supabase, or leave blank
+cp .env.example .env.local     # fill in Supabase, or leave blank
 npm run dev                    # http://localhost:3000
 ```
 
 **It runs with no credentials at all.** Solving, the daily, progress analysis and
 the trainer are entirely local — `localStorage` is the source of truth and the app
-works offline. Accounts, ranked, leaderboards and profiles need Clerk and Supabase;
-without them those pages say so plainly instead of breaking.
+works offline. Accounts, ranked, leaderboards and profiles need Supabase; without
+it those pages say so plainly instead of breaking.
 
 To enable them, apply everything in [`supabase/migrations/`](supabase/migrations)
 to a fresh Supabase project **in filename order**, then fill in `.env.local`. All
@@ -129,12 +129,11 @@ and a constraint fix — and a page whose table is missing renders a gate naming
 migration rather than an error, so a partial apply looks like a working app with
 features quietly switched off.
 
-If you are running this for real, also set `CLERK_WEBHOOK_SECRET` and point a
-Clerk `user.deleted` webhook at `/api/webhooks/clerk`. Without it, deleting an
-account leaves the profile, its public page and its rating in place — which is
-not what the person who deleted it asked for. The route refuses everything while
-the secret is unset, so a missing variable never leaves an unauthenticated delete
-endpoint open.
+**There is no identity provider to configure.** Accounts, sessions, passwords and
+passkeys are this application's own — see [Identity](#identity-srclibauth) below.
+The only optional extra is `RESEND_API_KEY` for outgoing mail; without it, links
+that would have been emailed are written to the server log instead, so the whole
+reset flow can be walked on a laptop with no mail provider and no domain.
 
 ## How it is tested
 
@@ -144,7 +143,7 @@ in the commit history was caught by exactly one of them.
 | | | |
 |---|---|---|
 | `npm test` | 345 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 10 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm run e2e` | 11 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
 | `npm run integration:rush` | live database | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
@@ -167,7 +166,7 @@ worker and the two bundlers resolve it differently.
 
 ## Stack
 
-Next.js 16 · React 19 · TypeScript · Tailwind 4 · Clerk · Supabase (Postgres) ·
+Next.js 16 · React 19 · TypeScript · Tailwind 4 · Supabase (Postgres) ·
 [cubing.js](https://js.cubing.net) for scrambles, cube state and rendering.
 The solving engine is this repository's own — see `src/lib/solver/`.
 
@@ -322,7 +321,7 @@ because it makes a claim about a person that has to persist.
 
 **Nothing in the browser writes to the database.** Every table has RLS enabled with
 no policies at all, which denies the anon and authenticated roles outright. Writes
-happen only in server code that has already checked Clerk auth and, for anything
+happen only in server code that has already checked the session cookie and, for anything
 ranked, re-verified the result itself. A rating the client can PATCH is not a rating.
 
 ### The rating (`src/lib/rating.ts`)
@@ -451,6 +450,84 @@ The test that matters most is that it flags this repository's own integration
 harness, which paces solves evenly by inverting the scramble — exactly the shape a
 replayed answer has. A detector that could not see that could not see the real
 thing either.
+
+### Identity (`src/lib/auth/`)
+
+Accounts, sessions, passwords and passkeys are this application's own. There is
+no identity provider, and every line of it is in this repository.
+
+It was rented before, and the reasons for moving are worth stating plainly: the
+development instance capped at a hundred users, its sign-up form began rendering
+a CAPTCHA that the project's own test suite could not solve — which read exactly
+like the app being broken — and the account-deletion webhook was live, correct,
+tested, and refusing every request because a secret was never set in the host
+environment. The most load-bearing question in the product is *is this really the
+person whose rating this is*, and it should not be answered by something that
+cannot be tested end to end.
+
+**Nothing cryptographic is invented.** Passwords use scrypt from `node:crypto`;
+signatures are verified by OpenSSL through the same module. Writing an
+authentication layer by hand is reasonable and this repository does it
+deliberately — writing a *hashing scheme* by hand is not, and the distinction is
+why `password.ts` is short and boring.
+
+scrypt runs at `N = 2^15, r = 8, p = 3`, one of the configurations OWASP lists
+and specifically the one for environments short on memory rather than CPU. That
+is this one: memory is spent per concurrent hash, so the headline `N = 2^17`
+would ask 128 MiB each and exhaust a serverless function before it ran out of
+time. Measured on the machine that wrote this, not estimated — 107 ms at 32 MiB
+against 151 ms at 128 MiB.
+
+**Sessions are rows, not signed tokens.** A self-contained token stays valid
+until it expires no matter what the server thinks of it, which makes "sign out
+everywhere" a lie told with a straight face. On a ladder where the account owns
+a rating, ending a session you no longer trust is not a nicety. Both expiry
+rules — thirty days absolute, seven days idle — are enforced on read rather than
+delegated to a sweep, because a cleanup job that fails silently must not quietly
+extend everybody's session.
+
+**Nothing replayable is stored.** Session cookies and email links are 256-bit
+random values held by the client; the columns hold their SHA-256. A full dump of
+`sessions` grants nobody a session. Passwords are the opposite case and get the
+opposite treatment.
+
+### Passkeys (`src/lib/auth/webauthn.ts`)
+
+The CBOR decoder, the COSE key handling and both WebAuthn ceremonies are written
+out rather than installed, for the same reason as everything else here: the code
+standing between an attacker's bytes and a public key is exactly the part an
+auditor wants to see. The CBOR decoder is tested against RFC 8949's own vectors,
+not fixtures it produced itself.
+
+Three decisions carry most of the weight:
+
+**The algorithm comes from the stored credential, never from the assertion being
+verified.** A verifier that reads it out of the message lets the attacker choose
+it, which is the shape of the `alg: none` JWT bypasses that broke a long list of
+libraries that all looked correct.
+
+**Origins are compared for equality, never with `startsWith`.**
+`https://cubeduel.vercel.app.attacker.com` starts with the expected origin, and a
+passkey usable from an attacker's page is not a passkey.
+
+**The signature counter is advisory.** Every synced passkey — iCloud Keychain,
+Windows Hello, Google Password Manager — reports zero forever, so a decrease only
+means anything when both sides are non-zero. Treating zero as a clone would lock
+out most real users.
+
+Attestation statements are deliberately **not** verified, and that is written
+down rather than left as a silence: "we verify the attestation object" and "we
+verify attestation" sound alike and are very different claims. Checking them
+means shipping vendor root certificates to buy the ability to refuse somebody's
+perfectly good phone.
+
+`testAuthenticator.ts` is a working software authenticator holding a real P-256
+key, and it can be told to lie — wrong challenge, wrong origin, wrong relying
+party, no user presence, a counter wound backwards. That is what makes the
+rejection paths testable, which is the half of a security check that normally
+goes untested. `e2e/auth.py` then does the same thing through Chromium's own
+WebAuthn virtual authenticator, which catches the class of bug no unit test
+reaches: the `ArrayBuffer` that `JSON.stringify` silently turns into `{}`.
 
 ### Verification (`src/lib/verifySolve.ts`)
 

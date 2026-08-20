@@ -14,6 +14,7 @@ import { OPENING_SLACK, RUSH_LIVES } from "../src/lib/rush";
 import { rushBoard } from "../src/lib/server/boards";
 import { startRun, submitRushSolve, bestRun } from "../src/lib/server/rush";
 import { db } from "../src/lib/server/supabase";
+import { makeProbeAccount, cleanupProbes } from "./probeAccount.mjs";
 
 const HANDLE = "rush-probe";
 let failures = 0;
@@ -34,6 +35,10 @@ function solutionFor(scramble: string): string[] {
 
 async function cleanup() {
   await db().from("profiles").delete().in("handle", [HANDLE, "rush-probe-b"]);
+  // The probe accounts too, not only the profiles. `users` cascades to
+  // profiles, so deleting the profile alone leaves the account behind — and
+  // those accumulate silently, because nothing in the app ever lists them.
+  await cleanupProbes();
 }
 
 /** Solves the issued scramble honestly, pacing it to land on `durationMs`. */
@@ -62,7 +67,7 @@ async function main() {
   await cleanup();
   const { data: profile } = await db()
     .from("profiles")
-    .insert({ clerk_user_id: `rush_${Date.now()}`, handle: HANDLE, display_name: "Rush Probe" })
+    .insert({ user_id: (await makeProbeAccount("rush")).userId, handle: HANDLE, display_name: "Rush Probe" })
     .select("*")
     .single();
   check("a profile exists", Boolean(profile));
@@ -277,7 +282,7 @@ async function main() {
     const { data: stranger } = await db()
       .from("profiles")
       .insert({
-        clerk_user_id: `rush_stranger_${Date.now()}`,
+        user_id: (await makeProbeAccount("rush-stranger")).userId,
         handle: "rush-probe-b",
         display_name: "Stranger",
       })

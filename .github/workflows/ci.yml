@@ -35,19 +35,18 @@ jobs:
       - run: npm run lint
       - run: npm test
 
+      # No credentials at all, deliberately.
+      #
+      # The build must not need any. Every database-backed page degrades to an
+      # honest "not configured" state without them, and this job is what keeps
+      # that true — if a page ever starts requiring a key at build time, it
+      # breaks here rather than in production.
+      #
+      # This used to need two placeholder Clerk keys, one of which had to be a
+      # well-formed base64 payload because the SDK decoded a hostname out of it
+      # at build time. Identity is ours now and nothing is decoded at build.
       - name: Build
         run: npm run build
-        env:
-          # The build must not need real credentials. Every database-backed page
-          # degrades to an honest "not configured" state without them, and this
-          # job is what keeps that true — if a page ever starts requiring a key
-          # at build time, it breaks here rather than in production.
-          #
-          # The publishable key must still PARSE — Clerk base64-decodes its
-          # frontend API host out of it — so this is a well-formed key for a
-          # domain that does not exist, not an arbitrary string.
-          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ZXhhbXBsZS5jbGVyay5hY2NvdW50cy5kZXYk
-          CLERK_SECRET_KEY: sk_test_ciplaceholderciplaceholderciplaceholder
 
       # Two invariants that fail silently in the app itself:
       #   - future daily scrambles must NOT reach the client bundle

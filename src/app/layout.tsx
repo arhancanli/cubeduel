@@ -1,4 +1,3 @@
-import { ClerkProvider } from "@clerk/nextjs";
 
 import { HistorySync } from "@/components/HistorySync";
 import { SITE_URL } from "@/lib/site";
@@ -63,33 +62,18 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // Clerk's own UI is themed to match the app rather than dropped in as-is; a
-    // stock white modal on a near-black page reads as a third-party bolt-on.
-    <ClerkProvider
-      appearance={{
-        variables: {
-          colorBackground: "#141417",
-          colorForeground: "#f2f2f3",
-          colorMutedForeground: "#8a8a95",
-          colorInput: "#1c1c21",
-          colorInputForeground: "#f2f2f3",
-          colorPrimary: "#f2f2f3",
-          colorPrimaryForeground: "#0a0a0b",
-          colorNeutral: "#8a8a95",
-          borderRadius: "0.5rem",
-        },
-      }}
+    // No provider. Identity is a cookie the server reads and an endpoint the
+    // client asks once — see `useSession`. Nothing needs to wrap the tree, and
+    // nothing about signing in ships JavaScript to somebody who never does.
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <html
-        lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      >
-        <body className="min-h-full flex flex-col">
-          {children}
-          {/* Renders nothing; pushes local history to the account in the background. */}
-          <HistorySync />
-        </body>
-      </html>
-    </ClerkProvider>
+      <body className="min-h-full flex flex-col">
+        {children}
+        {/* Renders nothing; pushes local history to the account in the background. */}
+        <HistorySync />
+      </body>
+    </html>
   );
 }

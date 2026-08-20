@@ -24,6 +24,7 @@ import {
   submitSide,
 } from "../src/lib/server/challenges";
 import { db } from "../src/lib/server/supabase";
+import { makeProbeAccount, cleanupProbes } from "./probeAccount.mjs";
 
 const HANDLES = ["challenge-probe-a", "challenge-probe-b"] as const;
 
@@ -47,6 +48,10 @@ async function cleanup() {
   for (const handle of HANDLES) {
     await db().from("profiles").delete().eq("handle", handle);
   }
+  // The probe accounts too, not only the profiles. `users` cascades to
+  // profiles, so deleting the profile alone leaves the account behind — and
+  // those accumulate silently, because nothing in the app ever lists them.
+  await cleanupProbes();
 }
 
 /** Opens a side, waits out a believable solve, and submits it honestly. */
@@ -84,7 +89,7 @@ async function main() {
     const { data, error } = await db()
       .from("profiles")
       .insert({
-        clerk_user_id: `challenge_${handle}_${Date.now()}`,
+        user_id: (await makeProbeAccount(`challenge-${handle}`)).userId,
         handle,
         display_name: handle,
       })
@@ -250,7 +255,7 @@ async function main() {
     const { data: stranger } = await db()
       .from("profiles")
       .insert({
-        clerk_user_id: `challenge_stranger_${Date.now()}`,
+        user_id: (await makeProbeAccount("challenge-stranger")).userId,
         handle: "challenge-probe-c",
         display_name: "Stranger",
       })

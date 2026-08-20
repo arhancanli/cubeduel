@@ -27,7 +27,6 @@
     "dailies:annotate": "tsx scripts/annotate-dailies.mts"
   },
   "dependencies": {
-    "@clerk/nextjs": "^7.7.3",
     "@supabase/supabase-js": "^2.109.0",
     "cubing": "^0.56.0",
     "next": "16.3.0",

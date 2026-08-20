@@ -3,9 +3,13 @@ import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { AccountPanel, type DeviceRow, type PasskeyRow } from "@/components/AccountPanel";
 import { SiteHeader } from "@/components/SiteHeader";
 import { handleRejectionReason } from "@/lib/handle";
+import { currentSession } from "@/lib/server/currentUser";
+import { listPasskeys } from "@/lib/server/passkeys";
 import { ensureProfile, updateHandle } from "@/lib/server/profiles";
+import { listSessions } from "@/lib/server/sessions";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -14,7 +18,7 @@ export const dynamic = "force-dynamic";
 /**
  * Where a player fixes the handle they were given.
  *
- * New accounts are seeded with a handle derived from whatever Clerk knows,
+ * New accounts are seeded with a handle derived from their email address,
  * because stopping someone at a naming form before they have seen the product is
  * the reliable way to lose them. The cost of that choice is that the name they
  * end up with may not be one they chose — so changing it has to be easy, obvious,
@@ -36,6 +40,37 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
         <p className="text-sm text-muted">Sign in to change your handle.</p>
       </Shell>
     );
+  }
+
+  const session = await currentSession();
+
+  // Read together, and a failure of either is reported rather than rendered as
+  // an empty list. "You have no other passkeys" is what somebody uses to decide
+  // whether removing one is safe, and "no other device is signed in" is what
+  // somebody checks when they think their account was taken — neither may be
+  // guessed. `listPasskeys` and `listSessions` both throw on a read error for
+  // exactly this reason.
+  let passkeys: PasskeyRow[] = [];
+  let devices: DeviceRow[] = [];
+  let readFailed = false;
+  if (session) {
+    try {
+      passkeys = (await listPasskeys(session.user.id)).map((passkey) => ({
+        id: passkey.id,
+        label: passkey.label,
+        createdAt: passkey.createdAt,
+        lastUsedAt: passkey.lastUsedAt,
+        backedUp: passkey.backedUp,
+      }));
+      devices = (await listSessions(session.user.id)).map((device) => ({
+        id: device.id,
+        userAgent: device.userAgent,
+        lastSeenAt: device.lastSeenAt,
+        current: device.id === session.session.id,
+      }));
+    } catch {
+      readFailed = true;
+    }
   }
 
   const params = await props.searchParams;
@@ -110,6 +145,14 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
           Save
         </button>
       </form>
+
+      <AccountPanel
+        email={session?.user.email ?? ""}
+        emailVerified={session?.user.emailVerifiedAt !== null}
+        passkeys={passkeys}
+        devices={devices}
+        readFailed={readFailed}
+      />
     </Shell>
   );
 }

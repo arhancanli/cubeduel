@@ -8,7 +8,7 @@
  * A signed-in page tree calls `ensureProfile` from more than one place, so a
  * first visit fires several of them at once for a user who has no profile yet.
  * They all miss, they all try to insert, one wins, and the rest hit the
- * `clerk_user_id` unique index. Whether the losers recover decides whether the
+ * `user_id` unique index. Whether the losers recover decides whether the
  * player sees the app or an error page — and because it depends on timing, it
  * reproduces perhaps one run in three by hand, which is exactly the frequency at
  * which a bug gets dismissed as a fluke.
@@ -24,6 +24,7 @@
 import { handleCandidates } from "../src/lib/handle";
 import { createProfileFor, profileFor } from "../src/lib/server/profileStore";
 import { db } from "../src/lib/server/supabase";
+import { cleanupProbes, makeProbeAccount } from "./probeAccount.mjs";
 
 /** Concurrent callers per round — comfortably more than the page tree makes. */
 const CONCURRENCY = 8;
@@ -37,7 +38,9 @@ function check(label: string, ok: boolean, detail = "") {
 }
 
 async function cleanup() {
-  await db().from("profiles").delete().like("clerk_user_id", "race_probe_%");
+  // One statement: `users` cascades to profiles. Deleting profiles first would
+  // leave the accounts behind to accumulate unseen.
+  await cleanupProbes();
 }
 
 async function main() {
@@ -48,7 +51,10 @@ async function main() {
   console.log(`\n== ${ROUNDS} rounds of ${CONCURRENCY} concurrent first visits ==`);
 
   for (let round = 1; round <= ROUNDS; round++) {
-    const userId = `race_probe_${Date.now()}_${round}`;
+    // A real account, because `profiles.user_id` has a foreign key now. The
+    // race being forced is unchanged — what is contended is the same unique
+    // index, under its new name.
+    const { userId } = await makeProbeAccount("race");
 
     // Launched in the same tick, deliberately. Awaiting them in sequence would
     // pass with the bug present, because the first call would have finished
@@ -88,7 +94,7 @@ async function main() {
     const { count } = await db()
       .from("profiles")
       .select("id", { count: "exact", head: true })
-      .eq("clerk_user_id", userId);
+      .eq("user_id", userId);
     check(`round ${round}: exactly one row exists`, count === 1, `${count} rows`);
   }
 
@@ -99,9 +105,10 @@ async function main() {
     // handle index must mean "try the next candidate", not "return somebody
     // else's profile" — which is the failure that would quietly hand one player
     // another player's account.
-    const ids = Array.from(
-      { length: CONCURRENCY },
-      (_, i) => `race_probe_multi_${Date.now()}_${i}`,
+    const ids = await Promise.all(
+      Array.from({ length: CONCURRENCY }, async (_, i) =>
+        (await makeProbeAccount(`race-multi-${i}`)).userId,
+      ),
     );
 
     const settled = await Promise.allSettled(
@@ -124,8 +131,8 @@ async function main() {
       handles.join(", ").slice(0, 140));
 
     check("every player got their OWN profile",
-      profiles.every((p, i) => p.clerk_user_id === ids[i]),
-      `${profiles.filter((p, i) => p.clerk_user_id !== ids[i]).length} mismatched`);
+      profiles.every((p, i) => p.user_id === ids[i]),
+      `${profiles.filter((p, i) => p.user_id !== ids[i]).length} mismatched`);
 
     // And each is retrievable by the id it was created for.
     const round_trip = await Promise.all(ids.map((id) => profileFor(id)));
@@ -143,13 +150,14 @@ async function main() {
     const taken = handleCandidates(seed);
 
     await Promise.all(
-      taken.map((handle, i) =>
-        db().from("profiles").insert({
-          clerk_user_id: `race_probe_filler_${Date.now()}_${i}`,
+      taken.map(async (handle, i) => {
+        const filler = await makeProbeAccount(`race-filler-${i}`);
+        return db().from("profiles").insert({
+          user_id: filler.userId,
           handle,
           display_name: "Filler",
-        }),
-      ),
+        });
+      }),
     );
 
     const { count: occupied } = await db()
@@ -162,7 +170,7 @@ async function main() {
     // Now race a brand new player whose seed is that exhausted name. Every
     // caller walks the whole list, fails on the handle index each time, and
     // arrives at the fallback holding the same generated handle.
-    const userId = `race_probe_fallback_${Date.now()}`;
+    const { userId } = await makeProbeAccount("race-fallback");
     const settled = await Promise.allSettled(
       Array.from({ length: CONCURRENCY }, () => createProfileFor(userId, seed, null)),
     );
@@ -182,16 +190,16 @@ async function main() {
     check("and it is a fallback handle, so the loop really was exhausted",
       got[0]?.handle.startsWith("cuber-") === true, got[0]?.handle ?? "none");
 
-    await db().from("profiles").delete().like("clerk_user_id", "race_probe_filler_%");
-    await db().from("profiles").delete().eq("clerk_user_id", userId);
+    // Left for the final cleanup, which removes every probe account and
+    // cascades. Deleting the profiles here would strand their accounts.
   }
 
   console.log("\n== cleanup ==");
   await cleanup();
   const { count } = await db()
-    .from("profiles")
+    .from("users")
     .select("id", { count: "exact", head: true })
-    .like("clerk_user_id", "race_probe_%");
+    .like("email", "%@cubeduel.test");
   check("the probe removed itself", (count ?? 0) === 0, `${count ?? 0} left`);
 }
 

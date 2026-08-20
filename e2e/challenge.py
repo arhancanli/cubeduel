@@ -2,7 +2,7 @@
 Two real people, one scramble, in two real browsers.
 
 The integration suite already drives the server module against live Postgres.
-This exists for the part that cannot: two independent Clerk sessions, two
+This exists for the part that cannot: two independent sessions, two
 browser contexts that share no cookies, and the actual screens a player uses.
 
 The specific thing it is here to catch is a leak. Both fairness rules — the
@@ -25,12 +25,13 @@ import urllib.request
 
 from playwright.sync_api import sync_playwright
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from account import delete_account, probe_email, sign_up  # noqa: E402
+
 BASE = os.environ.get("BASE", "http://localhost:3000")
-PASSWORD = "Sub15-Cubeduel-Probe-2026"
-STAMP = int(time.time())
 PLAYERS = [
-    {"email": f"chal-a-{STAMP}+clerk_test@example.com", "label": "A"},
-    {"email": f"chal-b-{STAMP}+clerk_test@example.com", "label": "B"},
+    {"email": probe_email("chal-a"), "label": "A"},
+    {"email": probe_email("chal-b"), "label": "B"},
 ]
 FAILS = []
 
@@ -50,75 +51,6 @@ def env(name):
             if line.startswith(f"{name}="):
                 return line.split("=", 1)[1].strip()
     return None
-
-
-SECRET = env("CLERK_SECRET_KEY")
-PUBLISHABLE = env("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY")
-FAPI = base64.b64decode(re.sub(r"^pk_(test|live)_", "", PUBLISHABLE)).decode().rstrip("$")
-
-
-def clerk(path, method="GET", payload=None):
-    """Cloudflare 403s urllib's default user agent, which looks exactly like a bad key."""
-    req = urllib.request.Request(
-        f"https://api.clerk.com/v1/{path}",
-        data=json.dumps(payload).encode() if payload is not None else None,
-        method=method,
-        headers={
-            "Authorization": f"Bearer {SECRET}",
-            "Content-Type": "application/json",
-            "User-Agent": (
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
-            ),
-        },
-    )
-    with urllib.request.urlopen(req) as r:
-        raw = r.read()
-    return json.loads(raw) if raw else None
-
-
-def create_account(email):
-    clerk("users", "POST", {
-        "email_address": [email],
-        "password": PASSWORD,
-        "skip_password_checks": True,
-    })
-
-
-def delete_account(email):
-    try:
-        for user in clerk(f"users?email_address={urllib.parse.quote(email)}") or []:
-            clerk(f"users/{user['id']}", method="DELETE")
-    except Exception as exc:
-        print(f"  (cleanup warning: {exc})")
-
-
-def sign_in(page, email):
-    """Signs in through the real widget. Every Continue is `.last` — earlier steps stay mounted."""
-    page.locator("button:has-text('Sign in')").first.click()
-    page.wait_for_timeout(5000)
-    page.locator("input[name='identifier']").last.fill(email)
-    page.wait_for_timeout(500)
-    page.locator("button:has-text('Continue')").last.click()
-    page.wait_for_timeout(6000)
-    page.locator("input[name='password']").last.fill(PASSWORD)
-    page.wait_for_timeout(500)
-    page.locator("button:has-text('Continue')").last.click()
-    page.wait_for_timeout(9000)
-
-    # Clerk demands an emailed code for an unrecognised device, which is every
-    # run. A `+clerk_test` address always takes 424242 and sends no mail.
-    if "Check your email" in page.inner_text("body"):
-        code = page.locator("input[inputmode='numeric']")
-        if code.count():
-            code.first.click()
-            page.wait_for_timeout(300)
-        page.keyboard.type("424242", delay=140)
-        page.wait_for_timeout(7000)
-        cont = page.locator("button:has-text('Continue')")
-        if cont.count() and cont.last.is_visible():
-            cont.last.click()
-            page.wait_for_timeout(6000)
 
 
 def handle_of(page):
@@ -163,7 +95,9 @@ with sync_playwright() as p:
     # Two contexts, so the two players share no cookies and no session.
     contexts = []
     for player in PLAYERS:
-        create_account(player["email"])
+        # The account is created from inside the browser now, so it happens
+        # below where the page exists — creating it here would leave the session
+        # cookie in the wrong place, or nowhere.
         ctx = browser.new_context(viewport={"width": 1440, "height": 1000})
         page = ctx.new_page()
         page.on("pageerror", lambda e: errors.append(str(e)))
@@ -173,8 +107,11 @@ with sync_playwright() as p:
     handles = {}
     for _, page, player in contexts:
         page.goto(BASE + "/duel", wait_until="domcontentloaded")
-        page.wait_for_timeout(3500)
-        sign_in(page, player["email"])
+        page.wait_for_timeout(1500)
+        sign_up(page, player["email"])
+        # Reloaded so the page renders with the session it just acquired.
+        page.reload(wait_until="domcontentloaded")
+        page.wait_for_timeout(2500)
         handle = handle_of(page)
         handles[player["label"]] = handle
         check(f"player {player['label']} has a handle", handle is not None, handle or "none")

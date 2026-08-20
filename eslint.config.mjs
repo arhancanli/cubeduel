@@ -45,6 +45,7 @@ const eslintConfig = defineConfig([
      * six e2e-verified screens for one extra render on mount.
      */
     files: [
+      "src/components/AccountPanel.tsx",
       "src/components/ClaimScreen.tsx",
       "src/components/DailyRound.tsx",
       "src/components/GoalPanel.tsx",

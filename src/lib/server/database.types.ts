@@ -157,7 +157,8 @@ export interface Database {
       profiles: {
         Row: {
           id: string;
-          clerk_user_id: string;
+          /** Dead since migration 0009. Nothing reads it. */
+          clerk_user_id: string | null;
           user_id: string | null;
           handle: string;
           display_name: string;
@@ -168,7 +169,7 @@ export interface Database {
         };
         Insert: {
           id?: string;
-          clerk_user_id: string;
+          clerk_user_id?: string | null;
           user_id?: string | null;
           handle: string;
           display_name: string;

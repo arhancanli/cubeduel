@@ -14,6 +14,7 @@ import { EVENTS, EVENT_IDS } from "../src/lib/events";
 import { ratingForMs } from "../src/lib/rating";
 import { issueAttempt, submitAttempt } from "../src/lib/server/ranked";
 import { db } from "../src/lib/server/supabase";
+import { makeProbeProfile, cleanupProbes } from "./probeAccount.mjs";
 
 const HANDLE = "events-probe";
 let failures = 0;
@@ -34,22 +35,23 @@ function solutionFor(scramble: string): string[] {
 
 async function cleanup() {
   await db().from("profiles").delete().eq("handle", HANDLE);
+  // The probe accounts too, not only the profiles. `users` cascades to
+  // profiles, so deleting the profile alone leaves the account behind — and
+  // those accumulate silently, because nothing in the app ever lists them.
+  await cleanupProbes();
 }
 
 async function main() {
   console.log("\n== setup ==");
   await cleanup();
-  const { data: profile } = await db()
-    .from("profiles")
-    .insert({
-      clerk_user_id: `events_${Date.now()}`,
-      handle: HANDLE,
-      display_name: "Events Probe",
-    })
-    .select("*")
-    .single();
+  let profile;
+  try {
+    ({ profile } = await makeProbeProfile("events", HANDLE, "Events Probe"));
+  } catch (cause) {
+    check("a profile exists", false, String(cause));
+    return;
+  }
   check("a profile exists", Boolean(profile));
-  if (!profile) return;
 
   for (const id of EVENT_IDS) {
     const def = EVENTS[id];

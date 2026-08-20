@@ -1,6 +1,6 @@
 "use client";
 
-import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
+import { useSession } from "@/lib/useSession";
 import Link from "next/link";
 
 /**
@@ -106,35 +106,44 @@ export function SiteHeader({
 }
 
 /**
- * Clerk v7 replaced the `<SignedIn>` / `<SignedOut>` components with `<Show>`,
- * which in the App Router is an async server component and cannot be used inside a
- * client component. The hook is the client-side equivalent.
+ * The account corner.
  *
- * A fixed-width placeholder holds the slot while auth resolves, so the nav does not
- * jump sideways a beat after the page paints.
+ * A fixed-width placeholder holds the slot while the session resolves, so the
+ * nav does not jump sideways a beat after the page paints. That mattered under
+ * Clerk and it matters now for the same reason — the answer arrives over the
+ * network, and layout that settles late reads as a page still loading.
+ *
+ * Signed in, this is a link to settings rather than a menu. There are exactly
+ * two things an account holder does here — change their handle and sign out —
+ * and both live on the settings page. A dropdown holding two items is
+ * ceremony.
  */
 function AuthControl() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { loaded, session } = useSession();
 
-  if (!isLoaded) return <span className="inline-block w-14" aria-hidden="true" />;
+  // Not `!session.signedIn` — before the answer arrives the honest state is
+  // "unknown", and rendering "Sign in" at somebody who is signed in is the
+  // flash this placeholder exists to prevent.
+  if (!loaded) return <span className="inline-block w-14" aria-hidden="true" />;
 
-  if (isSignedIn) {
+  if (session.signedIn) {
     return (
-      <span className="flex items-center">
-        <UserButton />
-      </span>
+      <Link
+        href="/settings"
+        className="rounded-md border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+      >
+        {session.handle ?? "Account"}
+      </Link>
     );
   }
 
   return (
-    <SignInButton mode="modal">
-      <button
-        type="button"
-        className="rounded-md border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-muted-dim hover:text-foreground"
-      >
-        Sign in
-      </button>
-    </SignInButton>
+    <Link
+      href="/sign-in"
+      className="rounded-md border border-border px-2.5 py-1 text-xs text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+    >
+      Sign in
+    </Link>
   );
 }
 

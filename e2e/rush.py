@@ -25,9 +25,11 @@ import urllib.request
 
 from playwright.sync_api import sync_playwright
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from account import delete_account, probe_email, sign_up  # noqa: E402
+
 BASE = os.environ.get("BASE", "http://localhost:3000")
-EMAIL = f"rush-{int(time.time())}+clerk_test@example.com"
-PASSWORD = "Sub15-Cubeduel-Probe-2026"
+EMAIL = probe_email("rush")
 FAILS = []
 
 
@@ -46,53 +48,6 @@ def env(name):
             if line.startswith(f"{name}="):
                 return line.split("=", 1)[1].strip()
     return None
-
-
-SECRET = env("CLERK_SECRET_KEY")
-
-
-def clerk(path, method="GET", payload=None):
-    """Cloudflare 403s urllib's default user agent, which looks exactly like a bad key."""
-    req = urllib.request.Request(
-        f"https://api.clerk.com/v1/{path}",
-        data=json.dumps(payload).encode() if payload is not None else None,
-        method=method,
-        headers={
-            "Authorization": f"Bearer {SECRET}",
-            "Content-Type": "application/json",
-            "User-Agent": (
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
-            ),
-        },
-    )
-    with urllib.request.urlopen(req) as r:
-        raw = r.read()
-    return json.loads(raw) if raw else None
-
-
-def sign_in(page):
-    page.locator("button:has-text('Sign in')").first.click()
-    page.wait_for_timeout(5000)
-    page.locator("input[name='identifier']").last.fill(EMAIL)
-    page.wait_for_timeout(500)
-    page.locator("button:has-text('Continue')").last.click()
-    page.wait_for_timeout(6000)
-    page.locator("input[name='password']").last.fill(PASSWORD)
-    page.wait_for_timeout(500)
-    page.locator("button:has-text('Continue')").last.click()
-    page.wait_for_timeout(9000)
-    if "Check your email" in page.inner_text("body"):
-        code = page.locator("input[inputmode='numeric']")
-        if code.count():
-            code.first.click()
-            page.wait_for_timeout(300)
-        page.keyboard.type("424242", delay=140)
-        page.wait_for_timeout(7000)
-        cont = page.locator("button:has-text('Continue')")
-        if cont.count() and cont.last.is_visible():
-            cont.last.click()
-            page.wait_for_timeout(6000)
 
 
 KEYS = {
@@ -170,12 +125,10 @@ with sync_playwright() as p:
     check("rush is gated behind an account", "Sign in to run" in page.inner_text("body"))
 
     print("\n== signing in ==")
-    clerk("users", "POST", {
-        "email_address": [EMAIL],
-        "password": PASSWORD,
-        "skip_password_checks": True,
-    })
-    sign_in(page)
+    # The page has to be loaded before the fetch, so the request is same-origin
+    # and the session cookie lands in this browser rather than nowhere.
+    page.goto(BASE + "/", wait_until="domcontentloaded")
+    sign_up(page, EMAIL)
     page.goto(BASE + "/rush", wait_until="domcontentloaded")
     page.wait_for_timeout(5000)
     body = page.inner_text("body")
@@ -264,12 +217,7 @@ with sync_playwright() as p:
     browser.close()
 
 print("\n== cleanup ==")
-try:
-    for user in clerk(f"users?email_address={urllib.parse.quote(EMAIL)}") or []:
-        clerk(f"users/{user['id']}", method="DELETE")
-    print("  test account removed")
-except Exception as exc:
-    print(f"  (cleanup warning: {exc})")
+print("  test account removed" if delete_account(EMAIL) else "  (cleanup warning)")
 
 print("\n" + "=" * 52)
 print(f"{'FAILURES: ' + str(len(FAILS)) if FAILS else 'All checks passed.'}")

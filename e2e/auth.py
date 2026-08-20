@@ -20,13 +20,14 @@ account it creates.
 
 import os
 import sys
-import time
-import urllib.request
 
 from playwright.sync_api import sync_playwright
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from account import delete_account, probe_email  # noqa: E402
+
 BASE = os.environ.get("CUBEDUEL_BASE", "http://localhost:3000")
-EMAIL = f"e2e-passkey-{int(time.time())}@cubeduel.test"
+EMAIL = probe_email("e2e-passkey")
 
 failures = 0
 
@@ -39,27 +40,15 @@ def check(label, ok, detail=""):
 
 
 def cleanup():
-    """Removes the account through PostgREST, using the same key the app uses."""
-    url = os.environ.get("NEXT_PUBLIC_SUPABASE_URL")
-    key = os.environ.get("SUPABASE_SECRET_KEY")
-    if not url or not key:
-        print("  (no database credentials in the environment — skipping cleanup)")
-        return
-    request = urllib.request.Request(
-        f"{url}/rest/v1/users?email=eq.{EMAIL}",
-        method="DELETE",
-        headers={
-            "apikey": key,
-            "Authorization": f"Bearer {key}",
-            # Cloudflare 403s urllib's default agent, which looks exactly like a
-            # bad key if you do not know to expect it.
-            "User-Agent": "Mozilla/5.0",
-        },
-    )
-    try:
-        urllib.request.urlopen(request)
-    except Exception as cause:  # noqa: BLE001 - cleanup must never fail the run
-        print(f"  (cleanup failed: {cause})")
+    """Removes the account, using the shared reader that also looks in .env.local.
+
+    This used to read `os.environ` alone and silently print "skipping cleanup"
+    whenever the suite was run without the file sourced — which is how it is
+    normally run. The accounts it left behind were invisible until somebody
+    counted rows.
+    """
+    if not delete_account(EMAIL):
+        print("  (cleanup failed)")
 
 
 def main():

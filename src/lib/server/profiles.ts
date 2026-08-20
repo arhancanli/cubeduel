@@ -1,6 +1,6 @@
 import "server-only";
 
-import { auth, currentUser } from "@clerk/nextjs/server";
+import { currentSession } from "./currentUser";
 
 import { isValidHandle } from "../handle";
 import { db } from "./supabase";
@@ -9,27 +9,31 @@ import { createProfileFor, profileFor, type Profile } from "./profileStore";
 export type { Profile };
 
 /**
- * Clerk owns who someone is; this table owns who they are *here* — the handle,
+ * `users` owns who someone is; this table owns who they are *here* — the handle,
  * the public page, and the rows every rating and solve hang off.
  *
- * The two are joined on `clerk_user_id` rather than by copying Clerk's id into a
- * primary key, so a future move off Clerk changes one column instead of every
- * foreign key in the schema.
+ * The two are joined on `profiles.user_id` rather than by making the account id
+ * the profile's primary key. That was true when identity came from Clerk and it
+ * stays true now: the account is the thing that can be deleted, replaced, or
+ * migrated again, and none of that should reach a foreign key on a solve.
+ *
+ * The move off Clerk cost exactly the one column the original comment here
+ * promised it would.
  */
 
 /** The signed-in player's profile, or null. Never creates one. */
 export async function currentProfile(): Promise<Profile | null> {
-  const { userId } = await auth();
-  if (!userId) return null;
-  return profileFor(userId);
+  const session = await currentSession();
+  if (!session) return null;
+  return profileFor(session.user.id);
 }
 
 /**
  * The signed-in player's profile, creating it on first sight.
  *
  * Nobody is stopped at a naming form. The app's whole stance is that an account
- * earns itself after someone already cares, so a handle is seeded from whatever
- * Clerk knows and can be changed later in settings. Being made to invent a
+ * earns itself after someone already cares, so a handle is seeded from the
+ * address and can be changed later in settings. Being made to invent a
  * permanent public name before seeing a single screen is exactly the friction
  * that kills conversion.
  *
@@ -38,21 +42,24 @@ export async function currentProfile(): Promise<Profile | null> {
  * without a browser.
  */
 export async function ensureProfile(): Promise<Profile | null> {
-  const { userId } = await auth();
-  if (!userId) return null;
+  const session = await currentSession();
+  if (!session) return null;
 
-  const existing = await profileFor(userId);
+  const existing = await profileFor(session.user.id);
   if (existing) return existing;
 
-  // Only now is a Clerk Backend API call worth making — it is rate-limited and
-  // the session already told us the id, which is all the common path needs.
-  const user = await currentUser();
-  const displayName =
-    [user?.firstName, user?.lastName].filter(Boolean).join(" ").trim() ||
-    user?.username ||
-    "Cuber";
+  // Seeded from the local part of the address. It used to come from Clerk's
+  // profile — a first name, a last name, a username — which meant a round trip
+  // to a rate-limited third-party API on somebody's very first page load.
+  //
+  // The address is already in hand, and a handle derived from it is no worse:
+  // both are a starting point nobody chose, and both are changed in settings.
+  // What matters is that nobody is stopped at a naming form before they have
+  // seen the product.
+  const local = session.user.email.split("@")[0] ?? "";
+  const displayName = local.trim() || "Cuber";
 
-  return createProfileFor(userId, displayName, user?.username ?? null);
+  return createProfileFor(session.user.id, displayName, local || null);
 }
 
 /** Public lookup for `/u/<handle>`. Case-insensitive, since URLs get retyped. */

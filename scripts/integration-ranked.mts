@@ -6,8 +6,9 @@
  * executed until the schema existed: issue a server-side scramble, solve it,
  * have the server replay and verify it, and watch a rating actually appear.
  *
- * Everything except Clerk is real: real Supabase, real random-state scrambles,
- * real KPuzzle replay, real atomic rating window. Clerk is skipped by inserting
+ * Everything is real: a real account, real Supabase, real random-state
+ * scrambles, real KPuzzle replay, a real atomic rating window. Only the browser
+ * is skipped — the profile is created directly rather than by signing in,
  * the profile row directly, which is all `ensureProfile` would have done.
  *
  *   npm run integration
@@ -38,6 +39,7 @@ import {
   submitAttempt,
 } from "../src/lib/server/ranked";
 import { db } from "../src/lib/server/supabase";
+import { makeProbeProfile, cleanupProbes } from "./probeAccount.mjs";
 
 const HANDLE = "integration-probe";
 /** A fast but entirely human solve. The script waits this long for each one. */
@@ -66,6 +68,10 @@ function stream(moves: string[], gapMs: number) {
 
 async function cleanup() {
   await db().from("profiles").delete().eq("handle", HANDLE);
+  // The probe accounts too, not only the profiles. `users` cascades to
+  // profiles, so deleting the profile alone leaves the account behind — and
+  // those accumulate silently, because nothing in the app ever lists them.
+  await cleanupProbes();
 }
 
 const seen = new Set<string>();
@@ -110,18 +116,16 @@ async function main() {
   console.log("\n== setup ==");
   await cleanup();
 
-  const { data: profile, error } = await db()
-    .from("profiles")
-    .insert({
-      clerk_user_id: `integration_${Date.now()}`,
-      handle: HANDLE,
-      display_name: "Integration Probe",
-    })
-    .select("*")
-    .single();
-
-  check("a profile can be created", Boolean(profile) && !error, error?.message ?? "");
-  if (!profile) return;
+  // A real account behind the profile, because `profiles.user_id` now has a
+  // foreign key. See scripts/probeAccount.mts.
+  let profile;
+  try {
+    ({ profile } = await makeProbeProfile("ranked", HANDLE, "Integration Probe"));
+  } catch (cause) {
+    check("a profile can be created", false, String(cause));
+    return;
+  }
+  check("a profile can be created", Boolean(profile));
 
   console.log("\n== the server issues the puzzle ==");
   const first = await issueAttempt(profile.id, "333", "keyboard");

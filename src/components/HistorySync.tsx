@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
+import { useSession } from "@/lib/useSession";
 import { useEffect, useRef } from "react";
 
 import { syncLocalHistory } from "@/lib/sync";
@@ -22,11 +22,11 @@ import { syncLocalHistory } from "@/lib/sync";
  *   about a problem they cannot act on.
  */
 export function HistorySync() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { loaded, session } = useSession();
   const done = useRef(false);
 
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || done.current) return;
+    if (!loaded || !session.signedIn || done.current) return;
     done.current = true;
 
     const timer = setTimeout(() => {
@@ -34,7 +34,7 @@ export function HistorySync() {
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, [isLoaded, isSignedIn]);
+  }, [loaded, session.signedIn]);
 
   return null;
 }

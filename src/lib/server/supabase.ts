@@ -10,8 +10,8 @@ import type { Database } from "./database.types";
  * Every table has RLS enabled with no policies, which denies the anon and
  * authenticated roles outright. Nothing reaches Postgres except through this
  * client, which means every read and write passes through server code that has
- * already checked Clerk auth and, for anything ranked, re-verified the result
- * itself.
+ * already checked the session cookie and, for anything ranked, re-verified the
+ * result itself.
  *
  * That is a deliberate trade. Handing the browser a scoped key and writing RLS
  * policies is less code, but it puts the client on the write path for ratings and
@@ -40,9 +40,10 @@ export function db(): SupabaseClient<Database> {
     required("SUPABASE_SECRET_KEY"),
     {
       auth: {
-        // There is no Supabase user session here — Clerk owns identity, and this
-        // client is a trusted server actor. Persisting or refreshing a session
-        // would be meaningless and, in a serverless function, leaky.
+        // There is no Supabase user session here — identity is this
+        // application's own `sessions` table, and this client is a trusted
+        // server actor. Persisting or refreshing a session would be meaningless
+        // and, in a serverless function, leaky.
         persistSession: false,
         autoRefreshToken: false,
       },

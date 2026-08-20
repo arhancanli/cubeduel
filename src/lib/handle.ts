@@ -79,7 +79,7 @@ export function isValidHandle(handle: string): boolean {
 /**
  * Best-effort conversion of arbitrary text into a legal handle.
  *
- * Used to seed a handle from whatever Clerk knows about a new account, so nobody
+ * Used to seed a handle from a new account's email address, so nobody
  * is stopped at a naming form before they can do anything. Returns null when
  * there is nothing usable left, and the caller falls back to a generated name.
  */

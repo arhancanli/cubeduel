@@ -62,6 +62,35 @@ Two real examples, both already fixed, to show the kind of thing that qualifies:
 - **Opening your half of a challenge stamps a time that is never moved**, so
   closing the tab and returning does not buy a fresh fifteen seconds of inspection.
 
+### Identity is this project's own
+
+There is no identity provider. Accounts, sessions, passwords and passkeys are in
+`src/lib/auth/` and `src/lib/server/`, and that means bugs in them are ours —
+so they are in scope, and reports about them are especially welcome.
+
+- **Passwords** use scrypt from `node:crypto` at OWASP's memory-constrained
+  parameters, with a per-password salt and a constant-time comparison. Nothing
+  cryptographic is implemented by hand.
+- **Sessions are rows**, not signed tokens, so revocation actually revokes.
+  Cookies are `httpOnly`, `Secure`, `SameSite=Lax` and carry the `__Host-`
+  prefix in production. Only the SHA-256 of a session token is stored.
+- **Sign-in reveals nothing about who has an account.** A wrong password, an
+  unknown address and a passkey-only account return the same message, and an
+  unknown address still pays for a password hash so the two cannot be told apart
+  by timing. Sign-up is the one endpoint that must admit an address is taken.
+- **Passkeys** are verified against the challenge this server issued, for this
+  origin, for this relying party, with the key registered to that account.
+  Origins are compared for equality, never with `startsWith`.
+- **Rate limits count successes as well as failures**, because an attacker
+  spraying one common password across many accounts fails at most once per
+  account and would otherwise never trip a per-account counter.
+
+Things worth attacking, if you are looking: replaying a WebAuthn assertion or a
+consumed challenge, completing a ceremony started for another account, removing
+a passkey belonging to somebody else, learning whether an address is registered
+from any endpoint other than sign-up, and anything that lets a password reset
+leave an existing session alive.
+
 ## What is knowingly not solved
 
 Stated plainly because pretending otherwise would be the actual risk.

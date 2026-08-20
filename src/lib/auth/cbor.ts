@@ -3,10 +3,9 @@
  *
  * WebAuthn's attestation object and its public keys are CBOR (RFC 8949), so
  * something has to decode it. The options were a dependency or about two hundred
- * lines, and two hundred lines won for the same reason the Svix signature check
- * in `webhookSignature.ts` is written out rather than installed: this is a
- * repository meant to be read, and the parser standing between an attacker's
- * bytes and a public key is exactly the part an auditor wants to see.
+ * lines, and two hundred lines won for one reason: this is a repository meant to
+ * be read, and the parser standing between an attacker's bytes and a public key
+ * is exactly the part an auditor wants to see.
  *
  * ## Deliberately partial
  *

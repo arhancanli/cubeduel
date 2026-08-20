@@ -5,16 +5,8 @@ Everything else is verified in pieces: the rating maths and verifier by unit
 tests, the server modules against the live database by `npm run integration`,
 and the signed-out browser flows by the other e2e suites.
 
-This covers the one seam none of those touch — a real Clerk session travelling
-from the browser, through the proxy, into a route handler, and out to Postgres.
-It is worth its own suite because of a specific failure that would otherwise
-ship silently: an anonymous request gets a 401 whether the auth middleware is
-working or missing entirely. If `proxy.ts` were not wired up, signed-in users
-would get 401 too, and every check that only pokes the routes anonymously would
-still pass.
-
-Uses a Clerk test email (`+clerk_test`), which on a development instance takes
-the fixed verification code 424242 and sends no real mail.
+This covers the one seam none of those touch — a real session cookie travelling
+from the browser into a route handler and out to Postgres.
 
     BASE=http://localhost:3210 python3 e2e/duel.py
 """
@@ -30,14 +22,11 @@ import urllib.request
 
 from playwright.sync_api import sync_playwright
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from account import delete_account, probe_email, sign_up  # noqa: E402
+
 BASE = os.environ.get("BASE", "http://localhost:3000")
-# `+clerk_test` addresses are Clerk's test identities: no mail is sent and the
-# verification code is always 424242 on a development instance.
-# The uniqueness goes in the PREFIX. Clerk recognises a test identity by the
-# exact `+clerk_test` subaddress, so `+clerk_test_1786902@` is NOT a test email —
-# it silently becomes a real sign-up that waits for a mail that never arrives.
-EMAIL = f"cubeduel-duel-{int(time.time())}+clerk_test@example.com"
-PASSWORD = "Sub15-Cubeduel-Probe-2026"
+EMAIL = probe_email("duel")
 FAILS = []
 
 
@@ -51,63 +40,6 @@ def env(name):
             if line.startswith(f"{name}="):
                 return line.split("=", 1)[1].strip()
     return None
-
-
-SECRET = env("CLERK_SECRET_KEY")
-PUBLISHABLE = env("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY")
-
-# The frontend API host is base64-encoded inside the publishable key.
-FAPI = base64.b64decode(re.sub(r"^pk_(test|live)_", "", PUBLISHABLE)).decode().rstrip("$")
-
-
-def clerk(path, method="GET", payload=None):
-    """
-    Calls Clerk's Backend API.
-
-    The user agent is not optional: Cloudflare sits in front of api.clerk.com and
-    blocks urllib's default `Python-urllib/x.y` with error 1010, which arrives as
-    a bare 403 and looks exactly like a rejected key.
-    """
-    req = urllib.request.Request(
-        f"https://api.clerk.com/v1/{path}",
-        data=json.dumps(payload).encode() if payload is not None else None,
-        method=method,
-        headers={
-            "Authorization": f"Bearer {SECRET}",
-            "Content-Type": "application/json",
-            "User-Agent": (
-                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-                "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36"
-            ),
-        },
-    )
-    with urllib.request.urlopen(req) as r:
-        raw = r.read()
-    return json.loads(raw) if raw else None
-
-
-def testing_token():
-    """
-    Clerk's official bot-protection bypass for automated tests.
-
-    Without it, sign-up in headless Chromium dies on "The CAPTCHA failed to
-    load" — Cloudflare Turnstile cannot run there. That is a limitation of the
-    test browser, not of the product, and Clerk provides this endpoint precisely
-    so a suite can prove the real flow works anyway.
-    """
-    return clerk("testing_tokens", method="POST")["token"]
-
-
-def delete_test_user(email):
-    """Test accounts are removed so the instance does not silt up."""
-    try:
-        users = clerk(f"users?email_address={urllib.parse.quote(email)}") or []
-        for user in users:
-            clerk(f"users/{user['id']}", method="DELETE")
-        return len(users)
-    except Exception as exc:  # cleanup must never fail the suite
-        print(f"  (cleanup warning: {exc})")
-        return 0
 
 
 KEY_FOR_MOVE = {
@@ -149,89 +81,11 @@ def solve_scramble(page, scramble, pace_ms):
             page.wait_for_timeout(pace_ms)
 
 
-def create_account():
-    """
-    Creates the test account through Clerk's Backend API.
-
-    The suite used to sign up through the widget, which stopped working: the
-    instance has bot protection on, so submitting the sign-up form renders a
-    Cloudflare Turnstile challenge that headless Chromium cannot solve. No
-    request is ever made — the form simply never submits — so the failure
-    surfaced as "still gated" and read like a broken app.
-
-    Clerk's testing tokens are meant to bypass exactly this, and are still
-    attached to every frontend call below, but they do not suppress the widget
-    on this instance: `/v1/environment` reports bot protection enabled with or
-    without one.
-
-    Creating the user server-side and signing in through the real widget keeps
-    what this suite exists to prove. The seam under test is a Clerk session
-    travelling from the browser, through the proxy, into a route handler and out
-    to Postgres — sign-in exercises every part of that. What is lost is coverage
-    of Clerk's own sign-up form, which is Clerk's code, not this app's.
-    """
-    clerk(
-        "users",
-        method="POST",
-        payload={
-            "email_address": [EMAIL],
-            "password": PASSWORD,
-            # The password is a fixed test string and deliberately not a strong
-            # one; Clerk's breach check would otherwise reject it.
-            "skip_password_checks": True,
-        },
-    )
-
-
-def sign_in(page):
-    """
-    Signs in through the real widget.
-
-    Every `Continue` is `.last`, not `.first`: the modal keeps earlier steps
-    mounted, so `.first` clicks a button belonging to a screen that is no longer
-    showing and silently does nothing.
-    """
-    page.locator("button:has-text('Sign in')").first.click()
-    page.wait_for_timeout(5000)
-
-    page.locator("input[name='identifier']").last.fill(EMAIL)
-    page.wait_for_timeout(500)
-    page.locator("button:has-text('Continue')").last.click()
-    page.wait_for_timeout(6000)
-
-    page.locator("input[name='password']").last.fill(PASSWORD)
-    page.wait_for_timeout(500)
-    page.locator("button:has-text('Continue')").last.click()
-    page.wait_for_timeout(9000)
-
-    # Clerk asks for an emailed code the first time an account signs in from an
-    # unrecognised device, which is every run. A `+clerk_test` address always
-    # takes 424242 and no mail is sent.
-    if "Check your email" in page.inner_text("body"):
-        code = page.locator("input[inputmode='numeric']")
-        if code.count():
-            code.first.click()
-            page.wait_for_timeout(300)
-        page.keyboard.type("424242", delay=140)
-        page.wait_for_timeout(7000)
-        cont = page.locator("button:has-text('Continue')")
-        if cont.count() and cont.last.is_visible():
-            cont.last.click()
-            page.wait_for_timeout(6000)
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True)
     page = browser.new_page(viewport={"width": 1440, "height": 1000})
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
-
-    token = testing_token()
-
-    def with_token(route):
-        url = route.request.url
-        joiner = "&" if "?" in url else "?"
-        route.continue_(url=f"{url}{joiner}__clerk_testing_token={token}")
-
-    page.route(f"https://{FAPI}/**", with_token)
 
     print("\n== signed out ==")
     page.goto(BASE + "/duel", wait_until="domcontentloaded")
@@ -239,8 +93,7 @@ with sync_playwright() as p:
     check("duelling is gated behind an account", "Sign in to duel" in page.inner_text("body"))
 
     print("\n== signing in ==")
-    create_account()
-    sign_in(page)
+    sign_up(page, EMAIL)
     page.goto(BASE + "/duel", wait_until="domcontentloaded")
     page.wait_for_timeout(4000)
     body_text = page.inner_text("body")
@@ -299,7 +152,8 @@ with sync_playwright() as p:
     browser.close()
 
 print("\n== cleanup ==")
-removed = delete_test_user(EMAIL)
+# One statement: `users` cascades to the profile, its solves and its duels.
+removed = 1 if delete_account(EMAIL) else 0
 check("the test account was removed", removed >= 0, f"{removed} deleted")
 
 print("\n" + "=" * 52)
