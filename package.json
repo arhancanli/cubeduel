@@ -21,6 +21,7 @@
     "integration:challenges": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-challenges.mts",
     "integration:rush": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-rush.mts",
     "integration:passkeys": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-passkeys.mts",
+    "integration:accounts": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-accounts.mts",
     "integration:events": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-events.mts",
     "integration:profile-race": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-profile-race.mts",
     "dailies:annotate": "tsx scripts/annotate-dailies.mts"
