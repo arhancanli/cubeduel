@@ -143,7 +143,7 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 334 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 345 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 10 browser suites | Real Chromium, real keypresses, real solves. Includes a real Clerk session driving a ranked solve and a duel end to end, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
@@ -414,6 +414,44 @@ charge it is worse than showing no clock at all. `npm run integration` sits on a
 scramble past the limit and asserts the server applies a DNF the client never sent:
 a rule that is correct, unit-tested and never actually executed is not a rule.
 
+### Does a human look like this? (`src/lib/humanness.ts`)
+
+Verification proves a move stream really solves the scramble it was issued for.
+It cannot prove a person produced it: a program that solves the cube and replays
+the answer at a believable speed passes every check in `verifySolve.ts`, and
+always will. This layer looks at *how* the moves arrived instead.
+
+**Move count** is the strongest signal, because the obvious cheat is to replay an
+engine's answer and an engine's answer is 20 moves. A human solving 3x3 with CFOP
+takes around 55; under about 30 while racing a clock is not a talented person, it
+is a search.
+
+**Pauses** are the second. People stop — to find the next pair, to recognise the
+last layer — and those stops are long relative to their turning. A replayed
+solution has no reason to pause, so its gaps cluster tightly around one value.
+
+**Rhythm** is the third. Even mid-burst, human turning wanders: fingers, grip
+changes, a cube that catches. Perfectly even spacing is a metronome, and a
+metronome is the cheapest cheat to write.
+
+The score is the *worst* signal rather than the average, because these are
+alternative ways of being impossible rather than parts of one measurement — a
+twenty-move solve is damning whatever its rhythm looked like, and averaging would
+let three ordinary signals dilute one that is conclusive.
+
+**Nothing is acted on automatically, and that is deliberate.** Every signal has a
+false-positive story: a short solve happens when the scramble is kind, a low-pause
+solve happens on a case somebody has drilled a thousand times. The cost of being
+wrong is asymmetric — a missed cheat costs one rating, a wrongly banned player
+costs the belief the whole ladder runs on. So the score is stored for review, the
+threshold is set high, and a *run* of flagged solves from one account is the
+question worth asking rather than any single one.
+
+The test that matters most is that it flags this repository's own integration
+harness, which paces solves evenly by inverting the scramble — exactly the shape a
+replayed answer has. A detector that could not see that could not see the real
+thing either.
+
 ### Verification (`src/lib/verifySolve.ts`)
 
 The server issues the scramble, so there is nothing to cherry-pick and nothing to
@@ -506,8 +544,10 @@ turning faster or pausing less."*
   channel, and needs a population before it needs code. The `challenges` row is
   shaped for it: both sides are symmetric and independently timestamped, so live
   is the case where the two `started_at` values happen to coincide.
-- **Behavioural anti-cheat.** Verification proves a solve is real, not human. Catching
-  assistance needs analysis across many results, not a check on one.
+- **Acting on the humanness score.** Every verified solve is now assessed and the
+  score stored (see below), but nothing consults it automatically. Turning a
+  statistic into a ban needs a review process and an appeal, and shipping the
+  enforcement before those exist would be the wrong order.
 - **Smart cubes are still unverified against hardware.** The Bluetooth path is written
   and typechecked but has never been run against a GAN/GoCube/GiiKER. Treat it as
   unproven until it is. The `smartcube` rating pool exists and is deliberately separate

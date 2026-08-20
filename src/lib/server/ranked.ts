@@ -11,6 +11,7 @@ import {
 import type { Timed } from "../stats";
 import { combinePenalties, judgeInspection } from "../inspection";
 import { eventOf } from "../events";
+import { humannessOf } from "../humanness";
 import type { Penalty } from "../types";
 import { ATTEMPT_TTL_MS, verifySolve, type SubmittedMove } from "../verifySolve";
 import { db } from "./supabase";
@@ -260,6 +261,12 @@ export async function submitAttempt(
       source: input.source,
       mode: "ranked",
       verified: true,
+      // Advisory only, and never consulted here. Verification says the moves
+      // solve the scramble; this says whether they arrived the way a person's
+      // moves arrive. Stored for review rather than acted on, because a missed
+      // cheat costs one rating and a wrongly flagged player costs the belief the
+      // ladder runs on.
+      humanness: humannessOf(input.moves, input.durationMs),
       moves: input.moves as never,
       splits: (input.splits ?? []) as never,
       oll_case: input.ollCase ?? null,

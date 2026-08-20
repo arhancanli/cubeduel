@@ -46,6 +46,7 @@ export interface Database {
       };
       solves: {
         Row: {
+          humanness: number | null;
           id: string;
           profile_id: string;
           client_id: string;
@@ -68,6 +69,7 @@ export interface Database {
           created_at: string;
         };
         Insert: {
+          humanness?: number | null;
           id?: string;
           profile_id: string;
           client_id: string;

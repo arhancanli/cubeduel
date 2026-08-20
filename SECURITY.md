@@ -68,9 +68,18 @@ Stated plainly because pretending otherwise would be the actual risk.
 
 **Verification proves a solve is real. It does not prove a human did it.** A
 program solving the issued scramble at a plausible turn rate, with plausible
-pauses, passes every check. This is the same position chess sites are in with
-engines, and it is answered the same way — behavioural analysis across many
-results, not a check on any single one. That layer does not exist yet.
+pauses, passes every check in the verifier. This is the same position chess sites
+are in with engines.
+
+A first behavioural layer now exists (`src/lib/humanness.ts`): every verified
+solve is scored on move count, pause structure and turning rhythm, and the score
+is stored. **Nothing acts on it.** Turning a statistic into a ban needs a review
+process and an appeal, and the cost of being wrong is asymmetric — a missed cheat
+costs one rating, a wrongly banned player costs the belief the ladder runs on.
+
+So reports of engine-like play are still expected to be about detection strategy
+rather than a bug, and are still welcome. A way to defeat the humanness signals
+while staying fast is a genuinely interesting report.
 
 Reports of *engine-like* play are therefore expected to be about detection
 strategy rather than a bug. They are still welcome.

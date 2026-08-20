@@ -124,6 +124,23 @@ async function main() {
       (stored ?? []).length === 3 && (stored ?? []).every((s) => s.mode === "rush"),
       `${(stored ?? []).length} rows`);
     check("and marked verified", (stored ?? []).every((s) => s.verified === true));
+
+    // The humanness score has to actually be written, or the whole layer is a
+    // module nothing calls. And this harness paces its solves evenly by
+    // inverting the scramble — which is exactly the shape a replayed engine
+    // answer has, so its own solves must come back flagged. A detector that
+    // could not see that could not see the real thing either.
+    const { data: scored } = await db()
+      .from("solves")
+      .select("humanness")
+      .eq("profile_id", profile.id);
+
+    check("a humanness score was recorded for every solve",
+      (scored ?? []).every((s) => s.humanness !== null),
+      (scored ?? []).map((s) => s.humanness).join(", "));
+    check("and this harness's own even pacing is flagged as non-human",
+      (scored ?? []).every((s) => (s.humanness ?? 0) >= 0.8),
+      (scored ?? []).map((s) => (s.humanness ?? 0).toFixed(2)).join(", "));
   }
 
   console.log("\n== a solve that misses the target costs a life ==");

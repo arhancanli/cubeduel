@@ -11,6 +11,7 @@ import {
 } from "../challenge";
 import { eventOf } from "../events";
 import { combinePenalties, judgeInspection } from "../inspection";
+import { humannessOf } from "../humanness";
 import type { Penalty } from "../types";
 import { verifySolve, type SubmittedMove } from "../verifySolve";
 import { db } from "./supabase";
@@ -436,6 +437,12 @@ export async function submitSide(input: SubmitInput): Promise<SubmitResult> {
       source: input.source,
       mode: "challenge",
       verified: true,
+      // Advisory only, and never consulted here. Verification says the moves
+      // solve the scramble; this says whether they arrived the way a person's
+      // moves arrive. Stored for review rather than acted on, because a missed
+      // cheat costs one rating and a wrongly flagged player costs the belief the
+      // ladder runs on.
+      humanness: humannessOf(input.moves, durationMs),
       moves: input.moves as never,
       splits: (input.splits ?? []) as never,
       solved_at: new Date(receivedAt).toISOString(),
