@@ -344,9 +344,35 @@ async function main() {
   {
     const mine = (await listPasskeys(userA.id))[0];
 
+    // B is given two passkeys of their own FIRST, and this is the whole point
+    // of the section rather than set-up noise.
+    //
+    // Without it the lockout guard refuses B before ownership is ever
+    // considered — B has no credentials, so "this is your only way in" fires
+    // and the check passes for a reason that has nothing to do with the
+    // passkey belonging to somebody else. Mutation-testing found exactly that:
+    // deleting the `.eq("user_id", ...)` scoping from removePasskey left this
+    // section green. A guard that cannot fail is worse than no guard, because
+    // it is believed.
+    //
+    // With two credentials of their own, B is past the lockout guard, and the
+    // only thing left standing between B and A's passkey is the owner scoping.
+    for (const label of ["b-first", "b-second"]) {
+      const options = await beginRegistration(userB);
+      const result = await finishRegistration({
+        userId: userB.id,
+        challenge: options!.challenge,
+        ...authenticator().register(options!.challenge),
+        label,
+      });
+      check(`B registered ${label}`, result.ok, result.ok ? "" : result.error);
+    }
+    check("B now has two passkeys, so the lockout guard cannot fire", (await listPasskeys(userB.id)).length === 2);
+
     const stolenRemove = await removePasskey(userB.id, mine.id);
     check("B cannot remove A's passkey", !stolenRemove.ok);
     check("...and it is still there", (await listPasskeys(userA.id)).length === 1);
+    check("...and B's own passkeys are untouched", (await listPasskeys(userB.id)).length === 2);
 
     const stolenRename = await renamePasskey(userB.id, mine.id, "owned");
     check("B cannot rename A's passkey", !stolenRename.ok);
