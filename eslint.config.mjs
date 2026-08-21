@@ -47,6 +47,8 @@ const eslintConfig = defineConfig([
     files: [
       "src/components/AccountPanel.tsx",
       "src/components/ClaimScreen.tsx",
+      "src/components/CubePicker.tsx",
+      "src/components/CubeView.tsx",
       "src/components/DailyRound.tsx",
       "src/components/GoalPanel.tsx",
       "src/components/LandingScreen.tsx",

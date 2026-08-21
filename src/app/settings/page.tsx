@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { AccountPanel, type DeviceRow, type PasskeyRow } from "@/components/AccountPanel";
+import { CubePicker } from "@/components/CubePicker";
 import { SiteHeader } from "@/components/SiteHeader";
 import { handleRejectionReason } from "@/lib/handle";
 import { currentSession } from "@/lib/server/currentUser";
@@ -145,6 +146,17 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
           Save
         </button>
       </form>
+
+      <section className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg font-medium tracking-tight">Your cube</h2>
+          <p className="max-w-lg text-sm leading-relaxed text-muted">
+            Applies everywhere a cube is drawn — the timer, the daily, duels and
+            the trainer.
+          </p>
+        </div>
+        <CubePicker />
+      </section>
 
       <AccountPanel
         email={session?.user.email ?? ""}
