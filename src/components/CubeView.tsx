@@ -171,7 +171,25 @@ export function CubeView({
         // Painted before the cube is revealed. The host starts at opacity 0 and
         // fades in when `ready` flips, so doing this first means nobody ever
         // sees the default palette flash to the chosen one.
-        await applyAppearance(player, appearanceId);
+        //
+        // Two guards, because the first version of this hid cubes.
+        //
+        // The 2D last-layer diagram has no Three.js object at all, so the
+        // repaint's promise never settled — and since `setReady` waited on it,
+        // every OLL and PLL case on /progress and in the coach rendered as an
+        // empty square. Nothing threw and nothing logged; the cubes were simply
+        // still at opacity 0, which reads as "the diagrams are broken".
+        //
+        // So: skipped where there is nothing to paint, and raced against a
+        // timeout everywhere else. Showing a cube in the wrong colours is a
+        // cosmetic disappointment; not showing it at all is a broken page, and
+        // the appearance must never be able to cause the second.
+        if (visualization === "3D") {
+          await Promise.race([
+            applyAppearance(player, appearanceId),
+            new Promise((resolve) => setTimeout(resolve, 2000)),
+          ]);
+        }
         if (cancelled) return;
 
         setReady(true);

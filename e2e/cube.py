@@ -24,6 +24,27 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
 BASE = os.environ.get("BASE", "http://localhost:3000")
+
+
+def history(n):
+    """A practice history with real phase splits, so /progress has cases to draw."""
+    solves, at = [], 1786900000000
+    for i in range(n):
+        cursor, splits = 0, []
+        for phase, duration in (("Cross", 1800), ("F2L", 8000), ("OLL", 2600), ("PLL", 2300)):
+            splits.append({
+                "phase": phase, "startMs": cursor, "endMs": cursor + duration,
+                "durationMs": duration, "moveCount": 12, "tps": 5,
+            })
+            cursor += duration
+        at += 60_000
+        solves.append({
+            "id": f"seed-{i}", "at": at, "scramble": "R U R' U'",
+            "durationMs": cursor, "penalty": "OK", "moveCount": 54, "tps": 3.6,
+            "splits": splits, "ollCase": "OLL 21", "pllCase": "T",
+            "ollSetup": "R U R' U R U2 R'", "pllSetup": None, "source": "keyboard",
+        })
+    return {"version": 1, "solves": solves}
 EMAIL = probe_email("cube-appearance")
 fails = 0
 
@@ -149,6 +170,43 @@ with sync_playwright() as p:
           page.evaluate("() => localStorage.getItem('cubeduel.cube.v1')") == "contrast",
           page.evaluate("() => localStorage.getItem('cubeduel.cube.v1')"))
     check("the settings page still loads", "sign in" in body or "settings" in body)
+
+    print("\n== every cube on every page actually becomes visible ==")
+    # The regression this exists for: the appearance repaint was awaited before
+    # the cube was revealed, and the 2D last-layer diagram has no Three.js
+    # object — so its promise never settled and every OLL and PLL case rendered
+    # as an empty square. Nothing threw, nothing logged, and the page looked
+    # merely disappointing rather than broken.
+    #
+    # Checked as computed opacity rather than as "the element exists", because
+    # the element existed the whole time.
+    # Seeded FIRST, because /progress draws its last-layer diagrams only when
+    # there are cases to draw — and the regression this guard exists for was on
+    # exactly that page. Without history the check passes having examined
+    # nothing, which is the failure mode it is meant to prevent.
+    page.goto("/", wait_until="domcontentloaded")
+    page.evaluate("""(s) => localStorage.setItem('cubeduel.history.v1', JSON.stringify(s))""", history(40))
+
+    for path in ("/play", "/timer", "/train", "/progress"):
+        page.goto(path, wait_until="domcontentloaded")
+        page.wait_for_timeout(7000)
+        hosts = page.evaluate("""() => [...document.querySelectorAll('[data-cube-view]')]
+            .map(h => ({
+                opacity: getComputedStyle(h).opacity,
+                hasPlayer: !!h.querySelector('twisty-player'),
+            }))""")
+
+        # A page that draws no cube is a failure here, not a skip. Every path in
+        # the list was chosen because it draws one, so "none found" means either
+        # the page changed or the set-up did — and a guard that quietly examines
+        # nothing is worse than no guard.
+        check(f"{path} draws at least one cube", len(hosts) > 0, f"{len(hosts)} found")
+        if not hosts:
+            continue
+
+        hidden = [h for h in hosts if h["opacity"] == "0" or not h["hasPlayer"]]
+        check(f"{path}: all {len(hosts)} cube(s) visible", not hidden,
+              f"{len(hidden)} hidden" if hidden else "")
 
     browser.close()
 

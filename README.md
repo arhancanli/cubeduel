@@ -11,6 +11,41 @@ practise the part that is actually slow.
 
 Solve with a keyboard, a Bluetooth smart cube, or a real cube and the spacebar.
 
+![The analysis page: F2L is 54% of your solve across 64 solves, with a per-phase
+breakdown and the cases worth drilling](docs/screens/progress.png)
+
+<sub>The part no other cubing site can do: your solve split into phases, ranked
+by the time you would actually get back.</sub>
+
+---
+
+## If you only read one section
+
+Three things here are unusual enough to be worth naming before the feature list.
+
+**A cube solver written from scratch.** Kociemba two-phase, no solver library:
+16 ms median, 20.54 moves mean against God's number of 20. It powers the move
+efficiency figure — *you took 58 quarter turns; this cube needed 20* — and the
+duel opponent. [How it works](docs/solver.md), including the pruning-table
+mistake that quietly turned the search into brute force, and the 40× cold start
+fix.
+
+**Results are proven rather than trusted.** The server generates the scramble,
+stores it, and replays your move stream against it. If the cube does not end
+solved, the result does not exist. The [security notes](SECURITY.md) say plainly
+what this does *not* prove, and a behavioural layer scores every solve for how
+human it looked without acting on it.
+
+**Identity is this project's own** — sessions, passwords and passkeys, including
+a hand-written CBOR decoder and both WebAuthn ceremonies, tested against RFC
+8949's own vectors and against Chromium's virtual authenticator. Nothing
+cryptographic is invented; the primitives are `node:crypto`.
+
+And a working habit that shows up throughout: **a check is not trusted until it
+has been made to fail.** Roughly fifty mutation tests in the history, each one a
+deliberate reintroduction of the bug the check exists for. Several of those
+found the check could not fail at all.
+
 ---
 
 ## What makes it different
