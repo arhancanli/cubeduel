@@ -239,13 +239,19 @@ console.log("Every commit is the owner's, and credits nobody else");
     fail(`Commits credited to somebody other than the owner: ${wrong.join(", ")}`);
   }
 
+  // Anchored to the start of a line, because a trailer is a line — and the
+  // first version of this matched anywhere in the message, so it failed on the
+  // commit that INTRODUCED it, which merely mentions the trailer in prose.
+  // A guard that fires on its own disclaimer is a guard nobody keeps.
   const bodies = execFileSync("git", ["log", "--format=%B"], { cwd: root, encoding: "utf8" });
-  const trailer = /co-authored-by|generated with|\bclaude\b|\banthropic\b/i;
-  if (trailer.test(bodies)) {
-    const offending = bodies
-      .split("\n")
-      .filter((line) => trailer.test(line))
-      .slice(0, 3);
+  const trailer = /^\s*(co-authored-by|signed-off-by\s*:.*(claude|anthropic)|generated with)\s*:/i;
+
+  const offending = bodies
+    .split("\n")
+    .filter((line) => trailer.test(line))
+    .slice(0, 3);
+
+  if (offending.length > 0) {
     fail(`Commit messages credit a tool as a collaborator: ${offending.join(" / ")}`);
   }
 
