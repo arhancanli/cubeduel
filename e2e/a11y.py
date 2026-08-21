@@ -137,7 +137,7 @@ with sync_playwright() as p:
           str(labelled.get("Compete")))
     check("the practice half is everything not on the record",
           set(labelled.get("Practice", []))
-          == {"Play", "Timer", "Learn", "Train", "Progress", "Your cube"},
+          == {"Play", "Timer", "How to solve", "Learn", "Train", "Progress", "Your cube"},
           str(labelled.get("Practice")))
 
     print("\n== the landing page demonstrates the solver ==")
