@@ -177,7 +177,7 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 488 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 504 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 14 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
@@ -725,6 +725,40 @@ halved the measured conversion of the sign-up screen. Both are why the check is
 ⚠️ **Still owed before launch:** a `/privacy` page. Collecting a persistent
 visitor identifier without a user-facing disclosure is not defensible, however
 careful the implementation is, and the README is not where a visitor looks.
+
+## Clubs and the WCA (`src/lib/club.ts`, `src/lib/wca.ts`)
+
+Two features that exist because cubing is a solo sport. You solve alone against
+a clock, which is why a free solo timer still dominates and why the network
+effect that makes chess.com unassailable does not exist here.
+
+**A club** is the closest thing to a reason two people both turn up. School and
+university cubing clubs already meet and already compare times; this gives that
+somewhere to live. The board reads the **same verified ratings** as the global
+one — no club-local scoring, no separate ladder. A private board with friendlier
+numbers is more flattering and completely worthless, because the whole claim
+here is that a rating means something.
+
+Unrated members are listed, without a number and without a position, sorted by
+how close they are to being rated. A board showing only the rated would greet a
+beginner on the day they join with a list they are not on.
+
+**The WCA link** answers the question only a site with a real rating can ask:
+how does what you do here compare to what you did at a competition? Two rules
+make it honest.
+
+*A link is proved, never claimed.* There is no way to type a WCA id in. Every
+WCA id is public, so a text field would let anybody attach a world-class average
+to their profile. The only route is the WCA's own OAuth, and with no credentials
+configured the feature is simply not offered.
+
+*The two numbers are never subtracted.* A WCA average is five solves on a real
+cube, in a hall, judged. A keyboard rating is five solves typed. Showing a delta
+between them would invite reading a difference in input device as a difference
+in the cuber — so both are shown, each labelled with what it measured, and the
+official average is also converted to this scale so the two are commensurable
+without pretending they are the same. Nothing read from the WCA ever writes to
+`ratings` or reaches a leaderboard.
 
 ## Not built yet
 

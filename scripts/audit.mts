@@ -58,7 +58,28 @@ const sourceFiles = [
   ...walk("e2e", (n) => n.endsWith(".py")),
   ...walk("scripts", (n) => n.endsWith(".mts") || n.endsWith(".mjs")),
 ];
-const allSource = sourceFiles.map(read).join("\n");
+/**
+ * Source with comments removed.
+ *
+ * Every scan below looks for paths, and this codebase documents itself heavily
+ * — including, inevitably, by naming paths in prose. Backtick-quoted inline
+ * code in a doc comment looks exactly like a string literal to a regex, so
+ * without this the audit reports that nothing serves `/api/v0/me` (the WCA's
+ * endpoint, named in a comment explaining why we call it) and that a doc
+ * mentioning a route is a broken link.
+ *
+ * That is the third time a guard in this repository has fired on its own
+ * documentation. Stripping comments is the fix that does not require a growing
+ * list of exceptions.
+ */
+function stripComments(source: string): string {
+  return source
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/(^|[^:])\/\/.*$/gm, "$1")
+    .replace(/^\s*#.*$/gm, " ");
+}
+
+const allSource = sourceFiles.map((f) => stripComments(read(f))).join("\n");
 
 // ---------------------------------------------------------------------------
 console.log("Every internal link points at a page that exists");
@@ -74,14 +95,25 @@ console.log("Every internal link points at a page that exists");
     [...allSource.matchAll(/href="(\/[a-z0-9/_-]*)"/g)].map((m) => m[1]),
   );
 
+  // Route handlers are legitimate link targets too: `/api/wca/start` redirects
+  // to the WCA, and an <a> is the right element for a navigation the server
+  // performs. Collected here so a link to one is not reported as broken.
+  const routeHandlers = new Set(
+    walk("src/app/api", (n) => n === "route.ts").map((p) =>
+      p.replace("src/app", "").replace("/route.ts", ""),
+    ),
+  );
+
   for (const link of linked) {
+    if (routeHandlers.has(link)) continue;
+
     // Dynamic segments are matched by pattern rather than by name.
     const matches = [...pages].some((page) => {
       if (page === link) return true;
       const pattern = new RegExp(`^${page.replace(/\[[^\]]+\]/g, "[^/]+")}$`);
       return pattern.test(link);
     });
-    if (!matches) fail(`Link to ${link} but no page renders it.`);
+    if (!matches) fail(`Link to ${link} but nothing serves it.`);
   }
   console.log(`  ${linked.size} distinct links, ${pages.size} pages`);
 }

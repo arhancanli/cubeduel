@@ -3,6 +3,7 @@ import "server-only";
 import { sweepEmailTokens } from "./emailTokens";
 import { sweepExpiredChallenges } from "./passkeys";
 import { sweepExpiredSessions } from "./sessions";
+import { sweepWcaStates } from "./wca";
 import { db } from "./supabase";
 
 /**
@@ -74,6 +75,7 @@ export interface SweepResult {
   emailTokens: number;
   authAttempts: number;
   events: number;
+  wcaStates: number;
 }
 
 export async function sweepAll(): Promise<SweepResult> {
@@ -86,5 +88,6 @@ export async function sweepAll(): Promise<SweepResult> {
     emailTokens: await sweepEmailTokens(),
     authAttempts: await deleteOlderThan("auth_attempts", "created_at", ATTEMPT_RETENTION_MS),
     events: await deleteOlderThan("events", "at", EVENT_RETENTION_MS),
+    wcaStates: await sweepWcaStates(),
   };
 }

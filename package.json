@@ -28,6 +28,7 @@
     "audit": "tsx scripts/audit.mts",
     "sweep": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/sweep.mts",
     "retention": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/retention.mts",
+    "integration:wca": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-wca.mts",
     "integration:clubs": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-clubs.mts",
     "integration:accounts": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-accounts.mts",
     "integration:events": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-events.mts",

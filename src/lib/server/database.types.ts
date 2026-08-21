@@ -42,6 +42,50 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["events"]["Insert"]>;
         Relationships: [];
       };
+      wca_links: {
+        Row: {
+          profile_id: string;
+          wca_id: string;
+          verified_at: string;
+          name: string | null;
+          country: string | null;
+          competitions: number | null;
+          records: Json | null;
+          refreshed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          profile_id: string;
+          wca_id: string;
+          verified_at?: string;
+          name?: string | null;
+          country?: string | null;
+          competitions?: number | null;
+          records?: Json | null;
+          refreshed_at?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["wca_links"]["Insert"]>;
+        Relationships: [];
+      };
+      wca_oauth_states: {
+        Row: {
+          id: string;
+          state_hash: string;
+          profile_id: string;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          state_hash: string;
+          profile_id: string;
+          expires_at: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["wca_oauth_states"]["Insert"]>;
+        Relationships: [];
+      };
       clubs: {
         Row: {
           id: string;

@@ -5,10 +5,16 @@ import { redirect } from "next/navigation";
 
 import { AccountPanel, type DeviceRow, type PasskeyRow } from "@/components/AccountPanel";
 import { CubePicker } from "@/components/CubePicker";
+import { WcaPanel } from "@/components/WcaPanel";
 import { SiteHeader } from "@/components/SiteHeader";
 import { handleRejectionReason } from "@/lib/handle";
 import { currentSession } from "@/lib/server/currentUser";
+import { EVENTS, type EventId } from "@/lib/events";
 import { listPasskeys } from "@/lib/server/passkeys";
+import { isEstablished, msForRating } from "@/lib/rating";
+import { currentRating } from "@/lib/server/ranked";
+import { linkFor, wcaConfigured } from "@/lib/server/wca";
+import { compare, type Comparison, type WcaRecord } from "@/lib/wca";
 import { ensureProfile, updateHandle } from "@/lib/server/profiles";
 import { listSessions } from "@/lib/server/sessions";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
@@ -71,6 +77,53 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
       }));
     } catch {
       readFailed = true;
+    }
+  }
+
+  // The WCA panel. Every failure here degrades to "not linked" rather than
+  // breaking the page: this sits below the handle form and the account
+  // controls, and a third party being unreachable must not take those with it.
+  const wcaAvailable = wcaConfigured();
+  let link: Awaited<ReturnType<typeof linkFor>> = null;
+  const comparisons: { event: EventId; comparison: Comparison }[] = [];
+
+  if (wcaAvailable) {
+    try {
+      link = await linkFor(profile.id);
+    } catch {
+      link = null;
+    }
+  }
+
+  if (link) {
+    const records = link.records as Partial<Record<EventId, WcaRecord>>;
+    for (const event of Object.keys(EVENTS) as EventId[]) {
+      const record = records[event];
+
+      // The rating converts back to the average that earned it, exactly — that
+      // is the whole design of the scale — so there is no separate stored time
+      // to read. Shown only when the ladder would publish it, using the same
+      // `isEstablished` rule the leaderboard applies: a provisional number
+      // beside a competition average would invite a comparison the ladder is
+      // not yet willing to make.
+      let cubeduelMs: number | null = null;
+      try {
+        const standing = await currentRating(profile.id, event, "keyboard");
+        if (standing.rating !== null && isEstablished(standing)) {
+          cubeduelMs = msForRating(standing.rating, event);
+        }
+      } catch {
+        cubeduelMs = null;
+      }
+
+      // Listed only when there is something to show on one side or the other.
+      // An event nobody has ever done is not a comparison, it is a blank row.
+      if (record?.averageMs == null && cubeduelMs === null) continue;
+
+      comparisons.push({
+        event,
+        comparison: compare({ event, pool: "keyboard", cubeduelMs, record }),
+      });
     }
   }
 
@@ -157,6 +210,13 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
         </div>
         <CubePicker />
       </section>
+
+      <WcaPanel
+        configured={wcaAvailable}
+        link={link}
+        comparisons={comparisons}
+        outcome={typeof params.wca === "string" ? params.wca : null}
+      />
 
       <AccountPanel
         email={session?.user.email ?? ""}
