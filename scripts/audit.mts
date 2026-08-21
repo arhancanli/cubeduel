@@ -213,6 +213,46 @@ console.log("The README's counts match reality");
 }
 
 // ---------------------------------------------------------------------------
+console.log("Every commit is the owner's, and credits nobody else");
+// ---------------------------------------------------------------------------
+{
+  // This repository is somebody's work and somebody's record. Every commit must
+  // be authored and committed by the owner, and must not carry a trailer
+  // crediting a tool as a collaborator — an assistant is not a contributor, and
+  // a `Co-Authored-By` on a public repository says otherwise permanently.
+  //
+  // Enforced rather than promised, because the history was wrong once already:
+  // eighteen commits were attributed to a stale account and nine to nobody at
+  // all, and nothing anywhere reported it. It was found by looking.
+  const OWNER = "Arhan Canli <315329124+arhancanli@users.noreply.github.com>";
+
+  const identities = execFileSync("git", ["log", "--format=%an <%ae>%n%cn <%ce>"], {
+    cwd: root,
+    encoding: "utf8",
+  })
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const wrong = [...new Set(identities.filter((who) => who !== OWNER))];
+  if (wrong.length > 0) {
+    fail(`Commits credited to somebody other than the owner: ${wrong.join(", ")}`);
+  }
+
+  const bodies = execFileSync("git", ["log", "--format=%B"], { cwd: root, encoding: "utf8" });
+  const trailer = /co-authored-by|generated with|\bclaude\b|\banthropic\b/i;
+  if (trailer.test(bodies)) {
+    const offending = bodies
+      .split("\n")
+      .filter((line) => trailer.test(line))
+      .slice(0, 3);
+    fail(`Commit messages credit a tool as a collaborator: ${offending.join(" / ")}`);
+  }
+
+  console.log(`  ${identities.length / 2} commits, all ${OWNER.split(" <")[0]}`);
+}
+
+// ---------------------------------------------------------------------------
 
 if (failures.length > 0) {
   console.error(`\nAudit FAILED — ${failures.length} claim(s) the repository does not support:\n`);
