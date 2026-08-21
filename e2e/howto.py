@@ -135,6 +135,25 @@ with sync_playwright() as p:
     check("stepping through a demonstration reaches the end state",
           not never_finished, f"cubes {never_finished} never got there")
 
+    print("\n== a beginner can find it from the front page ==")
+    page.goto(BASE + "/", wait_until="networkidle", timeout=90000)
+    page.wait_for_timeout(3000)
+
+    # Deliberately not counting the nav link. Every page carries that, so a check
+    # that accepts it would pass on a landing page whose every call to action
+    # still assumed you could already solve a cube — which is exactly what was
+    # wrong before this section existed.
+    outside_nav = page.evaluate(
+        """() => [...document.querySelectorAll("a[href='/solve']")]
+             .filter(a => !a.closest('nav')).length"""
+    )
+    check("the landing page itself points beginners at the guide", outside_nav >= 1,
+          f"{outside_nav} links outside the nav")
+
+    body = page.inner_text("body").lower()
+    check("and says so in words a beginner would recognise",
+          "solve one yet" in body or "have to be able to solve" in body)
+
     check("no page errors", not errors, str(errors[:2]))
     browser.close()
 

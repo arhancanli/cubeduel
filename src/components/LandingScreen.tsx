@@ -73,6 +73,18 @@ export function LandingScreen() {
               ? `${returningSolves} solves saved on this device.`
               : "Solving needs no account. Free, and it works offline."}
           </p>
+
+          {/* The other half of the audience, and until now the half with no door
+              at all: every call to action on this page assumed you could already
+              solve a cube. One quiet line rather than a third button, because the
+              claim this page makes is the ladder and two competing buttons argue
+              with each other. */}
+          <Link
+            href="/solve"
+            className="text-xs text-muted underline decoration-border underline-offset-4 transition-colors hover:decoration-current"
+          >
+            Can&rsquo;t solve one yet? Start here.
+          </Link>
         </Reveal>
 
         {/* A cube that solves itself, rather than one sitting there scrambled.
@@ -237,6 +249,46 @@ export function LandingScreen() {
             >
               Try today&apos;s
             </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Learning to solve at all */}
+      <section className="border-t border-border">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-28">
+          <Reveal className="flex flex-col gap-4">
+            <p className="text-[10px] uppercase tracking-widest text-muted-dim">
+              From the beginning
+            </p>
+            <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
+              You do not have to be able to solve one yet.
+            </h2>
+            <p className="max-w-xl text-base leading-relaxed text-muted">
+              Seven steps, one layer at a time, with every algorithm running on a
+              cube you can turn and step through move by move. Most people get
+              there in an afternoon.
+            </p>
+            <p className="max-w-xl text-base leading-relaxed text-muted-dim">
+              Each step also says what it will <em>not</em> disturb — and those
+              promises are checked against the puzzle rather than written down,
+              because &ldquo;this will not wreck your first two layers&rdquo; is the
+              sentence a beginner has to be able to trust, and the one most guides
+              get wrong.
+            </p>
+            <div className="flex flex-wrap gap-5 pt-1">
+              <Link
+                href="/solve"
+                className="text-sm text-foreground underline-offset-4 hover:underline"
+              >
+                How to solve a cube →
+              </Link>
+              <Link
+                href="/learn"
+                className="text-sm text-muted underline-offset-4 hover:text-foreground hover:underline"
+              >
+                All 57 OLL and 21 PLL cases →
+              </Link>
+            </div>
           </Reveal>
         </div>
       </section>

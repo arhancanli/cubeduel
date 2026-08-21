@@ -1,32 +1,43 @@
 import type { MetadataRoute } from "next";
 
+import { learnCases } from "@/lib/learn";
 import { SITE_URL } from "@/lib/site";
+import { INDEXABLE } from "@/lib/sitemapRoutes";
 
 /**
  * Only pages worth landing on cold.
  *
- * `/settings` and the per-player profiles are left out deliberately: settings is
- * useless without an account, and profiles are created by people rather than by
- * us — listing them would publish a directory of users nobody asked to be in.
+ * The list itself lives in `sitemapRoutes.ts`, beside the reasons for everything
+ * left out, so that `npm run audit` can check the two against the app's actual
+ * routes. It had drifted badly: eighty-two pages existed that this file had
+ * never heard of.
  *
- * `/verify`, `/reset` and `/forgot` are left out for a sharper reason. The first
- * two carry a single-use token in the URL, so a crawler that fetched one would
- * SPEND it — and then publish the page it landed on. All three also set
- * `robots: noindex` on the page itself, because a sitemap omission only means a
- * crawler was not invited, not that it will stay away.
+ * The 78 last-layer cases are enumerated rather than listed by hand. They are a
+ * fixed set that this repository defines, each one a page somebody might
+ * genuinely search for — "OLL 27", "PLL T perm" — and typing them out would be
+ * a second copy of a list that already exists.
  */
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  return [
-    { url: SITE_URL, lastModified: now, changeFrequency: "weekly", priority: 1 },
-    { url: `${SITE_URL}/play`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
-    { url: `${SITE_URL}/daily`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
-    { url: `${SITE_URL}/ranked`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${SITE_URL}/duel`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
-    { url: `${SITE_URL}/train`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/timer`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${SITE_URL}/leaderboard`, lastModified: now, changeFrequency: "hourly", priority: 0.6 },
-    { url: `${SITE_URL}/progress`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
-    { url: `${SITE_URL}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-  ];
+
+  const pages: MetadataRoute.Sitemap = INDEXABLE.map((route) => ({
+    url: route.path === "/" ? SITE_URL : `${SITE_URL}${route.path}`,
+    lastModified: now,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
+
+  const cases = await learnCases();
+  for (const c of cases) {
+    pages.push({
+      url: `${SITE_URL}/learn/${c.slug}`,
+      lastModified: now,
+      changeFrequency: "yearly",
+      // A case page is worth finding but is not the front of the site, and the
+      // algorithms on it will not change — they have not changed in decades.
+      priority: 0.5,
+    });
+  }
+
+  return pages;
 }

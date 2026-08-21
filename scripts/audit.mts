@@ -32,6 +32,12 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  ENUMERATED_DYNAMIC,
+  EXCLUDED,
+  INDEXABLE,
+} from "../src/lib/sitemapRoutes.js";
+
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const failures: string[] = [];
 
@@ -269,6 +275,47 @@ console.log("The README's counts match reality");
     }
     console.log(`  ${actualTests} unit tests, ${actualSuites} browser suites`);
   }
+}
+
+// ---------------------------------------------------------------------------
+console.log("Every page is either in the sitemap or excluded on purpose");
+// ---------------------------------------------------------------------------
+//
+// Adding a route and adding it to the sitemap were two separate acts, connected
+// by nothing. Eighty-two pages accumulated that the sitemap had never heard of —
+// including the one page on this site aimed at somebody who cannot solve a cube
+// at all, which is the single most searched thing in this subject.
+//
+// A page can still be left out. It just cannot be left out by accident.
+{
+  const routes = walk("src/app", (n) => n === "page.tsx")
+    .map((p) => p.replace("src/app", "").replace("/page.tsx", ""))
+    .map((p) => (p === "" ? "/" : p));
+
+  const listed = new Set(INDEXABLE.map((r) => r.path));
+  const excluded = new Set(Object.keys(EXCLUDED));
+  const enumerated = new Set(ENUMERATED_DYNAMIC);
+
+  for (const route of routes) {
+    if (listed.has(route) || excluded.has(route) || enumerated.has(route)) continue;
+    fail(
+      `${route} is a page, but it is not in the sitemap and no reason is given for leaving it out.`,
+    );
+  }
+
+  // The reverse: a sitemap entry for a page that no longer exists sends crawlers
+  // to a 404 and quietly costs the whole file credibility.
+  for (const route of listed) {
+    if (!routes.includes(route)) {
+      fail(`The sitemap lists ${route}, which is not a page.`);
+    }
+  }
+
+  for (const [route, reason] of Object.entries(EXCLUDED)) {
+    if (!reason.trim()) fail(`${route} is excluded from the sitemap with no reason.`);
+  }
+
+  console.log(`  ${routes.length} pages, ${listed.size} indexed, ${excluded.size} excluded with reasons`);
 }
 
 // ---------------------------------------------------------------------------

@@ -765,6 +765,26 @@ that actually matters is visual. Verified by mutation: removing the gate leaves
 the status text correct and turns the cube anyway, which the text check passes
 and the pixel check fails.
 
+## What search can see (`src/lib/sitemapRoutes.ts`)
+
+Eighty-two pages existed that the sitemap had never heard of — `/solve`,
+`/learn`, all 78 case pages, `/cube` and `/clubs`. Adding a route and adding a
+sitemap entry were two separate acts connected by nothing, so the content was
+built and then left invisible. Including the one page on this site written for
+somebody who cannot solve a cube at all, which is the most searched thing in
+this entire subject.
+
+The list is now data, beside a reason for everything left out, and `npm run
+audit` walks the app directory and refuses any page that is neither indexed nor
+excused. A page can still be left out; it cannot be left out silently. It also
+fails on a sitemap entry for a page that no longer exists, which would send
+crawlers to a 404, and on an exclusion whose reason is blank — "not in the
+sitemap" with no explanation is indistinguishable from "nobody remembered".
+
+The 78 case pages are enumerated from the case library rather than typed out,
+so they cannot drift from it. Nothing user-made is listed: profiles, solves,
+clubs and challenge links are served when somebody shares them, not advertised.
+
 ## How to solve a cube at all (`/solve`, `src/lib/beginner.ts`)
 
 `/learn` assumes you already reach the last layer. This assumes nothing: seven
