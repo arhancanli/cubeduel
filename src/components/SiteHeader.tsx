@@ -18,6 +18,7 @@ export type NavKey =
   | "duel"
   | "rush"
   | "train"
+  | "solve"
   | "learn"
   | "cube"
   | "leaderboard"
@@ -61,6 +62,9 @@ const PRACTICE: NavLink[] = [
   { key: "timer", href: "/timer", label: "Timer" },
   // Before Train, because it is the earlier half of the same activity: Learn is
   // where you meet a case, Train is where you keep it.
+  // First in Practice, because it is the only entry that assumes nothing. Every
+  // other page here takes it for granted that you can already solve a cube.
+  { key: "solve", href: "/solve", label: "How to solve" },
   { key: "learn", href: "/learn", label: "Learn" },
   { key: "train", href: "/train", label: "Train" },
   { key: "progress", href: "/progress", label: "Progress" },

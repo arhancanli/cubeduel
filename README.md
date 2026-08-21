@@ -177,8 +177,8 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 561 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 17 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 578 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 19 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
@@ -764,6 +764,53 @@ instead would only ever test the state machine that writes it — and the sympto
 that actually matters is visual. Verified by mutation: removing the gate leaves
 the status text correct and turns the cube anyway, which the text check passes
 and the pixel check fails.
+
+## How to solve a cube at all (`/solve`, `src/lib/beginner.ts`)
+
+`/learn` assumes you already reach the last layer. This assumes nothing: seven
+steps, from a scrambled cube to a solved one, with every algorithm running on a
+cube you can turn.
+
+**The organising idea is the promise.** What defeats beginners is not forgetting
+an algorithm — it is performing one and destroying the part they had already
+finished, over and over, until they conclude they are not the sort of person who
+can do this. So every step states what its algorithms leave alone, and every one
+of those statements is *derived from the puzzle*: apply the algorithm to a solved
+cube, compare orbit by orbit, and the slots that changed are the slots it
+disturbs. A promise on the page that the algorithm beside it does not keep fails
+the build.
+
+"This will not wreck your first two layers" is the most load-bearing sentence in
+any cube tutorial, and on most of them it is folklore. Here it is checked.
+
+**The slot numbering is derived too.** A U turn moves corners 0–3 and edges 0–3
+and nothing else — that is what makes those the last layer, and the rest follows.
+Every promise is expressed in those indices, so a test pins them first.
+
+**A step with no algorithm promises nothing.** The cross is done by eye, so the
+page guarantees nothing there rather than guaranteeing something about moves
+nobody specified.
+
+**What the browser suite can and cannot check.** `e2e/howto.py` cannot check that
+an algorithm is correct: the demo builds its starting position by running the
+algorithm backwards, so performing it forwards returns to solved for *any*
+sequence of moves — the same tautology the last-layer library fell into, and it
+stayed green when the yellow-cross algorithm was mutated. What it does check is
+that the demonstration demonstrates: no cube starts already solved, and stepping
+through reaches the end.
+
+## The keyboard layout is real (`e2e/keymap.py`)
+
+`src/lib/keyMap.ts` is drawn on screen but decides nothing — cubing.js owns the
+real bindings, and the app uses its copy only to highlight the key you pressed.
+So the two can drift, and if they do the app teaches a beginner the wrong keys
+with complete confidence.
+
+The suite reads the cube's actual pattern before and after each key, then applies
+every candidate move to the "before" state to see which reproduces the "after" —
+so the move is identified by the puzzle, not by another table in this repository.
+All 29 bindings are correct. Nothing had ever checked: the module's docblock
+claimed a test like this existed, and none did.
 
 ## Learning the last layer (`/learn`, `src/lib/lastLayerCases.ts`)
 

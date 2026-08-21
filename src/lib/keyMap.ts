@@ -10,9 +10,18 @@
  * home-row keys drive the faces you turn most. `J`/`F` for U/U' sit under the index
  * fingers because U is the most-turned face on a 3x3.
  *
- * This table is for DISPLAY. cubing.js owns the real bindings, so an e2e test
- * presses these keys against a live cube and asserts the moves that come out —
- * otherwise a change upstream would silently turn this into a lie.
+ * This table is for DISPLAY ONLY. cubing.js owns the real bindings; the app uses
+ * this copy to highlight whichever key was pressed and for nothing else. So the
+ * two can drift, and if they ever do the app teaches a beginner the wrong keys
+ * with complete confidence — worse than showing no layout at all.
+ *
+ * `e2e/keymap.py` is what stops that. It reads the cube's actual pattern before
+ * and after each key, then applies every candidate move to the "before" state to
+ * see which one reproduces the "after" — so the move is identified by the puzzle
+ * rather than by any table in this repository.
+ *
+ * This docblock previously claimed such a test existed. It did not. All 29
+ * bindings turned out to be correct, but nothing here had ever checked.
  */
 
 export interface KeyBinding {
