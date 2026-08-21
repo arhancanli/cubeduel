@@ -65,6 +65,16 @@ interface Props {
    * Called with null on teardown.
    */
   onPlayerReady?: (player: CubePlayer | null) => void;
+  /**
+   * How far above the equator the camera sits, in degrees.
+   *
+   * The default three-quarter view is right for verifying a scramble, where all
+   * three visible faces matter equally. It is wrong for studying the last layer,
+   * where the U face carries the whole case and the default angle foreshortens it
+   * into a sliver — there, raising the camera is not a stylistic preference but
+   * the difference between being able to read the case and not.
+   */
+  cameraLatitude?: number;
   className?: string;
 }
 
@@ -83,6 +93,7 @@ export function CubeView({
   visualization = "3D",
   movePressInput = false,
   onPlayerReady,
+  cameraLatitude,
   className = "",
 }: Props) {
   // Held in a ref so a caller passing an inline function cannot force the whole
@@ -118,6 +129,10 @@ export function CubeView({
   // putting `scramble` in the creation effect's deps — that would rebuild the
   // whole Three.js scene on every solve.
   const scrambleRef = useLatest(scramble);
+
+  // Read at construction like the scramble, and for the same reason: putting it
+  // in the creation effect's deps would tear down the whole Three.js scene.
+  const latitudeRef = useLatest(cameraLatitude);
 
   // Created once. The scramble is pushed in through a separate effect so a new
   // scramble never costs a full Three.js teardown and rebuild.
@@ -156,6 +171,16 @@ export function CubeView({
           hintFacelets: "none",
           experimentalDragInput: interactive ? "auto" : "none",
           experimentalMovePressInput: movePressInput ? "auto" : "none",
+          // The limit has to move with the latitude. cubing.js clamps the camera
+          // to `cameraLatitudeLimit`, which defaults low enough that simply
+          // asking for a higher angle silently does nothing — the first version
+          // of this looked identical to the default and I nearly shipped it.
+          ...(latitudeRef.current === undefined
+            ? {}
+            : {
+                cameraLatitude: latitudeRef.current,
+                cameraLatitudeLimit: Math.max(latitudeRef.current, 35),
+              }),
         }) as unknown as TwistyPlayerInstance;
 
         if (scrambleRef.current) {
@@ -210,7 +235,7 @@ export function CubeView({
       notifyOwner?.(null);
       host.replaceChildren();
     };
-  }, [interactive, backView, visualization, movePressInput, appearanceId, onReadyRef, scrambleRef]);
+  }, [interactive, backView, visualization, movePressInput, appearanceId, onReadyRef, scrambleRef, latitudeRef]);
 
   useEffect(() => {
     if (playerRef.current && scramble) {

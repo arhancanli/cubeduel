@@ -25,6 +25,22 @@
   --ready: #34d399;
   --holding: #fbbf24;
   --danger: #f87171;
+
+  /* Depth.
+
+     This interface is deliberately flat, and mostly should stay that way — a
+     timer with drop shadows on it is a timer somebody stopped taking seriously.
+     But a cube is an object, and an object floating on a void reads as a
+     screenshot of an object. These are the two tools used to fix that, and
+     nothing else: one step of luminance, and light falling off around a thing.
+
+     Both are tuned for a dark ground, where a black shadow does almost nothing
+     and separation has to come from the surface being *lighter* than what is
+     behind it. */
+  --elevation-1: 0 1px 2px rgb(0 0 0 / 0.45);
+  --elevation-2:
+    0 8px 24px -8px rgb(0 0 0 / 0.7),
+    0 2px 6px -2px rgb(0 0 0 / 0.5);
 }
 
 @theme inline {
@@ -76,4 +92,61 @@ body {
   user-select: none;
   -webkit-user-select: none;
   -webkit-touch-callout: none;
+}
+
+/* The ground a cube stands on.
+
+   A soft pool of light under the puzzle, so it sits *in* the page rather than on
+   it. Not a glow and not a highlight — the falloff is centred slightly below the
+   cube and is barely visible on its own, which is the point: you should notice
+   the cube looking solid, not notice a gradient.
+
+   `pointer-events: none` because the cube underneath is draggable, and an
+   invisible pseudo-element eating those drags would break the one interaction
+   the page exists for. */
+.cube-stage {
+  position: relative;
+  isolation: isolate;
+}
+
+.cube-stage::before {
+  content: "";
+  position: absolute;
+  inset: -6% -6% -10%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 62% 52% at 50% 58%,
+      color-mix(in oklab, var(--surface-hi) 92%, transparent) 0%,
+      color-mix(in oklab, var(--surface) 55%, transparent) 45%,
+      transparent 72%
+    );
+}
+
+/* A raised panel: one step of luminance and a hairline, never a heavy shadow. */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--elevation-1);
+}
+
+.panel-raised {
+  background: var(--surface-hi);
+  border: 1px solid var(--border);
+  box-shadow: var(--elevation-2);
+}
+
+/* Cards that lift a little when pointed at. Transform only — animating a shadow
+   or a colour on 78 cards at once drops frames on a laptop. */
+@media (prefers-reduced-motion: no-preference) {
+  .lift {
+    transition:
+      transform 180ms cubic-bezier(0.2, 0, 0.2, 1),
+      border-color 180ms ease;
+  }
+
+  .lift:hover {
+    transform: translateY(-2px);
+  }
 }

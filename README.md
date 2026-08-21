@@ -177,8 +177,8 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 517 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 15 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 545 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 16 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
@@ -725,6 +725,58 @@ halved the measured conversion of the sign-up screen. Both are why the check is
 ⚠️ **Still owed before launch:** a `/privacy` page. Collecting a persistent
 visitor identifier without a user-facing disclosure is not defensible, however
 careful the implementation is, and the README is not where a visitor looks.
+
+## Learning the last layer (`/learn`, `src/lib/lastLayerCases.ts`)
+
+All 57 OLL and 21 PLL cases, each with a cube you can turn.
+
+**No algorithm here is trusted.** An algorithm in a cubing app is a claim, and a
+wrong one costs somebody weeks — they drill it, it half-works, and they cannot
+tell whether the algorithm or their own hands are at fault.
+
+The obvious check is a trap, and this repository shipped it for one commit:
+applying an algorithm's inverse to a solved cube produces a state, and applying
+the algorithm to that state returns to solved — *always*, for any sequence of
+moves whatsoever. It reads like verification and is arithmetic. Mutating a move
+inside Sune left it passing.
+
+What breaks the circle is a ground truth the algorithms had no hand in.
+`lastLayer.test.ts` enumerates every reachable last-layer state from the puzzle's
+own arithmetic — corner twists summing to zero mod 3, edge flips to zero mod 2 —
+and finds exactly 58 orientation classes and 22 permutation classes. So the real
+check is **coverage**: the 57 algorithms must produce exactly the 57 non-skip
+classes, every one hit, none twice. A mistyped move lands on the wrong class and
+leaves a real case with no algorithm. Add the property every last-layer algorithm
+has by definition — it leaves the two layers below untouched — and a typo has
+nowhere to hide. That check found a genuine bug on its first run: the PLL Ab
+algorithm had its rotation the wrong way round and quietly moved an F2L pair.
+
+**The numbering is pinned structurally.** A working algorithm filed under the
+wrong number is the one error coverage cannot catch, so edge orientation — a
+property of the case, not the label — is derived and checked: the seven cases
+arriving with the cross made are exactly OLL 21–27, and the eight dots exactly
+1–4 and 17–20.
+
+**The shape groups are computed, not typed.** Cubers sort OLL by what the
+oriented edges make — dot, L, line, cross — because that is what you see in the
+half second before deciding. A grouping typed by hand drifts from the algorithms
+beside it, and the first anybody knows is a learner drilling a case filed wrong.
+
+**The camera is aimed at the subject.** cubing.js defaults to about 34 degrees,
+right for checking a scramble where three faces matter equally. The last layer
+lives entirely on top, and at 34 degrees the U face is a sliver. The studio looks
+down at 62 — and the latitude *limit* has to move with it, or the request is
+silently clamped and the view is identical to the default.
+
+**Only what can be seen is built.** All 78 diagrams are drawn by the puzzle
+engine and mounted as they scroll into view: 19 on arrival rather than 78 WebGL
+contexts before anything appears. `e2e/learn.py` checks that lazy mounting still
+draws something, because showing nothing is how that optimisation fails.
+
+There is no "I got it" button. The case is built by running its algorithm
+backwards from solved, so performing it correctly returns the whole cube to
+solved — the cube answers, not the learner. A trainer that takes your word for it
+is measuring your confidence.
 
 ## A solve you can send somebody (`/s/[id]`, `src/lib/replay.ts`)
 
