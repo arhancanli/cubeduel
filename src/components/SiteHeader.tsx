@@ -62,9 +62,13 @@ const PRACTICE: NavLink[] = [
   // Before Train, because it is the earlier half of the same activity: Learn is
   // where you meet a case, Train is where you keep it.
   { key: "learn", href: "/learn", label: "Learn" },
-  { key: "cube", href: "/cube", label: "Your cube" },
   { key: "train", href: "/train", label: "Train" },
   { key: "progress", href: "/progress", label: "Progress" },
+  // Last, because it is the only entry here that is not an activity. Connecting
+  // hardware is something you do once and then forget about, and putting it
+  // between Learn and Train would interrupt the one sequence this group
+  // describes: meet a case, then keep it.
+  { key: "cube", href: "/cube", label: "Your cube" },
 ];
 
 export function SiteHeader({
