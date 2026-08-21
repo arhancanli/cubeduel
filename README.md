@@ -177,8 +177,8 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 545 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 16 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 561 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 17 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
@@ -725,6 +725,45 @@ halved the measured conversion of the sign-up screen. Both are why the check is
 ⚠️ **Still owed before launch:** a `/privacy` page. Collecting a persistent
 visitor identifier without a user-facing disclosure is not defensible, however
 careful the implementation is, and the README is not where a visitor looks.
+
+## Connecting a physical cube (`/cube`, `src/lib/cubeLink.ts`)
+
+Turn the puzzle in your hands and the one on screen turns with it. Once it does,
+the timer, the drills and every case take their moves from your cube rather than
+the keyboard.
+
+**The step almost everybody skips.** A Bluetooth cube reports *moves*, never
+state. It says "R was turned"; it never says "here is the cube". So the app has
+to assume where the cube started, and the assumption every implementation
+reaches for is "solved" — which is wrong most of the time, because people pick up
+the cube they were last using and it is scrambled.
+
+Connect then, and every screen quietly lies. The virtual cube animates a puzzle
+that is not the one in your hands, solve detection never fires because the
+tracker thinks it is one move from home, and the case being drilled is not the
+case in front of you. Nothing errors. It produces confident nonsense, which is
+the worst failure this project can have.
+
+So a link is not usable until it is **calibrated**: you solve your cube and say
+so, once. Until then `isTrustworthy` is false and moves are dropped rather than
+displayed. Asking the cube for its state instead only works on hardware that
+offers it — cubing.js's shared interface does not — and shipping that would mean
+the feature works on one brand and silently misleads on the rest.
+
+**Tested without hardware, and honest about it.** Everything below the
+`ConnectedPuzzle` interface is the same code whether moves arrive from a GAN over
+Bluetooth or from `simulatedCube()`. That is what makes the flow testable at all,
+since there is no smart cube in CI, and it is what "Show me how it works" runs on
+so somebody can see the whole flow before buying one. It is not a substitute for
+real hardware, and `/cube` says so on the page: no GAN, GoCube or GiiKER has ever
+been held up to this.
+
+**The check that matters looks at pixels.** `e2e/cubelink.py` screenshots the
+cube and asserts it does not move before calibration. Reading the status line
+instead would only ever test the state machine that writes it — and the symptom
+that actually matters is visual. Verified by mutation: removing the gate leaves
+the status text correct and turns the cube anyway, which the text check passes
+and the pixel check fails.
 
 ## Learning the last layer (`/learn`, `src/lib/lastLayerCases.ts`)
 

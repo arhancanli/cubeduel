@@ -19,6 +19,7 @@ export type NavKey =
   | "rush"
   | "train"
   | "learn"
+  | "cube"
   | "leaderboard"
   | "clubs"
   | "progress";
@@ -61,6 +62,7 @@ const PRACTICE: NavLink[] = [
   // Before Train, because it is the earlier half of the same activity: Learn is
   // where you meet a case, Train is where you keep it.
   { key: "learn", href: "/learn", label: "Learn" },
+  { key: "cube", href: "/cube", label: "Your cube" },
   { key: "train", href: "/train", label: "Train" },
   { key: "progress", href: "/progress", label: "Progress" },
 ];
