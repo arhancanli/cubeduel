@@ -142,8 +142,9 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 345 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 11 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 460 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 12 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
@@ -632,6 +633,27 @@ is a total across the whole sample, and quoting it directly would overstate the
 benefit by the size of that sample — then says plainly when algorithms cannot
 close the gap: *"roughly 40% of the 2.6s you need; the rest has to come from
 turning faster or pausing less."*
+
+## Cleaning up (`src/lib/server/maintenance.ts`)
+
+Five tables accumulate rows that stop being useful: expired sessions, spent
+passkey challenges, redeemed email links, sign-in attempts outside every
+rate-limit window, and events past a year. **None of them were ever cleaned in
+production.** Three sweep functions had been written and were called only by
+integration suites; `auth_attempts` had no sweep at all, and there was no cron.
+Nothing was broken, which is precisely why it would have gone unnoticed.
+
+`npm run sweep` does it, and a daily Vercel cron automates that. The ordering
+matters: the last piece of scheduled work in this project was an
+account-deletion webhook that was live, correct, tested, and refusing every
+request because a secret was never set — and it was the only implementation of
+the feature. Here the manual path works with no configuration at all, so the
+secret being unset costs nothing.
+
+Nothing here is load-bearing either way. Every rule these rows are subject to is
+enforced on read as well: an expired session is refused because the timestamps
+are checked, not because a sweep removed it. An unswept table is bigger, not
+wrong.
 
 ## What is measured, and what is not (`src/lib/analytics.ts`)
 

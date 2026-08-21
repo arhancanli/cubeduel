@@ -25,6 +25,8 @@
     "integration:rush": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-rush.mts",
     "integration:passkeys": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-passkeys.mts",
     "e2e:https": "NEXT_PUBLIC_SITE_URL=https://localhost:3443 npm run build && (NEXT_PUBLIC_SITE_URL=https://localhost:3443 npm run start & node scripts/tls-dev.mjs &) && sleep 10 && python3 e2e/https.py; code=$?; lsof -ti:3000,3443 | xargs kill -9 2>/dev/null; exit $code",
+    "audit": "tsx scripts/audit.mts",
+    "sweep": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/sweep.mts",
     "retention": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/retention.mts",
     "integration:accounts": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-accounts.mts",
     "integration:events": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/integration-events.mts",

@@ -53,3 +53,15 @@ jobs:
       #   - the startup scramble pool MUST reach it
       - name: Bundle invariants
         run: npm run check:bundle
+
+      # The claims the repository makes about itself: every internal link has a
+      # page, every fetched API path has a route, every analytics event has an
+      # emitter, every path the docs name exists, every suite is wired up, and
+      # the counts in the README are the counts the runner reports.
+      #
+      # All six were wrong at some point while everything above this step
+      # passed — `/forgot`, `/reset` and `/verify` were linked from two emails
+      # and did not exist, which made password reset a feature that lived only
+      # in a test. Nothing here is a type error, so nothing else can catch it.
+      - name: Audit the repository's own claims
+        run: npm run audit

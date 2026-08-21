@@ -6,9 +6,10 @@ import { SITE_URL } from "../site";
  * Sending mail, over Resend's HTTP API.
  *
  * Written as a `fetch` rather than by adding the `resend` package, for the same
- * reason the Svix signature check is written out: the dependency would be about
- * forty lines of convenience wrapping one POST, and this repository is meant to
- * be read. There is nothing here a reader has to take on trust.
+ * reason the CBOR decoder in `auth/cbor.ts` is written out: the dependency
+ * would be about forty lines of convenience wrapping one POST, and this
+ * repository is meant to be read. There is nothing here a reader has to take on
+ * trust.
  *
  * ## Sending never breaks the thing that triggered it
  *
@@ -27,9 +28,10 @@ import { SITE_URL } from "../site";
  * With no `RESEND_API_KEY`, nothing is sent and the link is written to the
  * server log instead. That is deliberate and it is what makes the whole flow
  * developable: a reset can be walked end to end on a laptop with no mail
- * provider, no domain and no account. It is also why `SEND_MODE` is reported
- * back to the caller — a silent no-op that looks like a success is how a broken
- * mail path survives to production.
+ * provider, no domain and no account. It is also why every function here returns
+ * a `SendResult` naming which of the three things happened — sent, logged, or
+ * failed. A silent no-op that looks like a success is how a broken mail path
+ * survives to production.
  */
 
 const RESEND_ENDPOINT = "https://api.resend.com/emails";
@@ -50,10 +52,6 @@ export interface SendResult {
   mode: SendMode;
   /** Present when `mode` is "failed", for the server log rather than the user. */
   error?: string;
-}
-
-export function isEmailConfigured(): boolean {
-  return Boolean(process.env.RESEND_API_KEY);
 }
 
 interface Message {

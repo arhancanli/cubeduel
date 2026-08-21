@@ -66,17 +66,6 @@ export async function userByEmail(email: string): Promise<AccountUser | null> {
   return shape(data);
 }
 
-export async function userById(id: string): Promise<AccountUser | null> {
-  const { data, error } = await db()
-    .from("users")
-    .select("id, email, email_verified_at, password_hash")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error || !data) return null;
-  return shape(data);
-}
-
 export type CreateOutcome =
   | { ok: true; user: AccountUser; created: true }
   | { ok: true; user: AccountUser; created: false }

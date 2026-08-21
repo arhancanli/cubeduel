@@ -45,23 +45,6 @@ export function passkeysSupported(): boolean {
   );
 }
 
-/**
- * Whether this device can produce one *itself*, rather than by scanning a code
- * with a phone.
- *
- * Worth knowing before offering it as the primary path. On a desktop with no
- * platform authenticator the prompt is a QR code, which is a fine fallback and
- * a poor headline.
- */
-export async function platformAuthenticatorAvailable(): Promise<boolean> {
-  if (!passkeysSupported()) return false;
-  try {
-    return await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-  } catch {
-    return false;
-  }
-}
-
 export type PasskeyResult =
   | { ok: true }
   | { ok: false; error: string; cancelled: boolean };

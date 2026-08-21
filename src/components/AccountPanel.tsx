@@ -9,7 +9,12 @@ import { forgetSession } from "@/lib/useSession";
 
 /**
  * The account controls Clerk's `UserButton` used to provide: sign out, the
- * passkeys that can open this account, and the devices currently signed in.
+ * passkeys that can open this account, and the devices currently signed in —
+ * each of which can be signed out individually, which is the whole reason to
+ * show the list. It did not do that at first: `revokeSessionById` existed and
+ * was documented as "what the device list's sign out acts on" while nothing
+ * called it, so somebody who spotted a device they did not recognise could see
+ * it and do nothing about it.
  *
  * Losing that menu is what made this necessary — but it is also the better
  * arrangement. A dropdown that opens a hosted modal put the most consequential
@@ -87,6 +92,23 @@ export function AccountPanel({
     if (!response.ok) {
       const body = (await response.json().catch(() => null)) as { error?: string } | null;
       setError(body?.error ?? "Could not remove that passkey.");
+      return;
+    }
+    router.refresh();
+  }
+
+  async function endDevice(sessionId: string) {
+    setBusy(true);
+    setError(null);
+    const response = await fetch("/api/auth/sessions/revoke", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId }),
+    });
+    setBusy(false);
+    if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as { error?: string } | null;
+      setError(body?.error ?? "Could not sign that device out.");
       return;
     }
     router.refresh();
@@ -199,16 +221,35 @@ export function AccountPanel({
         ) : (
           <ul className="flex flex-col gap-px overflow-hidden rounded-lg border border-border bg-border">
             {devices.map((device) => (
-              <li key={device.id} className="flex flex-col gap-0.5 bg-surface px-4 py-3">
-                <span className="text-sm">
-                  {describeAgent(device.userAgent)}
-                  {device.current ? (
-                    <span className="ml-2 text-xs text-ready">this device</span>
-                  ) : null}
-                </span>
-                <span className="text-xs text-muted-dim">
-                  Last seen {shortDate(device.lastSeenAt)}
-                </span>
+              <li
+                key={device.id}
+                className="flex flex-wrap items-center justify-between gap-3 bg-surface px-4 py-3"
+              >
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm">
+                    {describeAgent(device.userAgent)}
+                    {device.current ? (
+                      <span className="ml-2 text-xs text-ready">this device</span>
+                    ) : null}
+                  </span>
+                  <span className="text-xs text-muted-dim">
+                    Last seen {shortDate(device.lastSeenAt)}
+                  </span>
+                </div>
+
+                {/* Not offered for the current device: that is what the sign
+                    out button below does, and two controls for one action
+                    invites the confusing half of it. */}
+                {device.current ? null : (
+                  <button
+                    type="button"
+                    onClick={() => endDevice(device.id)}
+                    disabled={busy}
+                    className="text-xs text-muted-dim underline underline-offset-4 transition-colors hover:text-danger disabled:opacity-50"
+                  >
+                    Sign out
+                  </button>
+                )}
               </li>
             ))}
           </ul>
