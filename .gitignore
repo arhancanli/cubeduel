@@ -37,6 +37,13 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# ...except the example, which documents every variable this app needs and
+# contains no values. It was ignored by the rule above for this project's whole
+# life, which quietly broke the README's first setup step for everybody who
+# cloned it. `npm run audit` now fails if a file the docs tell you to use is not
+# committed.
+!.env.example
+
 # vercel
 .vercel
 

@@ -171,21 +171,48 @@ console.log("Every file an npm script names exists");
 }
 
 // ---------------------------------------------------------------------------
-console.log("Every path the docs name exists");
+console.log("Every path the docs name is one a clone actually has");
 // ---------------------------------------------------------------------------
+//
+// Existence is not the check. A file can sit in the working tree, satisfy every
+// `existsSync` here, and still be missing for everybody else — because it is
+// gitignored, or was simply never added.
+//
+// That is not hypothetical: `.env.example` was caught by the `.env*` rule for
+// this project's whole life, so the README's first setup step (`cp .env.example
+// .env.local`) failed for every person who cloned it, while passing this audit
+// on the machine where the file happened to exist.
 {
+  const tracked = new Set(
+    execFileSync("git", ["ls-files"], { cwd: root, encoding: "utf8" }).split("\n").filter(Boolean),
+  );
+
   let checked = 0;
+  const check = (doc: string, path: string) => {
+    checked++;
+    if (!existsSync(join(root, path))) {
+      fail(`${doc} names ${path}, which does not exist.`);
+    } else if (!tracked.has(path)) {
+      fail(`${doc} tells you to use ${path}, but it is not committed — a clone will not have it.`);
+    }
+  };
+
   for (const doc of ["README.md", "SECURITY.md", "CONTRIBUTING.md"]) {
     if (!existsSync(join(root, doc))) continue;
     const text = read(doc);
-    const pattern =
+
+    const sourcePaths =
       /`((?:src|scripts|e2e|supabase)\/[A-Za-z0-9/_.\-]+\.(?:ts|tsx|sql|mts|mjs|py))`/g;
-    for (const m of text.matchAll(pattern)) {
-      checked++;
-      if (!existsSync(join(root, m[1]))) fail(`${doc} names ${m[1]}, which does not exist.`);
-    }
+    for (const m of text.matchAll(sourcePaths)) check(doc, m[1]);
+
+    // Setup instructions. A `cp x y` in a README is a promise that x is there,
+    // and those files live at the repo root where the pattern above never looks.
+    // The leading char must allow a dot. Requiring alphanumeric here is what
+    // let `.env.example` — the one file this check exists for — slip past it.
+    const copied = /^\s*cp\s+(\.?[A-Za-z0-9][A-Za-z0-9/_.\-]*)\s/gm;
+    for (const m of text.matchAll(copied)) check(doc, m[1]);
   }
-  console.log(`  ${checked} referenced paths`);
+  console.log(`  ${checked} referenced paths, all committed`);
 }
 
 // ---------------------------------------------------------------------------
