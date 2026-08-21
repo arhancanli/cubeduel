@@ -148,10 +148,14 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
           ) : (
             <ol className="divide-y divide-border overflow-hidden rounded-lg border border-border">
               {stats.recent.map((solve, i) => (
-                <li
-                  key={`${solve.solvedAt}-${i}`}
-                  className="flex items-center gap-4 bg-surface px-4 py-2.5 text-sm"
-                >
+                <li key={`${solve.solvedAt}-${i}`} className="bg-surface">
+                  {/* The whole row is the link. Every solve has a page — the
+                      move stream is the one thing this site has that a
+                      stopwatch does not, and it is worth one click. */}
+                  <Link
+                    href={`/s/${solve.id}`}
+                    className="flex items-center gap-4 px-4 py-2.5 text-sm transition-colors hover:bg-border/40"
+                  >
                   <span className="tnum w-20 shrink-0 font-medium">
                     {solve.penalty === "DNF"
                       ? "DNF"
@@ -168,6 +172,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
                   <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted-dim">
                     {solve.scramble}
                   </span>
+                  </Link>
                 </li>
               ))}
             </ol>

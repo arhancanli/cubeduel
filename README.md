@@ -177,8 +177,8 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 507 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 14 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 517 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 15 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
 | `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
@@ -725,6 +725,45 @@ halved the measured conversion of the sign-up screen. Both are why the check is
 ⚠️ **Still owed before launch:** a `/privacy` page. Collecting a persistent
 visitor identifier without a user-facing disclosure is not defensible, however
 careful the implementation is, and the README is not where a visitor looks.
+
+## A solve you can send somebody (`/s/[id]`, `src/lib/replay.ts`)
+
+Every timer on the internet can tell you that you took 14.2 seconds. This is the
+page that shows you the 14.2 seconds: the move stream played back at the speed it
+happened, with the phase that cost the time named against that cuber's own
+average.
+
+It is the most direct expression of the thing the whole project rests on. The
+rating is the hook, the move stream is the moat — and a moat nobody can link to
+is not doing any work.
+
+**It is a recording, not an animation.** Every move is stored with the moment it
+was made, so playback runs at the real tempo. That distinction is the entire
+value: the pauses are the information. A replay at some invented constant speed
+would show you the moves and hide the half second of nothing before an F2L pair,
+which is where the time actually went.
+
+**Par comes only from solves that existed when this one happened.** `reviewSolve`
+compares a solve against what that cuber usually takes, and on the timer "usually"
+means their history up to now — right for a verdict delivered once. A permalink is
+read again later, by other people. Drawn from their whole history, a link shared
+today saying *F2L cost you three seconds* becomes *F2L was fine* a fortnight later,
+the number moving because the reader arrived late rather than because anything
+about the solve changed. `npm run integration:solve` pins this: it adds eight much
+faster solves *after* the one under review and asserts the verdict is identical to
+the millisecond. Removing the filter moves it from 5.00s to 6.43s.
+
+**Only competitive solves have a replay worth watching.** Practice is local-first
+by design — it works offline and signed out — so a practice solve syncs as a time
+with no move stream. The page says so plainly rather than showing an empty cube.
+
+Both ends of the playhead have been wrong, and both are pinned in
+`src/lib/replay.test.ts`, because an off-by-one in a replay is invisible in a
+screenshot — it looks like a cube. At `0.00` nothing may be turned: the first
+move is stamped at 0, so an inclusive comparison silently skipped the scrambled
+state, the one thing you want to study before pressing play. And the clock runs a
+millisecond past the final move, so a solve whose last turn lands on the buzzer
+can actually complete.
 
 ## Clubs and the WCA (`src/lib/club.ts`, `src/lib/wca.ts`)
 

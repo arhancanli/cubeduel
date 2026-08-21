@@ -155,6 +155,8 @@ export interface ProfileStats {
   duelWins: number;
   duelLosses: number;
   recent: {
+    /** So each row can link to the solve itself. */
+    id: string;
     durationMs: number;
     penalty: string;
     scramble: string;
@@ -190,7 +192,7 @@ export async function profileStats(
       .maybeSingle(),
     db()
       .from("solves")
-      .select("duration_ms, penalty, scramble, move_count, solved_at, mode")
+      .select("id, duration_ms, penalty, scramble, move_count, solved_at, mode")
       .eq("profile_id", profileId)
       .order("solved_at", { ascending: false })
       .limit(25),
@@ -242,6 +244,7 @@ export async function profileStats(
     duelLosses: duels.data?.filter((d) => d.outcome === "loss").length ?? 0,
     recent:
       recent.data?.map((row) => ({
+        id: row.id,
         durationMs: row.duration_ms,
         penalty: row.penalty,
         scramble: row.scramble,
