@@ -42,6 +42,46 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["events"]["Insert"]>;
         Relationships: [];
       };
+      clubs: {
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          bio: string | null;
+          created_by: string | null;
+          join_code: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          name: string;
+          bio?: string | null;
+          created_by?: string | null;
+          join_code: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["clubs"]["Insert"]>;
+        Relationships: [];
+      };
+      club_members: {
+        Row: {
+          club_id: string;
+          profile_id: string;
+          role: string;
+          joined_at: string;
+        };
+        Insert: {
+          club_id: string;
+          profile_id: string;
+          role?: string;
+          joined_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["club_members"]["Insert"]>;
+        Relationships: [];
+      };
       users: {
         Row: {
           id: string;

@@ -19,6 +19,7 @@ export type NavKey =
   | "rush"
   | "train"
   | "leaderboard"
+  | "clubs"
   | "progress";
 
 interface NavLink {
@@ -47,6 +48,10 @@ const COMPETE: NavLink[] = [
   { key: "duel", href: "/duel", label: "Duel" },
   { key: "daily", href: "/daily", label: "Daily" },
   { key: "leaderboard", href: "/leaderboard", label: "Leaderboard" },
+  // Under Compete rather than Practice, because a club board ranks you against
+  // people by the same verified solves the global one uses. It is the same
+  // ladder seen from closer up, not a separate, gentler one.
+  { key: "clubs", href: "/clubs", label: "Clubs" },
 ];
 
 const PRACTICE: NavLink[] = [

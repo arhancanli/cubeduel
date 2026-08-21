@@ -133,7 +133,7 @@ with sync_playwright() as p:
         }"""
     )
     check("ranked, rush, duels and the daily are the competitive half",
-          set(labelled.get("Compete", [])) == {"Ranked", "Rush", "Duel", "Daily", "Leaderboard"},
+          set(labelled.get("Compete", [])) == {"Ranked", "Rush", "Duel", "Daily", "Leaderboard", "Clubs"},
           str(labelled.get("Compete")))
     check("the timer and the trainer are the practice half",
           set(labelled.get("Practice", [])) == {"Play", "Timer", "Train", "Progress"},
