@@ -65,3 +65,26 @@ jobs:
       # in a test. Nothing here is a type error, so nothing else can catch it.
       - name: Audit the repository's own claims
         run: npm run audit
+
+  # The database half, which used to be run by hand against production because
+  # production was the only database there was. Every migration is applied to a
+  # fresh Postgres with Supabase's own roles and default grants, and every
+  # `scripts/integration-*.mts` runs against it. The default grants are the part
+  # that has to be faithful: they are why `REVOKE ... FROM public` once protected
+  # nothing here, and a copy without them could not reproduce that bug.
+  integration:
+    name: integration · local Postgres
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Integration suites against a fresh database
+        run: npm run integration:local

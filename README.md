@@ -157,7 +157,11 @@ the trainer are entirely local — `localStorage` is the source of truth and the
 works offline. Accounts, ranked, leaderboards and profiles need Supabase; without
 it those pages say so plainly instead of breaking.
 
-To enable them, apply everything in [`supabase/migrations/`](supabase/migrations)
+For development, `npm run db:up` gives you all of it with no account anywhere:
+a local Postgres with every migration applied, served the way Supabase serves it.
+`node scripts/db-local.mjs run -- npm run dev` points the app at it. Needs Docker.
+
+To run against a hosted project instead, apply everything in [`supabase/migrations/`](supabase/migrations)
 to a fresh Supabase project **in filename order**, then fill in `.env.local`. All
 of them are needed — `0001` is the core schema, later ones add duels, challenges
 and a constraint fix — and a page whose table is missing renders a gate naming the
@@ -181,11 +185,17 @@ in the commit history was caught by exactly one of them.
 | `npm run e2e` | 19 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
-| `npm run integration` | live database | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
-| `npm run integration:challenges` | live database | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
-| `npm run integration:rush` | live database | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
-| `npm run integration:events` | live database | Every event's ranked path end to end: a server-issued 4x4 scramble, solved, verified against a 4x4 and stored — plus a check that the scales really do differ, since 25 seconds is world class on 4x4 and nowhere near it on 3x3. |
-| `npm run integration:profile-race` | live database | Eight concurrent first visits for the same new account, including the path where every candidate handle is taken. Exists because a new player's first page load could render "Something broke", intermittently enough to look like a fluke. |
+| `npm run integration:local` | 10 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
+| `npm run integration` | local Postgres | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
+| `npm run integration:challenges` | local Postgres | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
+| `npm run integration:rush` | local Postgres | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
+| `npm run integration:events` | local Postgres | Every event's ranked path end to end: a server-issued 4x4 scramble, solved, verified against a 4x4 and stored — plus a check that the scales really do differ, since 25 seconds is world class on 4x4 and nowhere near it on 3x3. |
+| `npm run integration:profile-race` | local Postgres | Eight concurrent first visits for the same new account, including the path where every candidate handle is taken. Exists because a new player's first page load could render "Something broke", intermittently enough to look like a fluke. |
+| `npm run integration:accounts` | local Postgres | Sessions resolved and revoked, both expiry rules, a reset link that works exactly once and signs every device out — and none of it telling an outsider whether an address has an account. |
+| `npm run integration:passkeys` | local Postgres | A challenge redeemed exactly once, never across accounts, the sign-in counter persisted, and an account unable to delete its own only way in. |
+| `npm run integration:clubs` | local Postgres | A club board reads the same verified ratings the global one does, and lists members with no rating rather than hiding them. |
+| `npm run integration:wca` | local Postgres | The OAuth state is issued here, redeemed once, and bound to the profile that started it — the only thing between an honest link and somebody attaching a world-class average to their name. |
+| `npm run integration:solve` | local Postgres | A solve permalink says the same thing a fortnight later: faster solves added afterwards must not rewrite its verdict. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
 The e2e suite exists because of one specific failure mode: an anonymous request

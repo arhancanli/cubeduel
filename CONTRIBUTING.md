@@ -13,11 +13,23 @@ npm test
 npm run build && npm run check:bundle
 ```
 
-CI runs exactly these on every pull request. The browser and database suites
-(`npm run e2e` and the three `integration` scripts) need a running server and
-real credentials,
-so they are not in CI — run them locally if you touch the solve loop, the ranked
-path, or anything that talks to Postgres.
+CI runs these on every pull request, and the database suites alongside them:
+
+```bash
+npm run integration:local   # needs Docker
+```
+
+That starts a throwaway Postgres with every migration applied and runs every
+`scripts/integration-*.mts` against it. No credentials, and nothing it does can
+reach a hosted database — the runner refuses one unless told otherwise.
+
+The browser suites (`npm run e2e`) need a running server. Point it at the same
+local database and nothing you do while testing lands anywhere real:
+
+```bash
+npm run db:up
+node scripts/db-local.mjs run -- npm run dev
+```
 
 ## The two rules
 
@@ -57,8 +69,8 @@ caught it:
 
 - **Unit** (`src/lib/*.test.ts`) — pure logic. Fast, no browser, no network.
 - **Browser** (`e2e/*.py`) — anything a user does with their hands. Playwright.
-- **Integration** (`scripts/integration-ranked.mts`) — anything that crosses into
-  Postgres.
+- **Integration** (`scripts/integration-*.mts`) — anything that crosses into
+  Postgres. A new file matching that name runs in CI without being registered.
 
 Two real examples of why the layer matters. A drill that recorded a time but
 displayed `0.00` passed every unit test — only the browser suite saw it. A ranked

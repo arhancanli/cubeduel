@@ -278,6 +278,41 @@ console.log("The README's counts match reality");
 }
 
 // ---------------------------------------------------------------------------
+console.log("Every integration suite can be run by name and is documented");
+// ---------------------------------------------------------------------------
+{
+  // `integration:all` finds suites by filename, so none can be skipped there.
+  // What can still drift is everything around it: a suite with no script of its
+  // own, or no row saying what it proves. Five of ten had no row until this
+  // check existed, which is how a reader of the README learned that half the
+  // database coverage was not there.
+  const readme = read("README.md");
+  const pkg = JSON.parse(read("package.json")) as { scripts: Record<string, string> };
+  const suites = readdirSync(join(root, "scripts")).filter((n) => /^integration-[a-z0-9-]+\.mts$/.test(n));
+
+  const claimed = Number(/\|\s*`npm run integration:local`\s*\|\s*(\d+) integration suites/.exec(readme)?.[1]);
+  if (!claimed) fail("Could not find the integration suite count in the README.");
+  else if (claimed !== suites.length) {
+    fail(`README claims ${claimed} integration suites; scripts/ has ${suites.length}.`);
+  }
+
+  for (const suite of suites) {
+    const names = Object.entries(pkg.scripts)
+      .filter(([, command]) => command.includes(suite))
+      .map(([name]) => name)
+      .filter((name) => name !== "integration:all" && name !== "integration:local");
+    if (names.length === 0) {
+      fail(`scripts/${suite} has no npm script that runs it on its own.`);
+      continue;
+    }
+    if (!names.some((name) => readme.includes(`| \`npm run ${name}\` |`))) {
+      fail(`scripts/${suite} (\`npm run ${names[0]}\`) has no row in the README's testing table.`);
+    }
+  }
+  console.log(`  ${suites.length} suites, each with a script and a row`);
+}
+
+// ---------------------------------------------------------------------------
 console.log("Every page is either in the sitemap or excluded on purpose");
 // ---------------------------------------------------------------------------
 //
