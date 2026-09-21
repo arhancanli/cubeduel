@@ -25,6 +25,13 @@ stopped being rented, and the site learned to teach as well as to rank.
   badge earned only by the moves. They are now derived on the server from the
   stream it just replayed; a request that lies about them changes nothing.
 
+### Bring your csTimer history
+
+- **Import a csTimer export on `/progress`**, read in the browser and previewed
+  before anything is written. 3x3 sessions come across as times; other events are
+  named and left out; nothing already here is ever pushed out to make room. Checked
+  against a file csTimer itself wrote, not only against a reading of its source.
+
 ### Your own account
 
 - **Passkeys first, passwords as a fallback, recovery by email link** — written
@@ -77,6 +84,9 @@ stopped being rented, and the site learned to teach as well as to rank.
   a client module and got a proxy that threw on every request.
 - **The cross-efficiency line had never been shown to anybody.** The page looked
   for a phase named "cross"; the analysis writes "Cross".
+- **The sign-up screen projected a ladder rating from stopwatch times** — a real
+  cube timed by hand, which is a different sport from the keyboard ladder. It is
+  drawn only from solves turned here now.
 - **The engine's route was called "the shortest possible".** It is short, not
   proven shortest — a random cube's true minimum is 17 or 18 moves about 95% of
   the time, and the engine runs a couple longer. The copy, the README and the

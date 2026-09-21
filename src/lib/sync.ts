@@ -37,6 +37,59 @@ function setWatermark(at: number): void {
   }
 }
 
+const REWIND_KEY = "cubeduel.sync.rewind.v1";
+
+/**
+ * `<timestamp>|<token>`. The token makes every rewind distinct, so a sync can
+ * tell "the rewind I started from" from "a new one set to the same moment".
+ */
+function rewind(): { at: number; raw: string } | null {
+  if (typeof window === "undefined") return null;
+  const raw = window.localStorage.getItem(REWIND_KEY);
+  const at = raw === null ? NaN : Number(raw.split("|")[0]);
+  return raw !== null && Number.isFinite(at) ? { at, raw } : null;
+}
+
+/**
+ * Makes the next sync start from `at` again.
+ *
+ * Sync sends only what is newer than the last solve uploaded, which is exact
+ * while history only ever grows at the recent end. An import breaks that: it
+ * adds solves from months ago, all older than the watermark, and without this
+ * they would never leave the browser. Rewinding re-sends everything since, and
+ * the server stores each solve once however many times it arrives.
+ *
+ * Kept as its own marker rather than by moving the watermark back. A sync can
+ * already be running when somebody imports — the first sync of a long history
+ * is twenty requests — and it advances the watermark after every batch, so a
+ * rewound watermark would be moved straight past the imported solves by the
+ * very next batch. The marker is cleared only by a sync that STARTED after it
+ * was set and finished.
+ */
+export function resyncFrom(at: number): void {
+  if (typeof window === "undefined") return;
+  const pending = rewind();
+  const from = pending === null ? at : Math.min(pending.at, at);
+  try {
+    window.localStorage.setItem(REWIND_KEY, `${from}|${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`);
+  } catch {
+    /* Private mode: nothing is synced from here anyway. */
+  }
+}
+
+/**
+ * Clears the rewind this sync started from — unless another was set while it
+ * ran, in which case that one still has solves nobody has sent.
+ */
+function clearRewind(startedFrom: { raw: string } | null): void {
+  if (startedFrom === null || rewind()?.raw !== startedFrom.raw) return;
+  try {
+    window.localStorage.removeItem(REWIND_KEY);
+  } catch {
+    /* Nothing to clear in private mode. */
+  }
+}
+
 export interface SyncOutcome {
   stored: number;
   skipped: number;
@@ -55,9 +108,13 @@ export interface SyncOutcome {
 export async function syncLocalHistory(): Promise<SyncOutcome | null> {
   if (typeof window === "undefined") return null;
 
-  const since = watermark();
+  const rewoundTo = rewind();
+  const since = rewoundTo === null ? watermark() : Math.min(watermark(), rewoundTo.at - 1);
   const pending = loadHistory().filter((solve) => solve.at > since);
-  if (pending.length === 0) return { stored: 0, skipped: 0 };
+  if (pending.length === 0) {
+    clearRewind(rewoundTo);
+    return { stored: 0, skipped: 0 };
+  }
 
   let stored = 0;
   let skipped = 0;
@@ -104,6 +161,7 @@ export async function syncLocalHistory(): Promise<SyncOutcome | null> {
     setWatermark(batch[batch.length - 1].at);
   }
 
+  clearRewind(rewoundTo);
   return { stored, skipped };
 }
 

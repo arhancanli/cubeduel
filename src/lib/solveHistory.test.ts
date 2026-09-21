@@ -139,3 +139,47 @@ test("a full quota costs old replays, not solves", async () => {
     delete (globalThis as { window?: unknown }).window;
   }
 });
+
+test("an import into nearly full storage takes fewer solves, never a replay already here", async () => {
+  const { importSolves, loadHistory, recordSolve } = await import("./solveHistory");
+  const store = new Map<string, string>();
+  const QUOTA = 9000;
+  (globalThis as { window?: unknown }).window = {
+    localStorage: {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        if (v.length > QUOTA) throw new Error("QuotaExceededError");
+        store.set(k, v);
+      },
+      removeItem: (k: string) => void store.delete(k),
+    },
+  };
+  try {
+    const stream = Array.from({ length: 60 }, (_, i) => `R.${(i * 7).toString(36)}`).join(" ");
+    for (let i = 0; i < 6; i++) recordSolve({ ...(good as object), id: `own${i}`, moves: stream } as never);
+    const before = loadHistory();
+    assert.ok(before.every((s) => s.moves), "every solve here starts with its replay");
+
+    const imported = Array.from({ length: 200 }, (_, i) => ({
+      ...(good as object),
+      id: `cst${i}`,
+      at: 1_600_000_000_000 + i,
+      splits: [],
+      source: "manual",
+      origin: "cstimer",
+    })) as never[];
+    const result = importSolves(imported);
+
+    const after = loadHistory();
+    assert.ok(result.saved);
+    assert.ok(result.storageFull, "it says storage, not the 2,000 cap, is what stopped it");
+    assert.ok(result.added > 0 && result.added < 200, `${result.added} added`);
+    assert.equal(result.added + result.leftOut, 200);
+    assert.ok(
+      after.filter((s) => s.id.startsWith("own")).every((s) => s.moves === stream),
+      "no replay already here was given up",
+    );
+  } finally {
+    delete (globalThis as { window?: unknown }).window;
+  }
+});

@@ -2,6 +2,7 @@
 
 import { track } from "./analytics";
 import type { PhaseSplit } from "./cfop";
+import { mergeImported, type Merge } from "./cstimerImport";
 import type { Penalty } from "./types";
 
 /**
@@ -54,6 +55,11 @@ export interface StoredSolve {
    * oldest solves once storage runs short — see `save`.
    */
   moves?: string;
+  /**
+   * Where a solve came from when it was not recorded here. Only csTimer so far
+   * (see `cstimerImport.ts`); absent on everything recorded on this site.
+   */
+  origin?: "cstimer";
 }
 
 interface HistoryStore {
@@ -110,9 +116,12 @@ export function loadHistory(): StoredSolve[] {
 /**
  * True when the history was written, false when storage refused it.
  *
- * When storage is full, what gives way is the oldest solves' move streams: a
- * stream is the one part of a solve that can go without losing the solve, and
- * before streams were kept, this is where history silently stopped growing.
+ * `shed` decides what may give way when storage is full. For a solve just
+ * recorded it is the oldest solves' move streams: a stream is the one part of a
+ * solve that can go without losing the solve, and before streams were kept,
+ * this is where history silently stopped growing. For an import it is nothing
+ * — an import must never cost what is already here, so it takes fewer solves
+ * instead (see `importSolves`).
  */
 function save(store: HistoryStore, shed = true): boolean {
   if (typeof window === "undefined") return false;
@@ -178,6 +187,33 @@ export function recordSolve(
   track("solve");
 
   return solves;
+}
+
+/**
+ * Brings imported solves into history — see `cstimerImport.ts` for what they
+ * are and the rules they are merged by.
+ *
+ * Storage can hold fewer than 2,000 solves' worth when the ones already here
+ * carry replays. When it is full, this takes fewer imported solves — the newest
+ * — rather than strip anything already here to make room, and `storageFull`
+ * says so. `saved` is false only when storage refused every attempt (private
+ * browsing, most often), so the screen can say the import did not happen
+ * instead of reporting solves that are not there.
+ */
+export function importSolves(
+  imported: readonly StoredSolve[],
+): Merge & { saved: boolean; storageFull: boolean } {
+  const existing = loadHistory();
+  const wanted = mergeImported(existing, imported, MAX_SOLVES);
+  if (wanted.added === 0) return { ...wanted, saved: true, storageFull: false };
+
+  for (let limit = wanted.added; limit > 0; limit = Math.floor(limit / 2)) {
+    const merged = mergeImported(existing, imported, MAX_SOLVES, limit);
+    if (save({ version: 1, solves: merged.solves }, false)) {
+      return { ...merged, saved: true, storageFull: limit < wanted.added };
+    }
+  }
+  return { ...wanted, added: 0, saved: false, storageFull: false };
 }
 
 /** Applies a penalty decided after the solve was recorded. */

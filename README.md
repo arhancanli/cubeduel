@@ -185,8 +185,8 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 610 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 20 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 625 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 21 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
 | `npm run integration:local` | 11 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
@@ -403,6 +403,32 @@ client derived from it. Only a solve with no stream at all (a stopwatch time, or
 one recorded before streams were kept) keeps what it was sent, after validation,
 because there is nothing else to know about it. `npm run integration:sync` and
 `npm run integration` send each of those and assert what lands.
+
+## Bringing a csTimer history across (`src/lib/cstimerImport.ts`)
+
+csTimer is where nearly every cuber's history already lives, and that history is
+the biggest reason not to try anything else: switching means starting from zero,
+and every chart here starts out saying "not enough solves yet". `/progress` reads
+the file csTimer's own **Export → Export to file** writes, in the browser — it is
+never uploaded to be parsed — previews exactly which sessions are coming across and
+which are not, and only then writes.
+
+- **The format is csTimer's, read from its source** (`src/js/export.js`,
+  `src/js/stats/stats.js`) and then checked against a file csTimer itself wrote:
+  `e2e/fixtures/cstimer-export.txt` was produced on cstimer.net by pushing solves
+  through its own timer signal and calling its own export routine. The unit tests
+  parse that file, not just hand-built ones.
+- **Imported solves are times, never ratings.** Stored as `manual`, like a stopwatch
+  solve here: they count toward totals, bests, goals and trends, and cannot be split
+  by phase or reach the ladder. The sign-up screen's projected rating is now drawn
+  only from solves turned here, for the same reason — a year of real-cube times
+  would otherwise set it on its own.
+- **3x3 only, and the rest is named.** A 2x2 session is listed as left out, with
+  its scramble type, rather than silently dropped or averaged in.
+- **An import never costs a solve already here.** History keeps 2,000; imported
+  solves fill the room that is left, newest first, and a re-import adds nothing
+  twice. Merged history stays in time order, so a trend does not read last year's
+  times as today's — and sync is rewound so the older solves still reach the server.
 
 ## Challenge links
 

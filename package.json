@@ -18,7 +18,7 @@
     "dailies": "node scripts/generate-dailies.mjs",
     "pool": "node scripts/generate-pool.mjs",
     "check:bundle": "node scripts/check-bundle.mjs",
-    "e2e": "python3 e2e/a11y.py && python3 e2e/timer.py && python3 e2e/play.py && python3 e2e/train.py && python3 e2e/goal.py && python3 e2e/mobile.py && python3 e2e/ranked.py && python3 e2e/duel.py && python3 e2e/challenge.py && python3 e2e/rush.py && python3 e2e/auth.py && python3 e2e/recovery.py && python3 e2e/cube.py && python3 e2e/clubs.py && python3 e2e/solve.py && python3 e2e/learn.py && python3 e2e/cubelink.py && python3 e2e/keymap.py && python3 e2e/howto.py && python3 e2e/looking.py",
+    "e2e": "python3 e2e/a11y.py && python3 e2e/timer.py && python3 e2e/play.py && python3 e2e/train.py && python3 e2e/goal.py && python3 e2e/mobile.py && python3 e2e/ranked.py && python3 e2e/duel.py && python3 e2e/challenge.py && python3 e2e/rush.py && python3 e2e/auth.py && python3 e2e/recovery.py && python3 e2e/cube.py && python3 e2e/clubs.py && python3 e2e/solve.py && python3 e2e/learn.py && python3 e2e/cubelink.py && python3 e2e/keymap.py && python3 e2e/howto.py && python3 e2e/looking.py && python3 e2e/cstimer.py",
     "bench:solver": "tsx scripts/bench-solver.mts",
     "db:up": "node scripts/db-local.mjs up",
     "db:down": "node scripts/db-local.mjs down",

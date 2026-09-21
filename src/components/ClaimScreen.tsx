@@ -184,8 +184,7 @@ export function ClaimScreen() {
                   </p>
                 ) : (
                   <p className="mt-4 max-w-md text-xs leading-relaxed text-muted-dim">
-                    {MIN_SOLVES_TO_PROJECT - summary.solveCount} more solves and
-                    we can show you where this pace would sit on the ladder.
+                    {projectionHint(summary.turnedCount, summary.solveCount)}
                   </p>
                 )}
               </div>
@@ -434,4 +433,22 @@ function humaniseDuration(ms: number): string {
   const hours = Math.floor(minutes / 60);
   const remainder = minutes % 60;
   return remainder === 0 ? `${hours}h` : `${hours}h ${remainder}m`;
+}
+
+/**
+ * What it would take to see a projection. It used to subtract the total solve
+ * count, which went negative the moment stopwatch or imported csTimer times
+ * outnumbered the threshold — "-18 more solves" — while promising something
+ * those solves can never unlock, because they were not turned here.
+ */
+function projectionHint(turned: number, total: number): string {
+  const needed = MIN_SOLVES_TO_PROJECT - turned;
+  if (turned === 0 && total > 0) {
+    return "Stopwatch and imported times count as solves, but a pace on the ladder can only come from solves turned here — on the keyboard or a connected cube.";
+  }
+  if (needed > 0) {
+    return `${needed} more solve${needed === 1 ? "" : "s"} on the keyboard or a connected cube and we can show you where that pace would sit on the ladder.`;
+  }
+  // Enough solves, but no average of five that finished — too many DNFs.
+  return "Finish an average of five without a DNF and we can show you where that pace would sit on the ladder.";
 }

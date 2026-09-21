@@ -331,6 +331,13 @@ export function LandingScreen() {
             <p className="text-xs text-muted-dim">
               WCA-legal random-state scrambles. Works offline. No account needed to solve.
             </p>
+            {/* The one reason not to switch is the history left behind. */}
+            <Link
+              href="/progress"
+              className="text-sm text-foreground underline-offset-4 hover:underline"
+            >
+              Already on csTimer? Bring your history →
+            </Link>
           </Reveal>
 
           {/* The only place privacy is linked from. A disclosure nobody can

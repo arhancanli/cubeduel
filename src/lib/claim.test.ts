@@ -318,3 +318,35 @@ test("a projected rating is never presented as an established one", () => {
     "the word 'projected' is load-bearing and must survive any rewording",
   );
 });
+
+test("a projection onto the ladder is drawn only from solves turned here", () => {
+  // Twelve keyboard solves at 20s, and a hundred stopwatch or imported csTimer
+  // times at 11s from a real cube. The ladder is the keyboard; the 11s belong to
+  // a different sport and must not set the projection.
+  const turned = run(MIN_SOLVES_TO_PROJECT, 20_000);
+  const byHand = Array.from({ length: 100 }, (_, i) =>
+    solve(11_000, { id: `hand-${i}`, at: BASE + 500_000 + i, source: "manual", moveCount: 0 }),
+  );
+  const summary = summariseClaim([...turned, ...byHand]);
+  assert.ok(summariseClaim(turned).projectedRating !== null);
+  assert.equal(summary.projectedRating, summariseClaim(turned).projectedRating);
+  assert.equal(summary.solveCount, MIN_SOLVES_TO_PROJECT + 100, "they still count as solves");
+  assert.equal(summary.bestSingle, 11_000, "and their best is still their best");
+});
+
+test("stopwatch solves from before `manual` existed are told apart by having no turns", () => {
+  const oldStopwatch = Array.from({ length: 50 }, (_, i) =>
+    solve(9_000, { id: `old-${i}`, at: BASE + i, source: "keyboard", moveCount: 0 }),
+  );
+  assert.equal(summariseClaim(oldStopwatch).projectedRating, null);
+});
+
+test("the count toward a projection is of turned solves, so it can never go negative", () => {
+  const byHand = Array.from({ length: 30 }, (_, i) =>
+    solve(11_000, { id: `hand-${i}`, at: BASE + i, source: "manual", moveCount: 0 }),
+  );
+  const summary = summariseClaim([...byHand, ...run(3, 20_000)]);
+  assert.equal(summary.solveCount, 33);
+  assert.equal(summary.turnedCount, 3);
+  assert.ok(MIN_SOLVES_TO_PROJECT - summary.turnedCount > 0);
+});

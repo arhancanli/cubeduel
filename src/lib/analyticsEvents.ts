@@ -35,6 +35,8 @@ export const EVENTS = [
   "ranked_attempt",
   /** A rush run was started. */
   "rush_start",
+  /** A csTimer history was brought across — the cost of switching, paid. */
+  "cstimer_import",
 ] as const;
 
 export type EventName = (typeof EVENTS)[number];

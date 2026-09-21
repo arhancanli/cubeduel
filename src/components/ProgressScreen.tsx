@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { CaseCoach } from "@/components/CaseCoach";
+import { CsTimerImport } from "@/components/CsTimerImport";
 import { GoalPanel } from "@/components/GoalPanel";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
@@ -46,31 +47,38 @@ export function ProgressScreen() {
   const looking = lookAndTurn(solves);
   const trend = totalTimeTrend(solves);
 
-  if (solves.length === 0) {
-    return (
-      <Shell>
-        <div className="flex flex-col items-center gap-4 text-center">
-          <p className="text-sm text-muted">No solves recorded yet.</p>
-          <Link
-            href="/play"
-            className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
-          >
-            Start solving
-          </Link>
-        </div>
-      </Shell>
-    );
-  }
+  const reload = () => setSolves(loadHistory());
 
+  // One layout for both states, with the importer in the same place in each.
+  // Importing into an empty history turns this page from the empty state into
+  // the full one; if the importer lived in two different trees it would be
+  // unmounted at exactly that moment, taking its "Added 2,000 solves" with it.
   return (
     <Shell>
       <div className="flex w-full max-w-2xl flex-col gap-10">
-        <GoalPanel solves={solves} />
-        <Recommendation diagnosis={diagnosis} />
-        {aggregates.length > 0 ? <PhaseTable aggregates={aggregates} /> : null}
-        {aggregates.length > 0 ? <LookTurnTable rows={looking} /> : null}
-        <CaseCoach solves={solves} />
-        <Overview solves={solves} trend={trend} />
+        {solves.length === 0 ? (
+          <div className="flex flex-col items-center gap-4 text-center">
+            <p className="text-sm text-muted">No solves recorded yet.</p>
+            <Link
+              href="/play"
+              className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            >
+              Start solving
+            </Link>
+          </div>
+        ) : (
+          <>
+            <GoalPanel solves={solves} />
+            <Recommendation diagnosis={diagnosis} />
+            {aggregates.length > 0 ? <PhaseTable aggregates={aggregates} /> : null}
+            {aggregates.length > 0 ? <LookTurnTable rows={looking} /> : null}
+            <CaseCoach solves={solves} />
+            <Overview solves={solves} trend={trend} />
+          </>
+        )}
+        {/* Somebody arriving with years of csTimer history should not start
+            from zero — it is the single biggest cost of switching. */}
+        <CsTimerImport onImported={reload} />
       </div>
     </Shell>
   );
@@ -238,6 +246,7 @@ function LookTurnTable({ rows }: { rows: LookTurn[] }) {
 function Overview({ solves, trend }: { solves: StoredSolve[]; trend: Trend }) {
   const finished = solves.filter((s) => s.penalty !== "DNF" && s.durationMs > 0);
   const best = finished.length > 0 ? Math.min(...finished.map((s) => s.durationMs)) : null;
+  const imported = solves.filter((s) => s.origin === "cstimer").length;
 
   return (
     <section className="flex flex-col gap-3">
@@ -248,6 +257,12 @@ function Overview({ solves, trend }: { solves: StoredSolve[]; trend: Trend }) {
         <Stat label="trend" value={trendLabel(trend)} />
       </div>
       <p className="text-xs leading-relaxed text-muted-dim">{trendExplanation(trend)}</p>
+      {imported > 0 ? (
+        <p className="text-xs leading-relaxed text-muted-dim" data-testid="imported-count">
+          {imported.toLocaleString()} of these came from csTimer: times from a real cube, counted
+          here, never rated.
+        </p>
+      ) : null}
     </section>
   );
 }

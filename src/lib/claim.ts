@@ -66,6 +66,12 @@ export interface PhaseShare {
 
 export interface ClaimSummary {
   solveCount: number;
+  /**
+   * Solves turned here — keyboard or connected cube — which are the only ones a
+   * projection may be drawn from. Stopwatch times and imported csTimer times
+   * count as solves but never toward this.
+   */
+  turnedCount: number;
   /** Distinct calendar days with at least one solve. */
   dayCount: number;
   bestSingle: number | null;
@@ -136,6 +142,16 @@ export function summariseClaim(
 
   const bestAo5 = bestTrimmedAverage(counted.map(timed), 5);
 
+  // The ladder is solves turned HERE — on the keyboard or a connected cube — so
+  // a projection onto it may only be drawn from those. A stopwatch time, or a
+  // csTimer history brought across, is a real cube timed by hand: a different
+  // sport on a different clock, and a year of it would otherwise set the
+  // projection all on its own. Stopwatch solves recorded before `manual`
+  // existed were labelled `keyboard`, but they have no turns, which is how
+  // they are told apart.
+  const turned = counted.filter((solve) => solve.source !== "manual" && solve.moveCount > 0);
+  const turnedAo5 = bestTrimmedAverage(turned.map(timed), 5);
+
   // Projected from the best average of five rather than from the best single.
   // Ranked rates averages, so projecting from a single would advertise a number
   // the ladder would never award — and it would flatter, because a lucky single
@@ -146,12 +162,13 @@ export function summariseClaim(
   // of 1990.942818539531 until somebody looked at the page. Rounding at the
   // source means no future caller can forget.
   const projectedRating =
-    counted.length >= MIN_SOLVES_TO_PROJECT && bestAo5.kind === "value"
-      ? Math.round(ratingForMs(bestAo5.ms, event))
+    turned.length >= MIN_SOLVES_TO_PROJECT && turnedAo5.kind === "value"
+      ? Math.round(ratingForMs(turnedAo5.ms, event))
       : null;
 
   return {
     solveCount: counted.length,
+    turnedCount: turned.length,
     dayCount: days.size,
     bestSingle: bestSingle(counted.map(timed)),
     bestAo5,
