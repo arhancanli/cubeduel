@@ -3,6 +3,85 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.1.0 — 2026-09-21
+
+The release where the analysis stopped inferring and started measuring, identity
+stopped being rented, and the site learned to teach as well as to rank.
+
+### Why you are slow, measured
+
+- **Looking and turning.** Every phase after the cross is split into the time
+  before its first turn — between F2L pairs, recognising the OLL and PLL case —
+  and the time spent turning. `/progress` no longer guesses whether a slow phase
+  is recognition or execution from how much it varies: it compares your slower
+  solves with your faster ones and says which part the extra seconds went to.
+  The replay draws the looking on its timeline and jumps to your longest pause.
+- **Every solve keeps its turns.** Practice solves used to keep their phase
+  totals and throw the move stream away, so most solves had no replay. History
+  now stores the stream compactly, and when storage runs short the oldest solves
+  give up their replay before any solve is lost.
+- **The server works out every stored breakdown.** Ranked, duels, challenges,
+  rush and sync all stored the phase splits the browser sent, beside a "verified"
+  badge earned only by the moves. They are now derived on the server from the
+  stream it just replayed; a request that lies about them changes nothing.
+
+### Your own account
+
+- **Passkeys first, passwords as a fallback, recovery by email link** — written
+  here rather than rented. WebAuthn from scratch, including a CBOR decoder tested
+  against RFC 8949's own vectors; scrypt at OWASP's memory-constrained parameters;
+  sessions as rows, so signing out everywhere actually does.
+- **The claim.** Signing up leads with the solves you already did, which is what
+  the account is for.
+
+### More to play, more to learn
+
+- **2x2, 4x4 and 5x5**, ranked on their own scales — 25 seconds is world class on
+  4x4 and nowhere near it on 3x3.
+- **Rush:** a target built from your own pace that tightens until you miss three.
+- **Clubs**, a board for the people you actually cube with, reading the same
+  verified ratings as the global one.
+- **WCA link**, proved through the WCA's own sign-in and never typed, so nobody
+  can attach a world-class average to their name.
+- **A solve you can send somebody:** `/s/<id>` plays it back at the speed it
+  happened.
+- **All 57 OLL and 21 PLL cases** on a cube you can turn, checked by coverage
+  against every last-layer state the puzzle can reach — which found a PLL
+  algorithm that quietly broke an F2L pair.
+- **How to solve a cube at all** (`/solve`), for the most-searched question in
+  the sport.
+- **Your cube:** a smart cube linked and calibrated before any move is trusted.
+  Not yet run against real hardware, and the page says so.
+- **Cube appearances**, including a high-contrast scheme found by simulating
+  colour blindness — the one chosen by eye was worse than the default.
+
+### How it is built and checked
+
+- Solver tables precomputed at build: the cold start went from ~2s to 30ms of
+  table loading.
+- `npm run audit` checks the repository's claims about itself — links, routes,
+  docs, counts, the sitemap, and that every commit credits its owner alone.
+- The database suites run against a throwaway local Postgres with Supabase's own
+  roles and grants — in CI on every pull request, for the first time — and
+  `npm run e2e:local` runs every browser suite against it with no credentials.
+- First-party analytics that honour Do Not Track and Global Privacy Control
+  before an identifier exists, and a privacy page that says so.
+
+### Fixed along the way
+
+- **Challenge solves were never stored.** A check constraint predated the mode,
+  the insert failed, and the error was discarded.
+- **A momentary read failure could overwrite an established rating** with a new
+  player's.
+- **The analytics layer recorded nothing** — a server route imported a list from
+  a client module and got a proxy that threw on every request.
+- **The cross-efficiency line had never been shown to anybody.** The page looked
+  for a phase named "cross"; the analysis writes "Cross".
+- **The engine's route was called "the shortest possible".** It is short, not
+  proven shortest — a random cube's true minimum is 17 or 18 moves about 95% of
+  the time, and the engine runs a couple longer. The copy, the README and the
+  docs now say so, and both comparisons count moves in one unit.
+
 ## 1.0.0 — 2026-08-18
 
 Everything a 3x3 platform needs, and nothing claimed that the code cannot
@@ -74,4 +153,5 @@ The ones worth knowing about:
 - **Boards rendered "Nobody is ranked yet" during an outage**, which is
   indistinguishable from the truth and so gets investigated by nobody.
 
+[1.1.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.1.0
 [1.0.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.0.0

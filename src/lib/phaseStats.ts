@@ -121,6 +121,12 @@ export interface Diagnosis {
   sampleSize: number;
   /** Arithmetic fact — safe to state flatly. */
   fact: string;
+  /**
+   * What the move stream MEASURED about the slow solves, when there is enough of
+   * it — which part of the phase the extra time went to. Arithmetic, like
+   * `fact`. Null when the call below it rests on the older spread heuristic.
+   */
+  measured: string | null;
   /** Domain interpretation — hedged, because it is reasoning and not measurement. */
   interpretation: string;
 }
@@ -157,6 +163,7 @@ export function diagnose(solves: readonly StoredSolve[]): Diagnosis {
         phase: null,
         sampleSize: 0,
         fact: `${recorded} solve${recorded === 1 ? "" : "s"} recorded, none with move data.`,
+        measured: null,
         interpretation:
           "A stopwatch only knows the total. Phase analysis needs to see the turns, which means solving on Play or with a connected smart cube — timing by hand will never unlock it, however many you do.",
       };
@@ -170,6 +177,7 @@ export function diagnose(solves: readonly StoredSolve[]): Diagnosis {
         usable.length === 0
           ? "No solves analysed yet."
           : `${usable.length} of ${recorded} solves carry move data.`,
+      measured: null,
       interpretation: `${needed} more solve${needed === 1 ? "" : "s"} with move data before there's enough to point at anything.`,
     };
   }
@@ -192,14 +200,193 @@ export function diagnose(solves: readonly StoredSolve[]): Diagnosis {
   const spread =
     bottleneck.bestMs > 0 ? (bottleneck.worstMs / bottleneck.bestMs).toFixed(1) : "—";
 
+  const fact = `${bottleneck.phase} is ${sharePct}% of your solve across ${usable.length} solves, and your slowest was ${spread}× your fastest.`;
+
+  // Measured, when the stream allows it: split the phase's slow solves from its
+  // fast ones and ask which part the extra time went to. This replaces the spread
+  // heuristic below rather than sitting beside it — once the answer can be read
+  // off the clock, inferring it from variance is guessing at something known.
+  const slow = explainSlowSolves(solves, bottleneck.phase);
+  if (slow) {
+    const looking = slow.fromLookMs >= slow.fromTurnMs;
+    const [lookNoun, lookAdvice] = LOOKING[bottleneck.phase];
+    return {
+      kind: looking ? "recognition" : "execution",
+      phase: bottleneck.phase,
+      sampleSize: usable.length,
+      fact: `${fact} Per solve it is ${formatSeconds(slow.lookMs)} ${lookNoun} and ${formatSeconds(slow.turnMs)} turning.`,
+      measured: `In your slower half of ${slow.n} solves, ${bottleneck.phase} takes ${formatSeconds(slow.slowerByMs)} longer: ${moreOrLess(slow.fromLookMs, lookNoun)}, ${moreOrLess(slow.fromTurnMs, "turning")}.`,
+      interpretation: looking
+        ? `So the slow solves are slow in the looking, not the hands. ${lookAdvice}`
+        : `So the slow solves are slow in the turning, not the looking — the algorithms and fingertricks themselves. Drilling the executions, and cutting moves from them, usually pays more than recognition work here.`,
+    };
+  }
+
   return {
     kind: inconsistent ? "recognition" : "execution",
     phase: bottleneck.phase,
     sampleSize: usable.length,
-    fact: `${bottleneck.phase} is ${sharePct}% of your solve across ${usable.length} solves, and your slowest was ${spread}× your fastest.`,
+    fact,
+    measured: null,
     interpretation: inconsistent
       ? `That spread is wide relative to your other phases, which usually means recognition rather than hand speed — you know some cases cold and stall on others. Drilling the specific cases tends to help more than turning faster.`
       : `That time is fairly consistent, which usually points at execution rather than recognition — the algorithms and fingertricks themselves, rather than spotting what to do.`,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Looking and turning
+// ---------------------------------------------------------------------------
+
+/**
+ * What "looking" means in each phase, and the practice that usually helps when
+ * it is the problem. The cross has no entry: the clock starts on its first
+ * turn, so its looking happens in inspection, outside the solve.
+ */
+const LOOKING: Record<PhaseGroup, [noun: string, advice: string]> = {
+  Cross: ["before its first turn", ""],
+  F2L: [
+    "between pairs",
+    "What usually helps is lookahead: solving deliberately slower, so the next pair is found while the current one is still going in.",
+  ],
+  OLL: [
+    "recognising the case",
+    "Drilling recognition of the cases that stall you — the list below — usually helps more than faster algorithms.",
+  ],
+  PLL: [
+    "recognising the case",
+    "Drilling recognition of the cases that stall you — the list below — usually helps more than faster algorithms.",
+  ],
+};
+
+function formatSeconds(ms: number): string {
+  return `${(ms / 1000).toFixed(1)}s`;
+}
+
+/** "1.2s more turning", or "0.3s less turning" — never "-0.3s more". */
+function moreOrLess(ms: number, noun: string): string {
+  return `${formatSeconds(Math.abs(ms))} ${ms < 0 ? "less" : "more"} ${noun}`;
+}
+
+/** Enough solves that each half of a slow/fast split holds at least five. */
+export const MIN_SOLVES_FOR_DECOMPOSITION = 10;
+
+interface LookTurnSample {
+  lookMs: number;
+  turnMs: number;
+  turns: number;
+}
+
+/**
+ * One solve's looking and turning in `phase`, or null if the solve cannot say.
+ *
+ * Every split in the phase has to carry a measured recognition — a phase
+ * assembled from some measured pairs and some unmeasured ones would report the
+ * unmeasured pairs as all turning. Splits recorded before recognition was
+ * measured, and hand-marked laps, carry none.
+ */
+function lookTurnOf(splits: readonly PhaseSplit[], phase: PhaseGroup): LookTurnSample | null {
+  const inPhase = splits.filter((s) => groupOf(s.phase) === phase);
+  if (inPhase.length === 0 || inPhase.some((s) => s.recognitionMs === undefined)) return null;
+  let lookMs = 0;
+  let turnMs = 0;
+  let turns = 0;
+  for (const split of inPhase) {
+    lookMs += split.recognitionMs!;
+    turnMs += split.durationMs - split.recognitionMs!;
+    turns += split.moveCount;
+  }
+  return { lookMs, turnMs, turns };
+}
+
+export interface LookTurn {
+  phase: PhaseGroup;
+  /** Solves that carry a measured split of this phase. */
+  n: number;
+  /** Mean per solve. */
+  lookMs: number;
+  turnMs: number;
+  /** Turns per second while actually turning — hand speed with the pauses taken out. */
+  turningTps: number;
+}
+
+/**
+ * Looking and turning in each phase, averaged over the solves that measured it.
+ *
+ * The cross is left out: its looking happens in inspection, which is never
+ * inside the clock, so it would always read as 0.0s looking — a true number that
+ * says nothing and invites the wrong conclusion.
+ */
+export function lookAndTurn(solves: readonly StoredSolve[]): LookTurn[] {
+  const out: LookTurn[] = [];
+  for (const phase of PHASE_ORDER) {
+    if (phase === "Cross") continue;
+    const samples = analysable(solves)
+      .map((s) => lookTurnOf(s.splits, phase))
+      .filter((x): x is LookTurnSample => x !== null);
+    if (samples.length < MIN_SOLVES_FOR_DIAGNOSIS) continue;
+    const turnMs = samples.reduce((a, x) => a + x.turnMs, 0);
+    const turns = samples.reduce((a, x) => a + x.turns, 0);
+    out.push({
+      phase,
+      n: samples.length,
+      lookMs: mean(samples.map((x) => x.lookMs)),
+      turnMs: mean(samples.map((x) => x.turnMs)),
+      turningTps: turnMs > 0 ? turns / (turnMs / 1000) : 0,
+    });
+  }
+  return out;
+}
+
+export interface SlowSolves {
+  n: number;
+  /** Means over every measured solve. */
+  lookMs: number;
+  turnMs: number;
+  /** How much longer the phase takes in the slower half than in the faster. */
+  slowerByMs: number;
+  /** How much of that difference is looking, and how much turning. They sum to it. */
+  fromLookMs: number;
+  fromTurnMs: number;
+}
+
+/**
+ * Where the slow solves lose their time, in one phase.
+ *
+ * The solves are ranked by how long the phase took and cut in half; the halves'
+ * looking and turning are compared. That answers the useful question — what
+ * makes a slow solve slow — using nothing but the cuber's own solves: no
+ * population norm, no threshold for "too much looking", which there is no data
+ * here to set honestly.
+ *
+ * Comparing looking against turning directly would not do: turning is the larger
+ * of the two for almost everyone, so that comparison would name "execution" for
+ * nearly every cuber whatever was actually slowing them down.
+ */
+export function explainSlowSolves(
+  solves: readonly StoredSolve[],
+  phase: PhaseGroup,
+): SlowSolves | null {
+  if (phase === "Cross") return null;
+  const samples = analysable(solves)
+    .map((s) => lookTurnOf(s.splits, phase))
+    .filter((x): x is LookTurnSample => x !== null);
+  if (samples.length < MIN_SOLVES_FOR_DECOMPOSITION) return null;
+
+  const ranked = [...samples].sort((a, b) => a.lookMs + a.turnMs - (b.lookMs + b.turnMs));
+  const half = Math.floor(ranked.length / 2);
+  const fast = ranked.slice(0, half);
+  const slow = ranked.slice(ranked.length - half);
+
+  const fromLookMs = mean(slow.map((x) => x.lookMs)) - mean(fast.map((x) => x.lookMs));
+  const fromTurnMs = mean(slow.map((x) => x.turnMs)) - mean(fast.map((x) => x.turnMs));
+  return {
+    n: samples.length,
+    lookMs: mean(samples.map((x) => x.lookMs)),
+    turnMs: mean(samples.map((x) => x.turnMs)),
+    slowerByMs: fromLookMs + fromTurnMs,
+    fromLookMs,
+    fromTurnMs,
   };
 }
 

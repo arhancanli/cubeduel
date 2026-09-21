@@ -15,8 +15,12 @@ import type { Penalty } from "./types";
  */
 
 const WATERMARK_KEY = "cubeduel.sync.v1";
-/** The server accepts 500 per request; stay under it with room to spare. */
-const BATCH = 250;
+/**
+ * The server accepts 250 per request and replays every solve that carries a
+ * move stream, so smaller batches keep each request quick and let a long history
+ * land in steps that each survive on their own.
+ */
+const BATCH = 100;
 
 function watermark(): number {
   if (typeof window === "undefined") return 0;
@@ -79,6 +83,7 @@ export async function syncLocalHistory(): Promise<SyncOutcome | null> {
             ollCase: solve.ollCase,
             pllCase: solve.pllCase,
             source: solve.source,
+            moves: solve.moves,
           })),
         }),
       });

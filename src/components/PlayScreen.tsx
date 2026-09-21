@@ -8,7 +8,7 @@ import { MovePad } from "@/components/MovePad";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SolveBreakdown } from "@/components/SolveBreakdown";
 import { formatMs } from "@/lib/format";
-import type { SolveRecording } from "@/lib/moveStream";
+import { countMoves, encodeMoveStream, type SolveRecording } from "@/lib/moveStream";
 import { nextScramble, warmScrambles } from "@/lib/scramble";
 import { recordSolve } from "@/lib/solveHistory";
 import { useSolveSession } from "@/lib/useSolveSession";
@@ -28,11 +28,12 @@ import { useSolveSession } from "@/lib/useSolveSession";
 export function PlayScreen({ initialScramble }: { initialScramble?: string | null }) {
   const [copied, setCopied] = useState(false);
   /**
-   * How many moves this scramble actually needed.
+   * How many moves the engine's route for this scramble takes — short, not
+   * proven shortest (see SolveReport).
    *
    * The one thing a timer can never tell you. "22 seconds" says nothing about
    * whether the cube was hard or you went the long way round; "you used 58 moves
-   * and it needed 20" says exactly which.
+   * and the engine used 20" says which.
    */
   const [optimal, setOptimal] = useState<number | null>(null);
   /** Shortest cross available on the face they actually built on. */
@@ -85,6 +86,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
         ollSetup: analysis.ollSetup,
         pllSetup: analysis.pllSetup,
         source,
+        moves: encodeMoveStream(recording.moves),
       });
     },
   });
@@ -161,7 +163,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
             recording={recording}
             optimal={optimal}
             optimalCross={optimalCross}
-            crossMoves={splits?.find((s) => s.phase === "cross")?.moveCount ?? null}
+            crossEndMs={splits?.find((s) => s.phase === "Cross")?.endMs ?? null}
           />
         ) : null}
         {splits && splits.length > 0 ? <SolveBreakdown splits={splits} /> : null}
@@ -240,24 +242,34 @@ function SolveReport({
   recording,
   optimal,
   optimalCross,
-  crossMoves,
+  crossEndMs,
 }: {
   recording: SolveRecording;
+  /** Length of the engine's route for this scramble — short, not proven shortest. */
   optimal: number | null;
+  /** The true minimum for the cross on the face they built, from an exact table. */
   optimalCross: number | null;
-  crossMoves: number | null;
+  crossEndMs: number | null;
 }) {
   const { stats } = recording;
   const pausedPct = Math.round(stats.pausedFraction * 100);
-  // Quarter turns, because keyboard input can only produce quarter turns and a
-  // half turn is two presses. The solver answers in half turns, where R2 is one
-  // move, so comparing the raw numbers would flatter the solver and mislead the
-  // cuber. Doubling the solver's count is the honest floor in the same metric.
-  const optimalQuarterTurns = optimal === null ? null : optimal * 2;
-  const ratio =
-    optimalQuarterTurns && optimalQuarterTurns > 0
-      ? stats.moveCount / optimalQuarterTurns
-      : null;
+
+  // Both comparisons are made in the half-turn metric, where R2 is one move —
+  // the unit every solver answers in. The keyboard produces quarter turns, so the
+  // cuber's side is counted the way cubers count it (R R is R2) rather than
+  // compared raw, which overstated the waste by a move for every half turn. The
+  // previous version doubled the solver's count instead and called it a floor;
+  // it is a ceiling, and it flattered the cuber by the same amount.
+  const solveMoves = countMoves(recording.moves.map((m) => m.move));
+  const ratio = optimal !== null && optimal > 0 ? solveMoves / optimal : null;
+
+  // Looked up by the phase's real name. It was looked up as "cross" — lower case
+  // — which matches no phase the analysis writes, so this line had never once
+  // been shown to anybody.
+  const crossMoves =
+    crossEndMs === null
+      ? null
+      : countMoves(recording.moves.filter((m) => m.atMs <= crossEndMs).map((m) => m.move));
 
   // Cross efficiency is the one number here a CFOP solver can act on this
   // afternoon. Total move count says "your method is long", which is true of
@@ -273,13 +285,13 @@ function SolveReport({
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-        <Metric label="moves" value={String(stats.moveCount)} />
+        {/* Turns as typed — a half turn is two. "Moves" below are counted the
+            way solvers count them, and the two words keep the units apart. */}
+        <Metric label="turns" value={String(stats.moveCount)} />
         <Metric label="tps" value={stats.tps.toFixed(2)} />
         <Metric label="longest pause" value={formatMs(stats.longestPauseMs)} />
         <Metric label="paused" value={`${pausedPct}%`} />
-        {optimal !== null ? (
-          <Metric label="shortest possible" value={String(optimal)} />
-        ) : null}
+        {optimal !== null ? <Metric label="engine" value={String(optimal)} /> : null}
         {crossWaste !== null ? (
           <Metric
             label="cross"
@@ -292,16 +304,18 @@ function SolveReport({
         <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">
           {crossWaste <= 0
             ? `Your cross was optimal — ${optimalCross} moves was the shortest available on that face. Nothing to win back there.`
-            : `Your cross took ${crossMoves} quarter turns; the shortest on that face was ${optimalCross}. That is ${crossWaste} ${crossWaste === 1 ? "move" : "moves"} spent before F2L even starts, and the cross is the one phase you can plan entirely during inspection.`}
+            : `Your cross took ${crossMoves} moves; the shortest on that face was ${optimalCross}. That is ${crossWaste} ${crossWaste === 1 ? "move" : "moves"} spent before F2L even starts, and the cross is the one phase you can plan entirely during inspection.`}
         </p>
       ) : null}
 
       {ratio !== null ? (
-        <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">
-          This cube can be solved in {optimal} moves. You used {stats.moveCount}{" "}
-          quarter turns — about {ratio.toFixed(1)}× the shortest route. Every
-          method takes more than the minimum; CFOP typically runs three to four
-          times it, so this is a measure of your method, not a mistake.
+        <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim" data-testid="engine-route">
+          This site&apos;s engine solved this cube in {optimal} moves. You used {solveMoves},
+          counted the same way — about {ratio.toFixed(1)}× its route. Every method
+          takes more than that; CFOP typically runs three to four times it, so this
+          is a measure of your method, not a mistake. The engine&apos;s route is short,
+          not proven shortest: a random cube&apos;s true minimum is 17 or 18 moves
+          about 95% of the time.
         </p>
       ) : null}
       <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">

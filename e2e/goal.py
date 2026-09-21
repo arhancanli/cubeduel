@@ -6,7 +6,7 @@ exists to pin the behaviour that is easy to quietly lose: with too little
 evidence the app must say so and name no date, however much a confident line
 would look better on the screen.
 
-    BASE=http://localhost:3210 python3 e2e/goal.py
+    BASE=http://localhost:3000 python3 e2e/goal.py
 """
 
 import sys

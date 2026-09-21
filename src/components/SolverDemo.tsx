@@ -129,9 +129,10 @@ export function SolverDemo() {
           </span>
         </div>
         <p className="max-w-sm text-center text-xs leading-relaxed text-muted-dim">
-          God&apos;s number is 20, so a solution within a move or two of that is
-          about as short as a cube can be solved. This engine is in this
-          repository — no solver library.
+          A random cube&apos;s shortest solution is 17 or 18 moves about 95% of
+          the time; proving which takes far longer than a page load. This engine
+          finds a route a couple of moves longer, in milliseconds — and it is in
+          this repository, not a solver library.
         </p>
       </div>
 

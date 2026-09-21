@@ -26,7 +26,11 @@ from playwright.sync_api import sync_playwright
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email  # noqa: E402
 
-BASE = os.environ.get("CUBEDUEL_BASE", "http://localhost:3000")
+# BASE like every other suite. The default matters more here than anywhere: a
+# passkey is bound to the origin the server was BUILT for (NEXT_PUBLIC_SITE_URL,
+# http://localhost:3000 when unset), so this suite only passes against a server
+# on that origin. CUBEDUEL_BASE is still read, for anything that set it.
+BASE = os.environ.get("BASE") or os.environ.get("CUBEDUEL_BASE", "http://localhost:3000")
 EMAIL = probe_email("e2e-passkey")
 
 failures = 0

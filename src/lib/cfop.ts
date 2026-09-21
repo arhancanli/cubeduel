@@ -190,6 +190,20 @@ export interface PhaseSplit {
   durationMs: number;
   moveCount: number;
   tps: number;
+  /**
+   * How much of `durationMs` passed before this phase's first layer turn — the
+   * time spent looking rather than turning. The rest is execution.
+   *
+   * A phase starts where the previous one's last turn landed, so every phase
+   * already contained its own recognition; it was just never separated out. That
+   * separation is the question a stopwatch cannot answer and every cuber asks:
+   * am I slow because I cannot see what to do, or because I cannot do it?
+   *
+   * Absent on splits recorded before this existed and on hand-marked splits,
+   * which have times but no turns. Zero on the cross by construction: the clock
+   * starts on the first turn, so inspection is never inside it.
+   */
+  recognitionMs?: number;
 }
 
 export interface TimedMove {
@@ -276,6 +290,56 @@ interface Candidate extends SolveAnalysis {
   crossAt: number;
   /** Where every F2L slot was in at once — the strongest signal of the real cross. */
   f2lAt: number;
+}
+
+/**
+ * The ordinary time between two turns in this solve: the median of the gaps
+ * between consecutive turns inside each phase. The first turn of each phase is
+ * left out — the gap before it is exactly the looking being measured.
+ */
+function typicalTurnGap(phases: readonly (readonly TimedMove[])[]): number {
+  const gaps: number[] = [];
+  for (const turns of phases) {
+    for (let i = 1; i < turns.length; i++) gaps.push(turns[i].atMs - turns[i - 1].atMs);
+  }
+  if (gaps.length === 0) return 0;
+  gaps.sort((a, b) => a - b);
+  const mid = Math.floor(gaps.length / 2);
+  return gaps.length % 2 ? gaps[mid] : (gaps[mid - 1] + gaps[mid]) / 2;
+}
+
+/**
+ * Every whole-cube orientation, keyed by where the centres sit, with the
+ * shortest run of rotations that reaches it. There are 24.
+ *
+ * The replay undoes the rotations made so far before every check, and it used
+ * to undo them one by one — so each move cost as much as the number of
+ * rotations before it, and a stream padded with rotations cost quadratic time
+ * on the server that analyses it. Any run of rotations is one of these 24, so
+ * it is reduced to at most three moves as it grows.
+ */
+function orientationTable(solved: Pattern): Map<string, string[]> {
+  const key = (p: Pattern) => {
+    const c = p.patternData.CENTERS;
+    return `${c.pieces.join(",")}/${c.orientation.join(",")}`;
+  };
+  const table = new Map<string, string[]>([[key(solved), []]]);
+  let frontier: string[][] = [[]];
+  while (frontier.length > 0) {
+    const next: string[][] = [];
+    for (const alg of frontier) {
+      for (const move of ["x", "x'", "x2", "y", "y'", "y2", "z", "z'", "z2"]) {
+        const candidate = [...alg, move];
+        const k = key(solved.applyAlg(candidate.join(" ")));
+        if (!table.has(k)) {
+          table.set(k, candidate);
+          next.push(candidate);
+        }
+      }
+    }
+    frontier = next;
+  }
+  return table;
 }
 
 /** Reads one solve under one assumption about which face the cross was built on. */
@@ -375,21 +439,51 @@ function interpret(
   if (finished) score += 1;
   boundaries.push({ phase: finished ? "PLL" : "Unfinished", at: endAt });
 
+  // A milestone already true at the previous boundary contributes no phase — it
+  // happens when a scramble leaves a pair solved, or a pair is finished as a
+  // side effect of the previous one.
+  const ranges: { phase: string; from: number; to: number }[] = [];
+  {
+    let prevIndex = -1;
+    for (const { phase, at } of boundaries) {
+      if (at <= prevIndex) continue;
+      ranges.push({ phase, from: prevIndex + 1, to: at });
+      prevIndex = at;
+    }
+  }
+
+  const turnsIn = (from: number, to: number) =>
+    moves.slice(from, to + 1).filter((m) => !isRotationMove(m.move));
+  const typicalGap = typicalTurnGap(ranges.map((r) => turnsIn(r.from, r.to)));
+
   const splits: PhaseSplit[] = [];
-  let prevIndex = -1;
   let prevMs = 0;
-
-  for (const { phase, at } of boundaries) {
-    // A milestone already true at the previous boundary contributes no phase — it
-    // happens when a scramble leaves a pair solved, or a pair is finished as a
-    // side effect of the previous one.
-    if (at <= prevIndex) continue;
-
-    const endMs = moves[at].atMs;
+  for (const { phase, from, to } of ranges) {
+    // Whole milliseconds. The recorder's clock is fractional, and a split stored
+    // as 1843.2999999523163 is six times the bytes of 1843 and no more true.
+    const endMs = Math.round(moves[to].atMs);
     const durationMs = endMs - prevMs;
-    const moveCount = moves
-      .slice(prevIndex + 1, at + 1)
-      .filter((m) => !isRotationMove(m.move)).length;
+    const turns = turnsIn(from, to);
+    const moveCount = turns.length;
+
+    // Recognition ends at the first TURN, not the first move. A rotation is how
+    // a cuber brings the next pair round to look at it — part of seeing what to
+    // do, not of doing it — so counting it as execution would credit looking
+    // time to the hands.
+    //
+    // And one ordinary turn is taken back out of it. The gap before a phase's
+    // first turn holds the looking AND the making of that turn, which takes as
+    // long as any other; left in, a cuber turning at an even 10 per second with
+    // half-second looks was shown 600ms of looking per phase and hands at 13
+    // turns per second. The ordinary turn is the median gap between turns
+    // inside phases, where nobody is stopping to look.
+    const gapBefore = turns.length > 0 ? turns[0].atMs - prevMs : durationMs;
+    const recognitionMs =
+      turns.length > 0 && prevMs > 0
+        ? Math.min(durationMs, Math.max(0, Math.round(gapBefore - typicalGap)))
+        : turns.length > 0
+          ? 0
+          : durationMs;
 
     splits.push({
       phase,
@@ -397,10 +491,9 @@ function interpret(
       endMs,
       durationMs,
       moveCount,
-      tps: durationMs > 0 ? moveCount / (durationMs / 1000) : 0,
+      tps: durationMs > 0 ? Math.round((moveCount / (durationMs / 1000)) * 100) / 100 : 0,
+      recognitionMs,
     });
-
-    prevIndex = at;
     prevMs = endMs;
   }
 
@@ -444,12 +537,20 @@ export async function analyzeSolve(
   // The move replay is the expensive part, so it happens once and every candidate
   // cross face is evaluated against the same patterns.
   let pattern = scramble ? solved.applyAlg(scramble) : solved;
-  const rotations: string[] = [];
+  let rotations: string[] = [];
   const patterns: Pattern[] = [pattern];
+  let orientations: Map<string, string[]> | null = null;
 
   for (const { move } of moves) {
     pattern = pattern.applyMove(move);
-    if (isRotationMove(move)) rotations.push(move);
+    if (isRotationMove(move)) {
+      orientations ??= orientationTable(solved);
+      const reached = solved.applyAlg([...rotations, move].join(" ")).patternData.CENTERS;
+      rotations = orientations.get(`${reached.pieces.join(",")}/${reached.orientation.join(",")}`) ?? [
+        ...rotations,
+        move,
+      ];
+    }
     const canonical = rotations.length > 0 ? pattern.applyAlg(invertAlg(rotations)) : pattern;
     patterns.push(canonical);
   }

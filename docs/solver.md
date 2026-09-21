@@ -7,8 +7,9 @@ attempts were wrong.
 
 **Result.** Over 100 random-state scrambles: every cube solved, mean **20.65
 moves** (half-turn metric), median **69ms**, maximum **815ms**. Tables build once
-in ~750ms. God's number is 20, so the average solution is within a move of the
-proven optimum.
+in ~750ms. That is short, not shortest: the average true minimum for a random
+cube is about 17.7 moves, so these routes run about three moves long. See
+[What this is not](#9-what-this-is-not).
 
 ---
 
@@ -204,8 +205,14 @@ one script that *worked* was the one using a hardcoded scramble.
 
 ## 9. What this is not
 
-- **Not optimal.** Two-phase trades a provable minimum for speed. The mean is
-  0.65 moves above God's number; a genuinely optimal solver (IDA* over a much
-  larger pattern database) would take minutes per cube for that last fraction.
+- **Not optimal.** Two-phase trades a provable minimum for speed. Its mean of
+  about 20.6 moves is roughly three above the true average minimum: per
+  Rokicki, Kociemba, Davidson and Dethridge's distance table (cube20.org), about
+  two thirds of all positions need exactly 18 moves and about a quarter need 17,
+  which puts the average near 17.7. (An earlier version of this line compared
+  the mean to God's number, 20 — but that is the worst case, not the typical
+  one, so the comparison made the engine look closer to optimal than it is.) A
+  genuinely optimal solver — IDA* over a much larger pattern database — would
+  take minutes per cube for those last three moves.
 - **Not multi-puzzle.** 3x3 only. The coordinate scheme is specific to it.
 - **Not incremental.** It solves a state; it does not resume or explain.

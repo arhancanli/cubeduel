@@ -92,15 +92,37 @@ async function honestSolve(profileId: string, label: string) {
 
   await new Promise((resolve) => setTimeout(resolve, durationMs));
 
+  const clientId = `probe_${label}_${Date.now()}`;
   const result = await submitAttempt({
     profileId,
     attemptId: attempt.attemptId,
-    clientId: `probe_${label}_${Date.now()}`,
+    clientId,
     moves,
     durationMs,
     penalty: "OK",
     source: "keyboard",
+    // A verifiable solve carrying a made-up breakdown. The moves are replayed and
+    // pass; everything below them used to be stored exactly as sent, beside a
+    // "verified" badge the server had only earned for the moves.
+    splits: [{ phase: "Fabricated", startMs: 0, endMs: 1, durationMs: 1, moveCount: 1, tps: 1 }],
+    ollCase: "made-up",
+    pllCase: "made-up",
   });
+
+  if (result.accepted) {
+    const { data: stored } = await db()
+      .from("solves")
+      .select("splits, oll_case, pll_case")
+      .eq("profile_id", profileId)
+      .eq("client_id", clientId)
+      .single();
+    const phases = ((stored?.splits ?? []) as { phase: string }[]).map((p) => p.phase);
+    check(
+      `${label}: the stored breakdown is the server's, not the request's`,
+      !phases.includes("Fabricated") && stored?.oll_case !== "made-up" && stored?.pll_case !== "made-up",
+      `${phases.join(",") || "no phases"} · ${stored?.oll_case} · ${stored?.pll_case}`,
+    );
+  }
 
   check(
     `${label} verified`,

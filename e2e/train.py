@@ -8,7 +8,7 @@ clock never starts, or the rep never ends. Both leave a page that looks fine.
 So this drives a real browser, types a real algorithm on the keyboard, and asserts
 the drill actually completed and the deck advanced.
 
-    BASE=http://localhost:3210 python3 e2e/train.py
+    BASE=http://localhost:3000 python3 e2e/train.py
 """
 
 import os

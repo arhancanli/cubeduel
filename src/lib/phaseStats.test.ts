@@ -6,6 +6,7 @@ import {
   diagnose,
   groupOf,
   groupSplits,
+  lookAndTurn,
   totalTimeTrend,
   MIN_SOLVES_FOR_DIAGNOSIS,
   type PhaseGroup,
@@ -228,4 +229,134 @@ test("a large, consistent change is reported as improvement", () => {
   const trend = totalTimeTrend(solves);
   assert.equal(trend.kind, "improving");
   assert.ok(Math.abs(trend.deltaMs + 7000) < 100, `delta was ${trend.deltaMs}`);
+});
+
+// ---------------------------------------------------------------------------
+// Looking and turning, measured from the stream
+// ---------------------------------------------------------------------------
+
+/**
+ * A solve whose phases carry measured recognition. F2L's look and turn are
+ * spread over four pairs, as a real solve's would be.
+ */
+function measured(
+  phases: Partial<Record<Exclude<PhaseGroup, "Cross">, { look: number; turn: number }>>,
+  cross = 1500,
+): StoredSolve {
+  seq += 1;
+  const splits: PhaseSplit[] = [
+    { phase: "Cross", startMs: 0, endMs: cross, durationMs: cross, moveCount: 7, tps: 5, recognitionMs: 0 },
+  ];
+  const push = (phase: string, look: number, turn: number, moves: number) =>
+    splits.push({
+      phase,
+      startMs: 0,
+      endMs: look + turn,
+      durationMs: look + turn,
+      moveCount: moves,
+      tps: 0,
+      recognitionMs: look,
+    });
+  if (phases.F2L) {
+    for (let i = 1; i <= 4; i++) push(`F2L ${i}`, phases.F2L.look / 4, phases.F2L.turn / 4, 7);
+  }
+  if (phases.OLL) push("OLL", phases.OLL.look, phases.OLL.turn, 9);
+  if (phases.PLL) push("PLL", phases.PLL.look, phases.PLL.turn, 13);
+  const total = splits.reduce((a, s) => a + s.durationMs, 0);
+  return {
+    id: `m${seq}`,
+    at: seq,
+    scramble: "",
+    durationMs: total,
+    penalty: "OK",
+    moveCount: 60,
+    tps: 3,
+    splits,
+    ollCase: null,
+    pllCase: null,
+    ollSetup: null,
+    pllSetup: null,
+    source: "keyboard",
+  };
+}
+
+/** Twenty solves in which F2L is the bottleneck, with fast and slow halves. */
+function f2lSolves(slow: { look: number; turn: number }, fast: { look: number; turn: number }) {
+  return Array.from({ length: 20 }, (_, i) =>
+    measured({
+      F2L: i % 2 ? slow : fast,
+      OLL: { look: 600, turn: 1400 },
+      PLL: { look: 500, turn: 1500 },
+    }),
+  );
+}
+
+test("slow solves that lose their time looking are called recognition — measured, not inferred", () => {
+  const d = diagnose(f2lSolves({ look: 5000, turn: 5000 }, { look: 2000, turn: 4600 }));
+  assert.equal(d.phase, "F2L");
+  assert.equal(d.kind, "recognition");
+  assert.match(d.measured ?? "", /3\.4s longer: 3\.0s more between pairs, 0\.4s more turning/);
+  assert.match(d.fact, /3\.5s between pairs and 4\.8s turning/);
+});
+
+test("slow solves that lose their time turning are called execution", () => {
+  const d = diagnose(f2lSolves({ look: 2200, turn: 8000 }, { look: 2000, turn: 4000 }));
+  assert.equal(d.kind, "execution");
+  assert.match(d.measured ?? "", /0\.2s more between pairs, 4\.0s more turning/);
+});
+
+test("the call is made by comparing slow solves to fast ones, not looking to turning", () => {
+  // Turning is the larger part of every solve here, as it is for almost every
+  // cuber. Comparing the two parts directly would call this execution; it is the
+  // looking that makes the slow ones slow.
+  const d = diagnose(f2lSolves({ look: 4000, turn: 6100 }, { look: 1000, turn: 6000 }));
+  assert.equal(d.kind, "recognition");
+});
+
+test("slow solves that look LESS are described as less, never as a negative more", () => {
+  const d = diagnose(f2lSolves({ look: 1500, turn: 9000 }, { look: 2000, turn: 4000 }));
+  assert.match(d.measured ?? "", /0\.5s less between pairs, 5\.0s more turning/);
+});
+
+test("below ten measured solves the old heuristic answers, and says nothing measured", () => {
+  const few = f2lSolves({ look: 5000, turn: 5000 }, { look: 2000, turn: 4600 }).slice(0, 9);
+  const d = diagnose(few);
+  assert.equal(d.phase, "F2L");
+  assert.equal(d.measured, null);
+});
+
+test("a phase with any unmeasured pair is not counted as measured", () => {
+  const solves = f2lSolves({ look: 5000, turn: 5000 }, { look: 2000, turn: 4600 }).map((s) => ({
+    ...s,
+    // One pair recorded before recognition existed. Treating it as all turning
+    // would pour its looking into the wrong column.
+    splits: s.splits.map((p) => (p.phase === "F2L 3" ? { ...p, recognitionMs: undefined } : p)),
+  }));
+  assert.equal(diagnose(solves).measured, null);
+  assert.ok(!lookAndTurn(solves).some((l) => l.phase === "F2L"));
+});
+
+test("looking and turning per phase, with turning speed free of the pauses", () => {
+  const solves = Array.from({ length: 6 }, () =>
+    measured({ F2L: { look: 4000, turn: 7000 }, OLL: { look: 900, turn: 1800 }, PLL: { look: 600, turn: 2600 } }),
+  );
+  const table = lookAndTurn(solves);
+  assert.deepEqual(
+    table.map((t) => t.phase),
+    ["F2L", "OLL", "PLL"],
+    "the cross is left out: its looking is inspection, outside the clock",
+  );
+  const f2l = table.find((t) => t.phase === "F2L")!;
+  assert.equal(f2l.n, 6);
+  assert.equal(f2l.lookMs, 4000);
+  assert.equal(f2l.turnMs, 7000);
+  // 28 turns in 7 seconds of turning is 4 TPS — the 4 seconds of looking do not dilute it.
+  assert.ok(Math.abs(f2l.turningTps - 4) < 1e-9, String(f2l.turningTps));
+});
+
+test("looking and turning is not reported below the diagnosis sample size", () => {
+  const solves = Array.from({ length: MIN_SOLVES_FOR_DIAGNOSIS - 1 }, () =>
+    measured({ F2L: { look: 4000, turn: 7000 } }),
+  );
+  assert.deepEqual(lookAndTurn(solves), []);
 });

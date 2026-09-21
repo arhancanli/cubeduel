@@ -150,7 +150,8 @@ export function TimerScreen() {
         pllCase: null,
         ollSetup: null,
         pllSetup: null,
-        source: "keyboard",
+        // A real cube and a key press: a time, and no turns behind it.
+        source: "manual",
       });
     },
     [mutateSolves, advanceScrambleRef],

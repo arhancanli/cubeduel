@@ -8,7 +8,7 @@ and the signed-out browser flows by the other e2e suites.
 This covers the one seam none of those touch — a real session cookie travelling
 from the browser into a route handler and out to Postgres.
 
-    BASE=http://localhost:3210 python3 e2e/duel.py
+    BASE=http://localhost:3000 python3 e2e/duel.py
 """
 
 import base64

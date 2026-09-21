@@ -12,7 +12,7 @@ anonymous request gets a 401 whether authentication is working or missing
 entirely, so every check that only pokes the routes anonymously still passes
 when signed-in requests are broken too.
 
-    BASE=http://localhost:3210 python3 e2e/ranked.py
+    BASE=http://localhost:3000 python3 e2e/ranked.py
 """
 
 import base64

@@ -24,11 +24,11 @@ by the time you would actually get back.</sub>
 Three things here are unusual enough to be worth naming before the feature list.
 
 **A cube solver written from scratch.** Kociemba two-phase, no solver library:
-16 ms median, 20.54 moves mean against God's number of 20. It powers the move
-efficiency figure — *you took 58 quarter turns; this cube needed 20* — and the
-duel opponent. [How it works](docs/solver.md), including the pruning-table
-mistake that quietly turned the search into brute force, and the 40× cold start
-fix.
+16 ms median, 20.54 moves mean — short routes, not proven-shortest ones (a
+random cube's true minimum averages about 17.7). It powers the move efficiency
+figure — *you used 52 moves; the engine's route was 20* — and the duel
+opponent. [How it works](docs/solver.md), including the pruning-table mistake
+that quietly turned the search into brute force, and the 40× cold start fix.
 
 **Results are proven rather than trusted.** The server generates the scramble,
 stores it, and replays your move stream against it. If the cube does not end
@@ -122,11 +122,15 @@ guarantee broken in turn to confirm the suite catches it. See
 **It ships its own solving engine.** Kociemba's two-phase algorithm, written from
 scratch in TypeScript — cube model, coordinates, pruning tables and IDA* search.
 Over 100 random-state scrambles: every cube solved, mean **20.65 moves**, median
-**69ms**, all under a second. God's number is 20, so the average solution is
-within a move of the proven optimum.
+**69ms**, all under a second. Those routes are short, not proven shortest: a
+random cube's true minimum is 17 or 18 moves about 95% of the time, so the
+engine runs about three moves long, and the app says "the engine's route", never
+"the shortest possible". Earlier versions of this README said the average was
+"within a move of the proven optimum", comparing it with God's number — which is
+the worst case, not the typical one.
 
-It is not a showpiece. It is what lets the app say *"you took 58 quarter turns;
-this cube needed 20"* — a timer can tell you how long you took, but only a solver
+It is not a showpiece. It is what lets the app say *"you used 52 moves; the
+engine's route was 20"* — a timer can tell you how long you took, but only a solver
 can separate the cube being hard from you going the long way round. It is also
 the prerequisite for bot opponents that replay real solutions rather than
 counting down to a chosen time. The full write-up, including the three mistakes
@@ -181,11 +185,11 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 578 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 19 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 610 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 20 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
-| `npm run integration:local` | 10 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
+| `npm run integration:local` | 11 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
 | `npm run integration` | local Postgres | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | local Postgres | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
 | `npm run integration:rush` | local Postgres | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
@@ -196,6 +200,7 @@ in the commit history was caught by exactly one of them.
 | `npm run integration:clubs` | local Postgres | A club board reads the same verified ratings the global one does, and lists members with no rating rather than hiding them. |
 | `npm run integration:wca` | local Postgres | The OAuth state is issued here, redeemed once, and bound to the profile that started it — the only thing between an honest link and somebody attaching a world-class average to their name. |
 | `npm run integration:solve` | local Postgres | A solve permalink says the same thing a fortnight later: faster solves added afterwards must not rewrite its verdict. |
+| `npm run integration:sync` | local Postgres | Practice solves keep their move stream, and the stored breakdown, cases and counts are derived from it — a request that lies about any of them changes nothing stored. A stream longer than its own solve is dropped, and junk never reaches the splits column. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
 The e2e suite exists because of one specific failure mode: an anonymous request
@@ -204,12 +209,21 @@ poked the API signed out would have passed while ranked was completely dead — 
 it was, for a while, for two unrelated reasons. See the commit history.
 
 ```bash
-npm run build && npx next start -p 3210
-BASE=http://localhost:3210 npm run e2e
+npm run e2e:local      # needs Docker
 ```
 
-Run e2e against a **production** build, not dev — the scramble generator is a WASM
-worker and the two bundlers resolve it differently.
+That is the whole thing in one command: a fresh local database, a production
+build, a server on `http://localhost:3000` pointed at that database, every suite,
+and the server stopped afterwards. No credentials, and nothing it creates lands
+anywhere real.
+
+Two constraints it encodes, both learned the hard way. Run e2e against a
+**production** build, not dev — the scramble generator is a WASM worker and the two
+bundlers resolve it differently. And serve it on the origin it was **built for**:
+passkeys and emailed links are bound to `NEXT_PUBLIC_SITE_URL`
+(`http://localhost:3000` when unset), so the same suites against a server on any
+other port fail sign-in for reasons that have nothing to do with the code. The
+instructions here used to say port 3210, which is how that was found.
 
 ## Stack
 
@@ -326,6 +340,69 @@ Rules that keep it honest:
   changed that week. This is tested explicitly.
 - DNFs and unsplittable solves are excluded from phase stats but still recorded, so the
   history doesn't quietly bias toward clean CFOP solves.
+
+## Looking and turning (`recognitionMs`, `lookAndTurn`, `explainSlowSolves`)
+
+The question every cuber asks and no stopwatch can answer: *am I slow because I
+cannot see what to do, or because I cannot do it?* The move stream answers it by
+measurement. A phase starts where the previous one's last turn landed, so every
+phase already contained its own looking; it was just never separated out.
+`recognitionMs` is the time before a phase's first **turn** — between F2L pairs,
+and recognising the OLL and PLL case — and the rest is turning.
+
+- **A rotation is looking, not turning.** Bringing a pair round to look at it is
+  part of seeing what to do, so recognition ends at the first layer turn, not the
+  first move. Tested by rotating away and back inside a pause and asserting the
+  pause is unchanged.
+- **The cross has none inside the clock.** The clock starts on the first turn, so
+  its looking is inspection. Showing "0.0s looking" would be true and misleading, so
+  the cross is left out rather than displayed.
+- **"Hands" is turning speed with the pauses taken out.** Ordinary TPS mixes the
+  two, which is how a cuber with fast hands and slow eyes reads as "low TPS" and
+  goes off to practise fingertricks they do not need.
+
+The diagnosis on `/progress` now **measures** where a phase's time goes instead of
+inferring it from variance. It does not compare looking against turning — turning
+is the larger part for almost everyone, so that comparison would say "execution"
+whatever the truth was. It ranks the cuber's own solves by that phase, splits them
+in half, and asks which part the extra time in the slower half went to: *"In your
+slower half of 40 solves, F2L takes 2.6s longer: 2.1s more between pairs, 0.5s
+more turning."* Only the cuber's own solves, no population norm, and no threshold
+for "too much looking" — there is no data here to set one honestly. Below ten
+measured solves it falls back to the spread heuristic and says nothing measured.
+
+`e2e/looking.py` types a CFOP solve on the keyboard with a 1.2s pause before one
+F2L pair and asserts the pause lands in exactly that pair's looking — keyboard,
+recorder, analysis and bar, end to end.
+
+**Looking has one ordinary turn taken out of it.** The gap before a phase's first
+turn holds the looking *and* the making of that turn, which takes as long as any
+other. Left in, a cuber turning at an even ten per second with half-second looks
+was shown 600ms of looking per phase and hands at thirteen turns a second — the
+first version did exactly that, and an independent review caught it. The ordinary
+turn is the median gap between turns inside phases, where nobody stops to look;
+the tests pin that steady turning reads as its real speed.
+
+**Every solve keeps its turns.** Practice solves used to store their phase totals
+and throw the move stream away, so the most common kind of solve had no replay,
+and its public page said it had been "entered by hand". History now keeps each
+solve's stream as a compact string (about 350 bytes for 60 moves, roughly a fifth
+of the same thing as JSON), and when storage runs short the oldest solves give up
+their replay before any solve is lost. Sync sends the stream too.
+
+**The server derives every stored breakdown.** Ranked, duels, challenges, rush
+and sync all used to store the phase splits and last-layer cases the browser sent,
+unexamined — beside a "verified" badge the server had only earned for the moves.
+They are now worked out on the server from the stream it just replayed
+(`src/lib/server/solveAnalysis.ts`), 3x3 only because CFOP is 3x3 only. For a
+solve that arrives with a stream that holds up, a request that lies about its
+breakdown, cases, move count or turn rate changes nothing that is stored. A stream
+that does not hold up — unreadable, longer than the clock, faster than a human
+turns, or past the request's replay budget — is dropped along with everything the
+client derived from it. Only a solve with no stream at all (a stopwatch time, or
+one recorded before streams were kept) keeps what it was sent, after validation,
+because there is nothing else to know about it. `npm run integration:sync` and
+`npm run integration` send each of those and assert what lands.
 
 ## Challenge links
 

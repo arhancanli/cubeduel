@@ -6,6 +6,7 @@ import type { Penalty } from "../types";
 import { ATTEMPT_TTL_MS, verifySolve, type SubmittedMove } from "../verifySolve";
 import { eventOf } from "../events";
 import { db } from "./supabase";
+import { analysisFromStream } from "./solveAnalysis";
 import { raise } from "./schema";
 
 /**
@@ -195,6 +196,7 @@ export async function finishDuel(input: DuelFinishInput): Promise<DuelResult> {
   const effective = durationMs + (input.penalty === "PLUS2" ? 2000 : 0);
   const outcome: "win" | "loss" = effective < duel.bot_duration_ms ? "win" : "loss";
 
+  const analysis = await analysisFromStream(duel.event, duel.scramble, input.moves);
   const { data: solve, error: solveError } = await db()
     .from("solves")
     .insert({
@@ -210,7 +212,10 @@ export async function finishDuel(input: DuelFinishInput): Promise<DuelResult> {
       mode: "duel",
       verified: true,
       moves: input.moves as never,
-      splits: (input.splits ?? []) as never,
+      // Derived from the verified stream, never taken from the request.
+      splits: analysis.splits as never,
+      oll_case: analysis.ollCase,
+      pll_case: analysis.pllCase,
       solved_at: new Date(receivedAt).toISOString(),
     })
     .select("id")

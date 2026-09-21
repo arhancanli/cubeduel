@@ -25,6 +25,7 @@ import {
   type DailyEntry,
 } from "@/lib/dailyStorage";
 import { analyzeSolve, type PhaseSplit, type SolveAnalysis } from "@/lib/cfop";
+import { encodeMoveStream, isRotation } from "@/lib/moveStream";
 import { SolveBreakdown } from "@/components/SolveBreakdown";
 import { recordSolve } from "@/lib/solveHistory";
 import { submitDailyResult } from "@/lib/sync";
@@ -128,18 +129,23 @@ export function DailyRound({
       // only habit was the daily saw an empty analysis page forever.
       const store = (analysis: SolveAnalysis) => {
         setSplits(analysis.splits);
+        // Turns, not moves: a rotation is the cube changing hands, and every
+        // other screen leaves it out. Counting it here made the same solve
+        // report a higher move count and turn rate on the daily than on /play.
+        const turns = moves?.filter((m) => !isRotation(m.move)).length ?? 0;
         recordSolve({
           scramble: scramble ?? "",
           durationMs: ms,
           penalty: "OK",
-          moveCount: moves?.length ?? 0,
-          tps: moves && ms > 0 ? moves.length / (ms / 1000) : 0,
+          moveCount: turns,
+          tps: ms > 0 ? turns / (ms / 1000) : 0,
           splits: analysis.splits,
           ollCase: analysis.ollCase,
           pllCase: analysis.pllCase,
           ollSetup: analysis.ollSetup,
           pllSetup: analysis.pllSetup,
-          source: "keyboard",
+          source: moves && moves.length > 0 ? "keyboard" : "manual",
+          ...(moves && moves.length > 0 ? { moves: encodeMoveStream(moves) } : {}),
         });
       };
 
@@ -313,7 +319,7 @@ export function DailyRound({
           */}
           {optimalMoves !== null ? (
             <p className="text-xs text-muted-dim">
-              The whole cube can be solved in{" "}
+              This site&apos;s engine solves today&apos;s cube in{" "}
               <span className="text-muted">{optimalMoves} moves</span>. A human
               method takes three or four times that.
             </p>

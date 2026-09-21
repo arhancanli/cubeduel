@@ -41,7 +41,19 @@ export interface StoredSolve {
   /** Algorithms that redraw those cases, so the coach can show them. */
   ollSetup: string | null;
   pllSetup: string | null;
-  source: "keyboard" | "smartcube";
+  /**
+   * `manual` is a stopwatch time: the player turned a real cube and pressed a
+   * key. It has a time and nothing else, and it used to be recorded as
+   * `keyboard` — which told the server, and the solve's public page, that it had
+   * been solved on the keyboard when it had not.
+   */
+  source: "keyboard" | "smartcube" | "manual";
+  /**
+   * Every turn and when it happened, as `encodeMoveStream` writes it. Absent on a
+   * stopwatch solve, on solves recorded before streams were kept, and on the
+   * oldest solves once storage runs short — see `save`.
+   */
+  moves?: string;
 }
 
 interface HistoryStore {
@@ -71,6 +83,7 @@ function isUsable(value: unknown): value is StoredSolve {
     Number.isFinite(s.durationMs) &&
     (s.penalty === "OK" || s.penalty === "PLUS2" || s.penalty === "DNF") &&
     typeof s.moveCount === "number" &&
+    (s.moves === undefined || typeof s.moves === "string") &&
     Array.isArray(s.splits) &&
     s.splits.every(
       (split) =>
@@ -94,13 +107,47 @@ export function loadHistory(): StoredSolve[] {
   }
 }
 
-function save(store: HistoryStore): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(HISTORY_KEY, JSON.stringify(store));
-  } catch {
-    /* Quota or private mode — the session keeps working, history just stops growing. */
+/**
+ * True when the history was written, false when storage refused it.
+ *
+ * When storage is full, what gives way is the oldest solves' move streams: a
+ * stream is the one part of a solve that can go without losing the solve, and
+ * before streams were kept, this is where history silently stopped growing.
+ */
+function save(store: HistoryStore, shed = true): boolean {
+  if (typeof window === "undefined") return false;
+  let solves = store.solves;
+  for (;;) {
+    try {
+      window.localStorage.setItem(HISTORY_KEY, JSON.stringify({ ...store, solves }));
+      return true;
+    } catch {
+      // Out of quota, most likely. The oldest quarter of the solves that still
+      // carry a stream lose it, and the save is tried again. Private mode fails
+      // every attempt and ends here once nothing is left to shed.
+      const next = shed ? shedOldestStreams(solves) : null;
+      if (next === null) return false;
+      solves = next;
+    }
   }
+}
+
+/**
+ * The same solves with the oldest quarter of the remaining move streams removed,
+ * or null once there are none left to remove. A quarter rather than all of them
+ * at once, so a history that is only just over the quota keeps most replays.
+ */
+export function shedOldestStreams(solves: readonly StoredSolve[]): StoredSolve[] | null {
+  const carrying = solves.filter((s) => s.moves !== undefined).length;
+  if (carrying === 0) return null;
+  let toShed = Math.ceil(carrying / 4);
+  return solves.map((solve) => {
+    if (toShed === 0 || solve.moves === undefined) return solve;
+    toShed--;
+    const shed = { ...solve };
+    delete shed.moves;
+    return shed;
+  });
 }
 
 /**

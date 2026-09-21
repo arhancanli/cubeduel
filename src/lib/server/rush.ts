@@ -16,6 +16,7 @@ import { verifySolve, type SubmittedMove } from "../verifySolve";
 import { currentRating } from "./ranked";
 import { raise } from "./schema";
 import { db } from "./supabase";
+import { analysisFromStream } from "./solveAnalysis";
 
 /**
  * Rush, server side.
@@ -225,6 +226,7 @@ export async function submitRushSolve(input: RushSubmitInput): Promise<RushSubmi
       // far more harshly than a slow solve.
       penalty = "DNF";
     } else {
+      const analysis = await analysisFromStream(event, run.current_scramble, input.moves);
       const { data: solve, error: solveError } = await db()
         .from("solves")
         .insert({
@@ -246,7 +248,10 @@ export async function submitRushSolve(input: RushSubmitInput): Promise<RushSubmi
           // player costs the belief the ladder runs on.
           humanness: humannessOf(input.moves, durationMs),
           moves: input.moves as never,
-          splits: (input.splits ?? []) as never,
+          // Derived from the verified stream, never taken from the request.
+          splits: analysis.splits as never,
+          oll_case: analysis.ollCase,
+          pll_case: analysis.pllCase,
           solved_at: new Date(receivedAt).toISOString(),
         })
         .select("id")

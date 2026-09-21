@@ -1,7 +1,16 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { SolveRecorder, computeStats, isRotation, type RecordedMove } from "./moveStream";
+import {
+  MAX_STREAM_MOVES,
+  SolveRecorder,
+  computeStats,
+  countMoves,
+  decodeMoveStream,
+  encodeMoveStream,
+  isRotation,
+  type RecordedMove,
+} from "./moveStream";
 
 test("rotations are distinguished from layer turns", () => {
   for (const m of ["x", "y", "z", "x'", "y2", "z'", "y2'"]) {
@@ -137,4 +146,101 @@ test("stats are safe on an empty or zero-length solve", () => {
   assert.equal(stats.tps, 0);
   assert.equal(stats.pausedFraction, 0);
   assert.equal(stats.longestPauseAtIndex, -1);
+});
+
+// ---------------------------------------------------------------------------
+// encodeMoveStream / decodeMoveStream
+// ---------------------------------------------------------------------------
+
+test("a move stream survives the round trip with its timing intact", () => {
+  const moves = [
+    { move: "R", atMs: 0 },
+    { move: "U", atMs: 120.4 },
+    { move: "R'", atMs: 239.6 },
+    { move: "y", atMs: 1450 },
+    { move: "F2", atMs: 1612 },
+    { move: "3Rw'", atMs: 99_999 },
+  ];
+  const decoded = decodeMoveStream(encodeMoveStream(moves));
+  assert.deepEqual(decoded, [
+    { move: "R", atMs: 0 },
+    { move: "U", atMs: 120 },
+    { move: "R'", atMs: 240 },
+    { move: "y", atMs: 1450 },
+    { move: "F2", atMs: 1612 },
+    { move: "3Rw'", atMs: 99_999 },
+  ]);
+});
+
+test("rounding does not accumulate over a long solve", () => {
+  // 500 moves each 100.4ms apart. Rounding every GAP would lose 0.4ms a move and
+  // end 200ms early; rounding each absolute time ends where the solve ended.
+  const moves = Array.from({ length: 500 }, (_, i) => ({ move: "R", atMs: i * 100.4 }));
+  const decoded = decodeMoveStream(encodeMoveStream(moves))!;
+  assert.equal(decoded.at(-1)!.atMs, Math.round(499 * 100.4));
+});
+
+test("an encoded solve is several times smaller than the same moves as JSON", () => {
+  const moves = Array.from({ length: 60 }, (_, i) => ({ move: i % 2 ? "U'" : "R2", atMs: i * 173 }));
+  const encoded = encodeMoveStream(moves);
+  assert.ok(encoded.length * 4 < JSON.stringify(moves).length, `${encoded.length} vs ${JSON.stringify(moves).length}`);
+});
+
+test("a corrupt stream is refused whole, never half-read", () => {
+  assert.equal(decodeMoveStream("R.0 U.3c <script>.1"), null);
+  assert.equal(decodeMoveStream("R.0 U"), null, "a token with no time");
+  assert.equal(decodeMoveStream("R.0 U.-5"), null, "a negative gap");
+  assert.equal(decodeMoveStream(".5"), null, "a time with no move");
+  assert.equal(decodeMoveStream(Array(MAX_STREAM_MOVES + 1).fill("R.1").join(" ")), null);
+  assert.deepEqual(decodeMoveStream(""), []);
+});
+
+test("times never run backwards even if the recorder's clock does", () => {
+  const decoded = decodeMoveStream(
+    encodeMoveStream([
+      { move: "R", atMs: 100 },
+      { move: "U", atMs: 90 },
+    ]),
+  )!;
+  assert.ok(decoded[1].atMs >= decoded[0].atMs);
+});
+
+// ---------------------------------------------------------------------------
+// countMoves
+// ---------------------------------------------------------------------------
+
+test("a half turn typed as two quarter turns is one move", () => {
+  assert.equal(countMoves(["R", "R"]), 1);
+  assert.equal(countMoves(["R2"]), 1);
+  assert.equal(countMoves(["D", "D", "R'", "D'"]), 3, "the cross D2 R' D' as the keyboard types it");
+});
+
+test("turns that cancel are no moves at all", () => {
+  assert.equal(countMoves(["R", "R'"]), 0);
+  assert.equal(countMoves(["U", "R", "R", "R", "R", "U'"]), 2);
+  assert.equal(countMoves(["R", "R", "R"]), 1, "three quarters is R'");
+});
+
+test("rotations are not moves, and the same letter either side of one is two layers", () => {
+  // After y, "R" is the face that used to be in front. Merging across the
+  // rotation would count two different layers as one move.
+  assert.equal(countMoves(["R", "y", "R"]), 2);
+  assert.equal(countMoves(["R", "y", "R'"]), 2, "and they certainly do not cancel");
+  assert.equal(countMoves(["x", "y2", "z'"]), 0);
+});
+
+test("different layers never merge, including opposite faces and wide turns", () => {
+  assert.equal(countMoves(["R", "L", "R"]), 3);
+  assert.equal(countMoves(["R", "Rw", "r"]), 3);
+  assert.equal(countMoves(["2R", "2R"]), 1);
+});
+
+test("a middle-slice turn counts as the two face turns it is", () => {
+  // M is R L' with the cube turned. Every solver here counts face turns, so a
+  // cross built with slices must not come out shorter than the shortest.
+  assert.equal(countMoves(["M"]), 2);
+  assert.equal(countMoves(["M", "M"]), 2, "M2 is still two face turns");
+  assert.equal(countMoves(["M", "M'"]), 0);
+  assert.equal(countMoves(["E", "S'"]), 4);
+  assert.equal(countMoves(["r"]), 1, "a wide turn is one face turn and a rotation");
 });

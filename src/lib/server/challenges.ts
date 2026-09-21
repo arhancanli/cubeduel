@@ -15,6 +15,7 @@ import { humannessOf } from "../humanness";
 import type { Penalty } from "../types";
 import { verifySolve, type SubmittedMove } from "../verifySolve";
 import { db } from "./supabase";
+import { analysisFromStream } from "./solveAnalysis";
 import { raise } from "./schema";
 
 /**
@@ -423,6 +424,7 @@ export async function submitSide(input: SubmitInput): Promise<SubmitResult> {
   const inspection = judgeInspection(receivedAt - durationMs - startedAt);
   const penalty = combinePenalties(input.penalty, inspection.penalty);
 
+  const analysis = await analysisFromStream(row.event, row.scramble, input.moves);
   const { data: solve, error: solveError } = await db()
     .from("solves")
     .insert({
@@ -444,7 +446,10 @@ export async function submitSide(input: SubmitInput): Promise<SubmitResult> {
       // ladder runs on.
       humanness: humannessOf(input.moves, durationMs),
       moves: input.moves as never,
-      splits: (input.splits ?? []) as never,
+      // Derived from the verified stream, never taken from the request.
+      splits: analysis.splits as never,
+      oll_case: analysis.ollCase,
+      pll_case: analysis.pllCase,
       solved_at: new Date(receivedAt).toISOString(),
     })
     .select("id")

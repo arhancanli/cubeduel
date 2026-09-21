@@ -173,8 +173,8 @@ export function LandingScreen() {
           <div className="grid gap-10 sm:grid-cols-3">
             {[
               {
-                title: "Phase splits",
-                body: "Tap through the stages as you solve, or connect a smart cube and let it read every turn. Either way you get cross, F2L, OLL and PLL separately.",
+                title: "Looking, or turning",
+                body: "Every stage is split in two: the time before your first turn, and the time spent turning. Slow to see and slow to do are different problems — and your slow solves say which one is yours.",
               },
               {
                 title: "The case, not the stage",

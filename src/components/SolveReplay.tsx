@@ -40,7 +40,22 @@ interface Segment {
   phase: string;
   startMs: number;
   endMs: number;
+  /** The part before the phase's first turn, when it was measured. See `lookOf`. */
+  lookMs: number | null;
 }
+
+/**
+ * Looking worth drawing: measured, and not the cross, whose looking was
+ * inspection and is never inside the clock. The same rule `SolveBreakdown`
+ * applies, so the track and the table cannot disagree.
+ */
+function lookOf(split: PhaseSplit): number | null {
+  if (split.phase === "Cross" || split.recognitionMs === undefined) return null;
+  return Math.min(split.recognitionMs, split.endMs - split.startMs);
+}
+
+/** How far before a pause the jump lands, so the move that ended the last phase is seen. */
+const LEAD_IN_MS = 600;
 
 export function SolveReplay({ scramble, moves, splits, durationMs }: SolveReplayProps) {
   const [atMs, setAtMs] = useState(0);
@@ -58,8 +73,20 @@ export function SolveReplay({ scramble, moves, splits, durationMs }: SolveReplay
         phase: split.phase,
         startMs: split.startMs,
         endMs: split.endMs,
+        lookMs: lookOf(split),
       })),
     [splits],
+  );
+
+  // The one moment most worth watching: the longest stretch spent looking. A
+  // replay is forty moves long and the lesson is usually in a single pause.
+  const longestLook = useMemo(
+    () =>
+      segments.reduce<Segment | null>(
+        (best, s) => (s.lookMs !== null && s.lookMs > (best?.lookMs ?? 0) ? s : best),
+        null,
+      ),
+    [segments],
   );
 
   // How many moves have been made by `atMs`. The moves are already in order, so
@@ -137,6 +164,18 @@ export function SolveReplay({ scramble, moves, splits, durationMs }: SolveReplay
   }, [toggle, played, moves, totalMs]);
 
   const currentPhase = phaseAt(splits, atMs);
+  const currentSegment = currentPhase
+    ? segments.find((s) => s.phase === currentPhase.phase && s.startMs === currentPhase.startMs)
+    : undefined;
+  const looking =
+    currentSegment?.lookMs != null && atMs < currentSegment.startMs + currentSegment.lookMs;
+
+  const watchLongestLook = useCallback(() => {
+    if (!longestLook) return;
+    setSpeed(1);
+    setAtMs(Math.max(0, longestLook.startMs - LEAD_IN_MS));
+    setPlaying(true);
+  }, [longestLook]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -201,16 +240,36 @@ export function SolveReplay({ scramble, moves, splits, durationMs }: SolveReplay
             the bar is the same fact as the split table, read in one glance. */}
         <div className="relative">
           <div className="flex h-2.5 w-full overflow-hidden rounded-full bg-surface">
-            {segments.map((segment, i) => (
-              <div
-                key={`${segment.phase}-${i}`}
-                title={`${segment.phase} · ${formatMs(Math.round(segment.endMs - segment.startMs))}`}
-                style={{ width: `${((segment.endMs - segment.startMs) / totalMs) * 100}%` }}
-                className={
-                  i % 2 === 0 ? "h-full bg-muted-dim/50" : "h-full bg-muted-dim/25"
-                }
-              />
-            ))}
+            {segments.map((segment, i) => {
+              const length = segment.endMs - segment.startMs;
+              return (
+                <div
+                  key={`${segment.phase}-${i}`}
+                  title={
+                    segment.lookMs !== null
+                      ? `${segment.phase} · ${formatMs(Math.round(segment.lookMs))} looking, ${formatMs(Math.round(length - segment.lookMs))} turning`
+                      : `${segment.phase} · ${formatMs(Math.round(length))}`
+                  }
+                  style={{ width: `${(length / totalMs) * 100}%` }}
+                  className={`flex h-full text-muted-dim ${
+                    i % 2 === 0 ? "bg-muted-dim/50" : "bg-muted-dim/25"
+                  }`}
+                >
+                  {/* Looking, striped: the pause is drawn where it happened. */}
+                  {segment.lookMs !== null && length > 0 ? (
+                    <span
+                      className="h-full bg-surface"
+                      data-look-segment={segment.phase}
+                      style={{
+                        width: `${(segment.lookMs / length) * 100}%`,
+                        backgroundImage:
+                          "repeating-linear-gradient(135deg, currentColor 0 2px, transparent 2px 5px)",
+                      }}
+                    />
+                  ) : null}
+                </div>
+              );
+            })}
           </div>
 
           <div
@@ -231,11 +290,27 @@ export function SolveReplay({ scramble, moves, splits, durationMs }: SolveReplay
         </div>
 
         <div className="flex items-baseline justify-between text-xs text-muted-dim">
-          <span>
-            {currentPhase ? currentPhase.phase : "—"} · move {played} of {moves.length}
+          <span data-testid="replay-status">
+            {currentPhase ? currentPhase.phase : "—"}
+            {looking ? <span className="text-holding"> · looking</span> : null} · move {played}{" "}
+            of {moves.length}
           </span>
           <span className="hidden sm:inline">space to play, ← → to step</span>
         </div>
+
+        {longestLook?.lookMs ? (
+          <button
+            type="button"
+            onClick={watchLongestLook}
+            className="self-start rounded-lg border border-border px-3 py-1.5 text-xs text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+          >
+            Watch the longest pause —{" "}
+            <span className="tnum font-mono text-foreground">
+              {formatMs(Math.round(longestLook.lookMs))}
+            </span>{" "}
+            before {longestLook.phase}
+          </button>
+        ) : null}
       </div>
 
       {/* ------------------------------------------------------------------ */}

@@ -10,7 +10,7 @@ This app has a specific reason to care beyond the usual. The entire product is
 driven from the keyboard, and its users are people who care a great deal about
 whether a control responds the instant they press a key.
 
-    BASE=http://localhost:3210 python3 e2e/a11y.py
+    BASE=http://localhost:3000 python3 e2e/a11y.py
 """
 
 import os

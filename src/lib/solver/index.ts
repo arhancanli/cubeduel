@@ -5,7 +5,7 @@
  * than wrapped around an existing solver, because the interesting parts of this
  * product depend on it and on understanding it:
  *
- *   - **Move efficiency.** "You took 58 moves; this cube needed 20." A timer can
+ *   - **Move efficiency.** "You used 58 moves; the engine used 20." A timer can
  *     tell you how long you took. Only a solver can tell you how much of that was
  *     the cube being hard and how much was you going the long way round.
  *   - **Bot opponents.** A bot that counts down to a chosen time is a fake
@@ -18,7 +18,11 @@
  * options: every cube solved, mean 20.65 moves in the half-turn metric, median
  * 69ms, maximum 815ms. Tables build once in about 750ms.
  *
- * God's number is 20, so a mean of 20.65 is within a move of optimal on average.
+ * That is about three moves above optimal on average: God's number, 20, is the
+ * WORST case, and a random cube's true minimum averages about 17.7 (two thirds
+ * of positions need 18, a quarter need 17 — cube20.org). An earlier version of
+ * this comment compared the mean with God's number and called it within a move
+ * of optimal, which is the comparison that flatters.
  * This is not an optimal solver and does not claim to be — it is a two-phase
  * solver, which trades a provable minimum for finishing in milliseconds instead
  * of minutes. Ask for `targetLength: 20` and it will spend the extra time.

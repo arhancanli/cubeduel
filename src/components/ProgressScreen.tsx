@@ -10,8 +10,10 @@ import { formatMs } from "@/lib/format";
 import {
   aggregatePhases,
   diagnose,
+  lookAndTurn,
   totalTimeTrend,
   type Diagnosis,
+  type LookTurn,
   type PhaseAggregate,
   type Trend,
 } from "@/lib/phaseStats";
@@ -41,6 +43,7 @@ export function ProgressScreen() {
 
   const aggregates = aggregatePhases(solves);
   const diagnosis = diagnose(solves);
+  const looking = lookAndTurn(solves);
   const trend = totalTimeTrend(solves);
 
   if (solves.length === 0) {
@@ -65,6 +68,7 @@ export function ProgressScreen() {
         <GoalPanel solves={solves} />
         <Recommendation diagnosis={diagnosis} />
         {aggregates.length > 0 ? <PhaseTable aggregates={aggregates} /> : null}
+        {aggregates.length > 0 ? <LookTurnTable rows={looking} /> : null}
         <CaseCoach solves={solves} />
         <Overview solves={solves} trend={trend} />
       </div>
@@ -92,6 +96,11 @@ function Recommendation({ diagnosis }: { diagnosis: Diagnosis }) {
 
       {/* Arithmetic first, plainly stated. */}
       <p className="text-sm leading-relaxed text-muted">{diagnosis.fact}</p>
+      {diagnosis.measured ? (
+        <p className="text-sm leading-relaxed text-muted" data-testid="measured">
+          {diagnosis.measured}
+        </p>
+      ) : null}
 
       {/* Then the judgement, marked as one. */}
       <div className="border-l-2 border-border pl-3">
@@ -145,6 +154,82 @@ function PhaseTable({ aggregates }: { aggregates: PhaseAggregate[] }) {
       <p className="text-xs leading-relaxed text-muted-dim">
         Spread is the standard deviation as a share of the mean — how much that phase
         swings from solve to solve, rather than how long it takes.
+      </p>
+    </section>
+  );
+}
+
+/**
+ * How much of each phase is looking and how much is turning.
+ *
+ * Turning speed here is turns per second of TURNING — the pauses taken out — so
+ * it describes the hands alone. The ordinary TPS figure mixes the two, which is
+ * why a cuber with fast hands and slow eyes reads as "slow TPS" and goes off to
+ * practise fingertricks they do not need.
+ */
+function LookTurnTable({ rows }: { rows: LookTurn[] }) {
+  if (rows.length === 0) {
+    return (
+      <section className="flex flex-col gap-2">
+        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Looking and turning</h2>
+        <p className="text-xs leading-relaxed text-muted-dim">
+          Needs five solves on /play or the daily that recorded their turns. Solves from before
+          this was measured, and stopwatch times, can&apos;t tell looking from turning.
+        </p>
+      </section>
+    );
+  }
+
+  const maxTotal = Math.max(...rows.map((r) => r.lookMs + r.turnMs));
+
+  return (
+    <section className="flex flex-col gap-3" data-testid="look-turn">
+      <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Looking and turning</h2>
+
+      <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-muted-dim">
+        <span className="w-12 shrink-0">Phase</span>
+        <span className="flex-1" />
+        <span className="tnum w-14 shrink-0 text-right">Look</span>
+        <span className="tnum w-14 shrink-0 text-right">Turn</span>
+        <span className="tnum w-16 shrink-0 text-right">Hands</span>
+        <span className="tnum w-10 shrink-0 text-right">n</span>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        {rows.map((r) => {
+          const width = ((r.lookMs + r.turnMs) / maxTotal) * 100;
+          const lookShare = r.lookMs / (r.lookMs + r.turnMs);
+          return (
+            <div key={r.phase} className="flex items-center gap-3 text-xs">
+              <span className="w-12 shrink-0 text-muted">{r.phase}</span>
+              <div className="h-2 flex-1 overflow-hidden rounded-sm bg-surface">
+                <div className="flex h-full text-bar" style={{ width: `${Math.max(width, 1.5)}%` }}>
+                  <span
+                    className="h-full"
+                    style={{
+                      width: `${lookShare * 100}%`,
+                      backgroundImage:
+                        "repeating-linear-gradient(135deg, currentColor 0 2px, transparent 2px 5px)",
+                    }}
+                  />
+                  <span className="h-full flex-1 rounded-r-sm bg-current" />
+                </div>
+              </div>
+              <span className="tnum w-14 shrink-0 text-right text-foreground">{formatMs(r.lookMs)}</span>
+              <span className="tnum w-14 shrink-0 text-right text-muted">{formatMs(r.turnMs)}</span>
+              <span className="tnum w-16 shrink-0 text-right text-muted-dim">
+                {r.turningTps.toFixed(1)} tps
+              </span>
+              <span className="tnum w-10 shrink-0 text-right text-muted-dim">{r.n}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <p className="text-xs leading-relaxed text-muted-dim">
+        Look is the time before each step&apos;s first turn — between F2L pairs, and recognising
+        the OLL and PLL case. Hands is turning speed with those pauses taken out. The cross is
+        left off: its looking happens in inspection, before the clock starts.
       </p>
     </section>
   );

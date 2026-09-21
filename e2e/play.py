@@ -115,10 +115,30 @@ with sync_playwright() as p:
           f"{final} -> {timer_text(page)}")
 
     print("\n== the solve report ==")
-    check("move count is reported", "MOVES" in body.upper())
+    # "turns": what was typed, a half turn being two. "Moves" is kept for the
+    # count in the solver's unit, further down.
+    check("the turn count is reported", "TURNS" in body.upper())
     check("turn speed is reported", "TPS" in body.upper())
     check("pause time is reported", "PAUSED" in body.upper())
     check("longest pause is reported", "LONGEST PAUSE" in body.upper())
+
+    print("\n== against the engine, in one unit ==")
+    # The cross line waits on a server round trip (the exact cross table is
+    # built on first use), so it is polled for rather than read once. It had
+    # never rendered at all: the page looked for a phase called "cross" and the
+    # analysis writes "Cross". Nothing else on the page depends on it, so only
+    # asserting it appears can catch that.
+    cross_line = page.locator("text=/Your cross (took|was optimal)/")
+    try:
+        cross_line.first.wait_for(timeout=30000)
+    except Exception:
+        pass
+    check("the cross is compared with the shortest cross on its face", cross_line.count() >= 1,
+          [l for l in page.inner_text("body").split("\n") if "cross" in l.lower()][:2])
+    route = page.locator("[data-testid=engine-route]")
+    check("the whole solve is compared with the engine's route", route.count() == 1)
+    check("the engine's route is never called the shortest possible",
+          "shortest possible" not in page.inner_text("body").lower())
 
     print("\n== phase breakdown ==")
     page.wait_for_timeout(1500)
