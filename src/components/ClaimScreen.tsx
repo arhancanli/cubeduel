@@ -13,6 +13,7 @@ import {
   summariseClaim,
   type ClaimSummary,
 } from "@/lib/claim";
+import { nextFromLocation } from "@/lib/nextPath";
 import { formatMs } from "@/lib/format";
 import { track, trackOnce } from "@/lib/analytics";
 import { createPasskey, passkeysSupported } from "@/lib/passkeyClient";
@@ -125,7 +126,7 @@ export function ClaimScreen() {
     // Signed in already. The passkey step is an offer, not a gate — somebody who
     // skips it still has an account and still keeps their solves.
     setStage(canUsePasskeys ? "passkey" : "form");
-    if (!canUsePasskeys) router.push("/progress");
+    if (!canUsePasskeys) router.push(nextFromLocation("/progress"));
   }
 
   async function addPasskey() {
@@ -137,7 +138,7 @@ export function ClaimScreen() {
 
     if (result.ok) {
       track("passkey_added", { at: "signup" });
-      router.push("/progress");
+      router.push(nextFromLocation("/progress"));
       return;
     }
     // Cancelling is not a failure. The account exists either way, so the only
@@ -274,7 +275,7 @@ export function ClaimScreen() {
 
         <Reveal className="flex flex-col gap-4">
           {stage === "passkey" ? (
-            <PasskeyStep busy={busy} error={error} onAdd={addPasskey} onSkip={() => router.push("/progress")} />
+            <PasskeyStep busy={busy} error={error} onAdd={addPasskey} onSkip={() => router.push(nextFromLocation("/progress"))} />
           ) : (
             <form onSubmit={createAccount} className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">

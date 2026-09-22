@@ -68,6 +68,8 @@ export interface SolveSession {
   phase: RecorderPhase;
   moveCount: number;
   recording: SolveRecording | null;
+  /** The moves made so far this round, read on demand. */
+  liveMoves: () => readonly string[];
   splits: PhaseSplit[] | null;
   sourceName: string | null;
   connectError: string | null;
@@ -322,11 +324,21 @@ export function useSolveSession(options: SolveSessionOptions): SolveSession {
     playerRef.current = player;
   }, []);
 
+  // The moves so far, for callers that report progress while the solve runs — a
+  // live race shows the other player how far through they are. A function, not
+  // state: reading it re-renders nothing, and it is read on the caller's own
+  // schedule rather than on every turn.
+  const liveMoves = useCallback(
+    (): readonly string[] => recorderRef.current!.getMoves().map((m) => m.move),
+    [],
+  );
+
   return {
     scramble,
     phase,
     moveCount,
     recording,
+    liveMoves,
     splits,
     sourceName,
     connectError,

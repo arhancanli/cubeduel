@@ -342,3 +342,37 @@ test("split times are whole milliseconds, however fractional the clock", async (
     }
   }
 });
+
+// ---------------------------------------------------------------------------
+// liveStage — what a live race shows of the other player
+// ---------------------------------------------------------------------------
+
+test("a live stage counts cross, each pair, OLL and solved, step by step", async () => {
+  const { liveStage } = await import("./cfop");
+  const scramble = invert(CLEAN_SOLVE.join(" "));
+  const stages: number[] = [];
+  let done: string[] = [];
+  for (const step of CLEAN_SOLVE) {
+    done = [...done, ...step.split(" ")];
+    stages.push(await liveStage(scramble, done));
+  }
+  assert.deepEqual(stages, [1, 2, 3, 4, 5, 6, 7]);
+});
+
+test("a live stage reads the cube as it is, whichever way it is held", async () => {
+  const { liveStage } = await import("./cfop");
+  const scramble = invert(CLEAN_SOLVE.join(" "));
+  const crossAndPair = [...CLEAN_SOLVE[0].split(" "), ...CLEAN_SOLVE[1].split(" ")];
+  assert.equal(await liveStage(scramble, crossAndPair), 2);
+  // Turning the whole cube in the hands changes nothing about how far along it is.
+  assert.equal(await liveStage(scramble, [...crossAndPair, "y", "x2"]), 2);
+});
+
+test("a live stage can go down while an algorithm lifts a pair out", async () => {
+  const { liveStage } = await import("./cfop");
+  const scramble = invert(CLEAN_SOLVE.join(" "));
+  const f2l = CLEAN_SOLVE.slice(0, 5).join(" ").split(" ");
+  assert.equal(await liveStage(scramble, f2l), 5);
+  // The first move of the OLL algorithm (R) takes the front-right pair out.
+  assert.ok((await liveStage(scramble, [...f2l, "R"])) < 5);
+});

@@ -32,6 +32,7 @@ export const INDEXABLE: IndexableRoute[] = [
   { path: "/ranked", changeFrequency: "monthly", priority: 0.8 },
   { path: "/duel", changeFrequency: "monthly", priority: 0.8 },
   { path: "/rush", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/race", changeFrequency: "monthly", priority: 0.8 },
   { path: "/train", changeFrequency: "monthly", priority: 0.7 },
   { path: "/timer", changeFrequency: "monthly", priority: 0.7 },
   { path: "/cube", changeFrequency: "monthly", priority: 0.7 },
@@ -67,6 +68,7 @@ export const EXCLUDED: Record<string, string> = {
   "/s/[id]": "Somebody's solve. Shared by them, when they choose to.",
   "/c/[slug]": "A club's board. Private to the people who were given the code.",
   "/challenge/[id]": "A one-off link between two players.",
+  "/race/[code]": "A one-off race between two players, over in minutes.",
 };
 
 /** The one dynamic route that IS enumerated, because the set is fixed and ours. */

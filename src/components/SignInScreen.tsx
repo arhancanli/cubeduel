@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { Reveal } from "@/components/Reveal";
 import { SiteHeader } from "@/components/SiteHeader";
+import { nextFromLocation } from "@/lib/nextPath";
 import { track } from "@/lib/analytics";
 import { passkeysSupported, signInWithPasskey } from "@/lib/passkeyClient";
 
@@ -58,7 +59,7 @@ export function SignInScreen() {
       // signed-out shell from the router cache, which reads exactly like the
       // sign-in having failed.
       router.refresh();
-      router.push("/progress");
+      router.push(nextFromLocation("/progress"));
       return;
     }
     // Cancelling a system prompt is not an error worth colouring red.
@@ -101,7 +102,7 @@ export function SignInScreen() {
 
     track("signin", { method: "password" });
     router.refresh();
-    router.push("/progress");
+    router.push(nextFromLocation("/progress"));
   }
 
   return (

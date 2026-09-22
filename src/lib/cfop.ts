@@ -585,3 +585,48 @@ export async function analyzeSolve(
   const { splits, ollCase, pllCase, ollSetup, pllSetup, crossFace } = best;
   return { splits, ollCase, pllCase, ollSetup, pllSetup, crossFace };
 }
+
+const liveGroups = new Map<string, PieceGroups>();
+
+/**
+ * How far through a CFOP solve a cube is right now, as a number from 0 to 7:
+ * the cross (1), each F2L pair in (up to 5), the last layer oriented (6), solved
+ * (7). What a live race shows of the other player.
+ *
+ * Read from the current state alone, on every face, keeping whichever face is
+ * furthest on — the same colour-neutral reading `analyzeSolve` makes, without
+ * the timeline. So it can go DOWN: an OLL algorithm lifts a pair out and puts it
+ * back, and the number says so while it is out. That is the honest version of a
+ * live bar; one that only ever rose would be showing a history, not the cube.
+ */
+export async function liveStage(scramble: string, moves: readonly string[]): Promise<number> {
+  const kpuzzle = await loadKPuzzle();
+  const solved = kpuzzle.defaultPattern();
+
+  let pattern = scramble ? solved.applyAlg(scramble) : solved;
+  const rotations: string[] = [];
+  for (const move of moves) {
+    pattern = pattern.applyMove(move);
+    if (isRotationMove(move)) rotations.push(move);
+  }
+  const canonical = rotations.length > 0 ? pattern.applyAlg(invertAlg(rotations)) : pattern;
+
+  let best = 0;
+  for (const face of CROSS_FACES) {
+    let groups = liveGroups.get(face);
+    if (!groups) {
+      groups = derivePieceGroups(solved, face);
+      liveGroups.set(face, groups);
+    }
+    const m = evaluate(canonical, groups);
+    let score = 0;
+    if (m.solved) {
+      score = 7;
+    } else if (m.cross) {
+      const pairs = m.slots.filter(Boolean).length;
+      score = 1 + pairs + (pairs === 4 && m.oll ? 1 : 0);
+    }
+    if (score > best) best = score;
+  }
+  return best;
+}

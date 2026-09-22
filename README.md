@@ -190,11 +190,11 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 631 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 21 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
+| `npm test` | 645 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 22 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
-| `npm run integration:local` | 11 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
+| `npm run integration:local` | 12 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
 | `npm run integration` | local Postgres | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | local Postgres | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
 | `npm run integration:rush` | local Postgres | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
@@ -206,6 +206,7 @@ in the commit history was caught by exactly one of them.
 | `npm run integration:wca` | local Postgres | The OAuth state is issued here, redeemed once, and bound to the profile that started it — the only thing between an honest link and somebody attaching a world-class average to their name. |
 | `npm run integration:solve` | local Postgres | A solve permalink says the same thing a fortnight later: faster solves added afterwards must not rewrite its verdict. |
 | `npm run integration:sync` | local Postgres | Practice solves keep their move stream, and the stored breakdown, cases and counts are derived from it — a request that lies about any of them changes nothing stored. A stream longer than its own solve is dropped, and junk never reaches the splits column. |
+| `npm run integration:race` | local Postgres | A whole live race between two players: one seat taken once and never by a third, the scramble existing through the countdown and sent to neither player until the start, both pressing ready at once starting it exactly once, a forged solve becoming a DNF, the server's winner, and a rematch that lands both players in the same new race. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
 The e2e suite exists because of one specific failure mode: an anonymous request
@@ -434,6 +435,43 @@ which are not, and only then writes.
   solves fill the room that is left, newest first, and a re-import adds nothing
   twice. Merged history stays in time order, so a trend does not read last year's
   times as today's — and sync is rewound so the older solves still reach the server.
+
+## Live races (`/race`, `src/lib/race.ts`)
+
+Chess.com's core is two people playing at the same moment, and cubing had
+nothing like it: the head-to-head challenges here are asynchronous on purpose,
+because a live lobby needs two people online in the same second and a site
+without players would leave everybody waiting for nobody. A race answers that
+differently — it is made for two people who have already arranged it. One
+creates it and sends the link; the other opens it and takes the seat; both press
+ready; a countdown both screens place on the server's clock ends with the same
+scramble appearing on both. It needs a friend, not a crowd, and every link is an
+invitation.
+
+- **The scramble exists before it is sent.** It is generated the moment both
+  are ready and withheld through the countdown — to both players — because
+  whoever read the network response first would otherwise get five seconds of
+  study the other did not. The screen fires one poll at the start time, so it
+  arrives within a round trip of zero.
+- **Both pressing ready in the same instant starts it once.** The start is a
+  write guarded on the lobby state it read, so the second of two simultaneous
+  presses changes nothing: one scramble, one start time.
+- **What you see of the other player is shown, never trusted.** How far through
+  the solve they are — the stage (cross, each pair, OLL, solved) from
+  `liveStage`, which can go down while an algorithm lifts a pair out, and their
+  turn count — is bounded on the way in and decides nothing. The result is the
+  server's verdict on both replayed solves.
+- **The faster solve wins, not the first to finish.** Inspection is each
+  player's, fifteen seconds of it, timed by the server from the start as in a
+  ranked solve; the clock starts on the first turn. The browser suite first
+  assumed the opposite — its guest started later, solved faster, and won — and
+  the page now says so before anybody presses ready.
+- **Walking away is a DNF**, ten minutes after the start, judged on read like
+  every expiry here; it cannot deny the other player a result. Races do not move
+  ratings — speed does not depend on being raced.
+
+`e2e/race.py` runs two separate browsers through all of it on the keyboard,
+including a rematch that lands both in the same new race.
 
 ## Challenge links
 

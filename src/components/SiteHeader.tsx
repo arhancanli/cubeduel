@@ -23,6 +23,7 @@ export type NavKey =
   | "cube"
   | "leaderboard"
   | "clubs"
+  | "race"
   | "progress";
 
 interface NavLink {
@@ -47,6 +48,8 @@ interface NavLink {
  */
 const COMPETE: NavLink[] = [
   { key: "ranked", href: "/ranked", label: "Ranked" },
+  // Second, because it is the one thing here that is two people at once.
+  { key: "race", href: "/race", label: "Race" },
   { key: "rush", href: "/rush", label: "Rush" },
   { key: "duel", href: "/duel", label: "Duel" },
   { key: "daily", href: "/daily", label: "Daily" },

@@ -3,6 +3,46 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.2.0 — 2026-09-22
+
+The release where two people can race the same scramble at the same moment, and
+the solver started looking at every cube from six sides.
+
+### Live races
+
+- **`/race` — race a friend, live.** Create a race, send the link, both press
+  ready, and after a five-second countdown on the server's clock the same
+  scramble appears on both screens. Each sees the other's progress as it happens
+  — cross, each pair, OLL, solved — and the server names the winner from both
+  replayed solves. A rematch puts both players in one new race.
+- **The scramble is withheld from both players until the start.** It is created
+  when both are ready and sent to nobody during the countdown, so whoever reads
+  the network first gains nothing.
+- **Both pressing ready at once starts the race once** — one scramble, one start
+  time — and the second seat can never be taken by a third person.
+- **Signing in from a race link brings you back to the race.** Sign-in and
+  claiming an account now follow a checked `?next=` path instead of always
+  landing on the home page.
+
+### A shorter solver
+
+- **Six views of every cube.** The solver searches the cube, its two rotations
+  about the corner diagonal and the inverses of all three, sharing one best
+  answer and one clock. The server's mean solution fell from 19.74 moves — with
+  one solve in five running into its time limit — to **19.02**, median 91 ms,
+  every one verified.
+- **A redundant finish is skipped.** A phase-one path that reaches the subgroup
+  on a move phase two could have made is a duplicate, and is no longer finished.
+
+### Fixed
+
+- **A race was won by whoever finished first on screen.** The browser suite
+  assumed it: its guest started later, solved faster and won. A race is decided
+  by solve time — inspection is each player's own — and the page now says so
+  before anybody presses ready.
+- **The race pages showed nothing to a brand-new account**, because they read the
+  profile instead of creating it on the first visit like every other page.
+
 ## 1.1.0 — 2026-09-21
 
 The release where the analysis stopped inferring and started measuring, identity
@@ -163,5 +203,6 @@ The ones worth knowing about:
 - **Boards rendered "Nobody is ranked yet" during an outage**, which is
   indistinguishable from the truth and so gets investigated by nobody.
 
+[1.2.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.2.0
 [1.1.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.1.0
 [1.0.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.0.0
