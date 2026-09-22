@@ -126,6 +126,12 @@ test("a code is read however somebody typed it", () => {
     "ABCD 2345",
     "https://cubeduel.app/c/join/abcd2345",
     "https://cubeduel.app/c/join/abcd2345?from=chat",
+    // An invite link, and the address the join form falls back to when it is
+    // submitted before the page's script has loaded — spaces and all.
+    "https://cubeduel.vercel.app/clubs?code=abcd2345",
+    "/clubs?code=++ABCD2345++",
+    "/clubs?code=ABCD-2345&from=chat",
+    "/clubs?code=abcd%202345",
   ]) {
     assert.equal(normaliseJoinCode(input), expected, `failed on: ${input}`);
   }

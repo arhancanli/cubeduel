@@ -34,13 +34,16 @@ export interface ClubSummary {
 export function ClubsScreen({
   clubs,
   signedIn,
+  initialCode = "",
 }: {
   clubs: ClubSummary[];
   signedIn: boolean;
+  /** From `/clubs?code=…`: an invite link, or the form's own no-script fallback. */
+  initialCode?: string;
 }) {
   const router = useRouter();
 
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(initialCode);
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [slugTouched, setSlugTouched] = useState(false);

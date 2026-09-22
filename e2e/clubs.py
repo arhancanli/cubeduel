@@ -100,8 +100,16 @@ with sync_playwright() as p:
         member.wait_for_selector("#email", timeout=20_000)
         sign_up(member, MEMBER)
 
-        member.goto("/clubs", wait_until="domcontentloaded")
+        # An invite link arrives with the code already in the box. This is also
+        # where the join form lands if it is submitted before the page's script
+        # has loaded — a plain form submission — which used to throw the code
+        # away. Found by running this suite against production, where a click
+        # beat hydration and the join silently did nothing.
+        member.goto(f"/clubs?code=++{code.upper()}++", wait_until="networkidle")
         member.wait_for_selector("#code", timeout=20_000)
+        prefilled = member.input_value("#code")
+        check("an invite link arrives with the code filled in", prefilled == code, repr(prefilled))
+
         # Typed the way somebody actually pastes it, out of a group chat.
         member.fill("#code", f"  {code.upper()}  ")
         # Scoped to the button. `text=Join` also matches the "Join with a code"

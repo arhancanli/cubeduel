@@ -156,6 +156,10 @@ export function generateJoinCode(random: () => number = Math.random): string {
  * the product is fussy rather than that they made a mistake.
  */
 export function normaliseJoinCode(input: string): string | null {
+  // An invite link carries the code as `?code=` — the form of the address the
+  // join form itself falls back to before the page's script has loaded.
+  const param = /[?&]code=([^&#]*)/.exec(input);
+  if (param) return normaliseJoinCode(decodeURIComponent(param[1].replace(/\+/g, " ")));
   const fromUrl = input.trim().split(/[?#]/)[0].split("/").pop() ?? "";
   const cleaned = fromUrl.toLowerCase().replace(/[^a-z0-9]/g, "");
   if (cleaned.length < 6 || cleaned.length > 12) return null;

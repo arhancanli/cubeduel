@@ -112,8 +112,11 @@ with sync_playwright() as p:
           sorted(looks) == sorted(["F2L 1", "F2L 2", "F2L 3", "F2L 4", "OLL", "PLL"]), str(sorted(looks)))
 
     pair2 = looks.get("F2L 2", -1)
+    # Looking is the pause less one ordinary turn, so it lands on the pause
+    # itself give or take the browser's own timing — 1199ms against production,
+    # which a floor of exactly the pause called a failure.
     check("the pause lands in pair 2's looking",
-          PAUSE_BEFORE_PAIR_2_MS <= pair2 <= PAUSE_BEFORE_PAIR_2_MS + 400, f"{pair2}ms")
+          PAUSE_BEFORE_PAIR_2_MS - 100 <= pair2 <= PAUSE_BEFORE_PAIR_2_MS + 300, f"{pair2}ms")
     others = {k: v for k, v in looks.items() if k != "F2L 2"}
     check("and nowhere else", all(v < 400 for v in others.values()), str(others))
 
