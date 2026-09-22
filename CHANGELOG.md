@@ -3,6 +3,39 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.5.0 — 2026-09-22
+
+The release where you no longer need to know somebody to play somebody.
+
+### A challenge anybody can take
+
+- **Leave a challenge open on the board.** A named challenge needs a handle you
+  already know; a live race needs a friend to send a link to. Neither works for
+  somebody who arrives here knowing nobody, which on a new site is everybody. An
+  open challenge sits on the duel page and whoever turns up next takes it.
+- **It is the same row with the second seat filled later**, so every rule that
+  made a challenge fair holds unchanged: the scramble is generated at creation
+  and shown to neither side until their own attempt opens, and neither time is
+  shown until both have solved. Accepting an offer six hours later gains nothing.
+- **Two people taking it at once**: exactly one gets the seat — the write is
+  guarded on the row it read — and the other is told somebody got there first,
+  which on a public board is an ordinary event rather than an error.
+- **Three offers per player at a time.** Ten would not be a busy player but a
+  wall, and the board is a page everybody sees.
+- **The board excludes your own offers**, because the one thing you cannot do
+  with your own challenge is take it, and a board where half the rows refuse you
+  is a worse board. Yours appear in your own list, marked as waiting.
+- **Challenge links now draw a share card** — the last shareable link without
+  one. An open challenge says so and invites whoever reads it; a challenge sent
+  to a named player names only who sent it, since anybody with the link can fetch
+  the card.
+
+### Fixed
+
+- **An offer you left appeared under "Your turn" with an empty name** where an
+  opponent's handle should be. There is no opponent yet — that was the point —
+  so it has its own section, and you can still open your own half whenever.
+
 ## 1.4.0 — 2026-09-22
 
 The release where a link to this site stops being a bare URL.
@@ -282,6 +315,7 @@ The ones worth knowing about:
 - **Boards rendered "Nobody is ranked yet" during an outage**, which is
   indistinguishable from the truth and so gets investigated by nobody.
 
+[1.5.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.5.0
 [1.4.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.4.0
 [1.3.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.3.0
 [1.2.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.2.0

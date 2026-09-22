@@ -138,6 +138,66 @@ export function raceCardContent(race: RaceCardInput | null): CardContent {
   };
 }
 
+export interface ChallengeCardInput {
+  event: string;
+  status: "pending" | "complete" | "expired" | "declined";
+  open: boolean;
+  by: string;
+}
+
+/**
+ * A challenge link.
+ *
+ * Two quite different things share this card. A challenge to a named player is
+ * an appointment between two people, and its preview says so and no more — not
+ * even who it is against. An open one is a standing offer to anybody who opens
+ * the link, so its preview is written to be taken up: it says who left it, on
+ * which event, and that the first person to take it gets the seat.
+ */
+export function challengeCardContent(challenge: ChallengeCardInput | null): CardContent {
+  const kind = "cubeduel · challenge";
+  if (!challenge) {
+    return {
+      kind,
+      headline: "No such challenge",
+      subheading: "This link has expired or never existed.",
+      figures: [],
+      footnote: null,
+    };
+  }
+
+  const event = eventName(challenge.event);
+  const by = clampName(challenge.by);
+
+  if (challenge.status !== "pending") {
+    return {
+      kind,
+      headline: "This one is over",
+      subheading: `${by} has finished this challenge. Leave one of your own — anybody can take it.`,
+      figures: [],
+      footnote: `${event}`,
+    };
+  }
+
+  if (challenge.open) {
+    return {
+      kind,
+      headline: `${by} left a challenge open`,
+      subheading: "The first person to take it gets the seat. You both solve the same scramble, whenever suits you — and neither of you sees it until your own attempt opens.",
+      figures: [],
+      footnote: `${event} · open to anybody`,
+    };
+  }
+
+  return {
+    kind,
+    headline: `${by} sent a challenge`,
+    subheading: "One scramble, one attempt each, two days to answer. Neither time is shown until you have both solved.",
+    figures: [],
+    footnote: `${event}`,
+  };
+}
+
 export interface SolveCardInput {
   event: string;
   durationMs: number;

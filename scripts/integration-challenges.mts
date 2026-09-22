@@ -18,15 +18,19 @@
 
 import { CHALLENGE_TTL_MS } from "../src/lib/challenge";
 import {
+  acceptChallenge,
   createChallenge,
+  createOpenChallenge,
   listChallenges,
+  listOpenChallenges,
   startSide,
   submitSide,
 } from "../src/lib/server/challenges";
+import { MAX_OPEN_PER_PLAYER } from "../src/lib/challenge";
 import { db } from "../src/lib/server/supabase";
 import { makeProbeAccount, cleanupProbes } from "./probeAccount.mjs";
 
-const HANDLES = ["challenge-probe-a", "challenge-probe-b"] as const;
+const HANDLES = ["challenge-probe-a", "challenge-probe-b", "challenge-probe-c"] as const;
 
 let failures = 0;
 
@@ -102,7 +106,9 @@ async function main() {
     profiles.push(data);
   }
   const [alice, bob] = profiles;
-  check("two players exist", profiles.length === 2);
+  // Three: the third exists so that two players can race each other for the
+  // same open seat, which is the case the board has to get right.
+  check("three players exist", profiles.length === HANDLES.length, `${profiles.length}`);
 
   console.log("\n== opening a challenge ==");
   const created = await createChallenge(alice.id, bob.handle);
@@ -316,6 +322,83 @@ async function main() {
       check("and claims no outcome for either side", view?.outcome === null,
         String(view?.outcome));
     }
+  }
+
+  // -------------------------------------------------------------------------
+  console.log("\n== a challenge left open to anybody ==");
+  {
+    const carol = profiles[2];
+    const offer = await createOpenChallenge(alice.id);
+    check("an open challenge is created", offer.ok, offer.ok ? "" : offer.reason);
+    if (!offer.ok) return;
+
+    const board = await listOpenChallenges(bob.id);
+    const listed = board.find((row) => row.id === offer.challengeId);
+    check("it appears on the board for other players", Boolean(listed), `${board.length} on the board`);
+    check("with the name of whoever left it", listed?.by.handle === alice.handle, listed?.by.handle);
+
+    const own = await listOpenChallenges(alice.id);
+    check(
+      "and not on the board of the player who left it",
+      !own.some((row) => row.id === offer.challengeId),
+      "it was listed to its own author",
+    );
+    const refusedOwn = await acceptChallenge(alice.id, offer.challengeId);
+    check("who cannot take it either", !refusedOwn.ok, refusedOwn.ok ? "accepted" : refusedOwn.reason);
+
+    // Two people pressing "take it" in the same instant is the ordinary case on
+    // a public board. Exactly one seat exists, so exactly one may win.
+    const [first, second] = await Promise.all([
+      acceptChallenge(bob.id, offer.challengeId),
+      acceptChallenge(carol.id, offer.challengeId),
+    ]);
+    const winners = [first, second].filter((r) => r.ok);
+    check("two players taking it at once: exactly one gets the seat", winners.length === 1,
+      `${winners.length} accepted`);
+    const loser = [first, second].find((r) => !r.ok);
+    check("and the other is told somebody got there first",
+      loser !== undefined && !loser.ok && /first/i.test(loser.reason),
+      loser && !loser.ok ? loser.reason : "no refusal");
+
+    const gone = await listOpenChallenges(carol.id);
+    check("a taken challenge leaves the board", !gone.some((row) => row.id === offer.challengeId));
+
+    // Whoever took it now has an ordinary challenge, with every rule intact.
+    const taker = first.ok ? bob : carol;
+    const viewBefore = (await listChallenges(taker.id)).find((c) => c.id === offer.challengeId);
+    check("the taker sees it in their challenges", Boolean(viewBefore), String(viewBefore?.status));
+    check("and cannot see the scramble before opening it", viewBefore?.scramble === null,
+      viewBefore?.scramble ?? "null");
+
+    await solveSide(alice.id, offer.challengeId, 4000);
+    const beforeBoth = (await listChallenges(taker.id)).find((c) => c.id === offer.challengeId);
+    check("the author's time stays hidden until the taker has solved", beforeBoth?.theirs === null,
+      JSON.stringify(beforeBoth?.theirs));
+
+    await solveSide(taker.id, offer.challengeId, 6000);
+    const settledView = (await listChallenges(taker.id)).find((c) => c.id === offer.challengeId);
+    // Near four seconds rather than exactly: the duration comes from the move
+    // stream, whose gaps are whole milliseconds, so it lands a few either way.
+    const authorMs = settledView?.theirs?.durationMs ?? 0;
+    check("both times are in once both have solved", Math.abs(authorMs - 4000) < 100,
+      JSON.stringify(settledView?.theirs));
+    check("the faster solve won", settledView?.outcome === "loss", String(settledView?.outcome));
+  }
+
+  // -------------------------------------------------------------------------
+  console.log("\n== the board cannot be owned by one player ==");
+  {
+    const carol = profiles[2];
+    let created = 0;
+    let refusal = "";
+    for (let i = 0; i < MAX_OPEN_PER_PLAYER + 2; i++) {
+      const attempt = await createOpenChallenge(carol.id);
+      if (attempt.ok) created++;
+      else refusal = attempt.reason;
+    }
+    check(`only ${MAX_OPEN_PER_PLAYER} open challenges are allowed at once`,
+      created === MAX_OPEN_PER_PLAYER, `${created} created`);
+    check("and the refusal says what to do about it", /take one/i.test(refusal), refusal);
   }
 
   console.log("\n== cleanup ==");

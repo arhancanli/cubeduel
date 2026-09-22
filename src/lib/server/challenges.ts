@@ -2,10 +2,15 @@ import "server-only";
 
 import {
   CHALLENGE_TTL_MS,
+  MAX_OPEN_PER_PLAYER,
   MAX_OUTGOING_PENDING,
+  type AcceptRefusal,
   type ChallengeState,
+  type ChallengeStatus,
   type Side,
   type Winner,
+  acceptRefusalText,
+  canAccept,
   resolve,
   visibleTo,
 } from "../challenge";
@@ -32,7 +37,8 @@ import { raise } from "./schema";
 type ChallengeRow = {
   id: string;
   challenger_id: string;
-  opponent_id: string;
+  /** Null while an open challenge is still waiting for somebody to take it. */
+  opponent_id: string | null;
   event: string;
   source: string;
   scramble: string;
@@ -211,6 +217,8 @@ export interface ChallengeView {
   awaitingYou: boolean;
   /** From this player's point of view, once settled. */
   outcome: "win" | "loss" | "draw" | null;
+  /** Still on the board, waiting for anybody to take the second seat. */
+  open: boolean;
 }
 
 function outcomeFor(seat: Seat, winner: Winner | null): "win" | "loss" | "draw" | null {
@@ -223,12 +231,12 @@ async function toView(row: ChallengeRow, profileId: string): Promise<ChallengeVi
   const seat = seatOf(row, profileId);
   if (!seat) return null;
 
+  // An open challenge has nobody on the other side yet, and the panel says so
+  // rather than naming a player who does not exist.
   const otherId = seat === "challenger" ? row.opponent_id : row.challenger_id;
-  const { data: other } = await db()
-    .from("profiles")
-    .select("handle, display_name")
-    .eq("id", otherId)
-    .maybeSingle();
+  const { data: other } = otherId
+    ? await db().from("profiles").select("handle, display_name").eq("id", otherId).maybeSingle()
+    : { data: null };
 
   const started =
     seat === "challenger" ? row.challenger_started_at !== null : row.opponent_started_at !== null;
@@ -239,7 +247,7 @@ async function toView(row: ChallengeRow, profileId: string): Promise<ChallengeVi
     seat,
     event: row.event,
     them: {
-      handle: other?.handle ?? "unknown",
+      handle: other?.handle ?? (otherId === null ? "" : "unknown"),
       displayName: other?.display_name ?? null,
     },
     status: row.status,
@@ -250,6 +258,7 @@ async function toView(row: ChallengeRow, profileId: string): Promise<ChallengeVi
     theirs: view.theirs,
     awaitingYou: view.awaitingYou,
     outcome: outcomeFor(seat, row.winner),
+    open: row.opponent_id === null,
   };
 }
 
@@ -275,6 +284,175 @@ export async function listChallenges(profileId: string, limit = 20): Promise<Cha
   const rows = await Promise.all((data as ChallengeRow[]).map((row) => settle(row, now)));
   const views = await Promise.all(rows.map((row) => toView(row, profileId)));
   return views.filter((v): v is ChallengeView => v !== null);
+}
+
+/**
+ * Leaves a challenge on the board for anybody to take.
+ *
+ * The same row as a named challenge with the opponent left empty, and
+ * deliberately so: the accept fills the seat and every rule after that — the
+ * scramble hidden until each side opens their attempt, neither time shown until
+ * both have solved, the lapse that hands the win to whoever did solve — is the
+ * code that was already there and already tested.
+ */
+export async function createOpenChallenge(
+  challengerId: string,
+  event = "333",
+): Promise<CreateResult> {
+  const now = Date.now();
+
+  // Counted rather than trusted: this is a public board, and ten offers from
+  // one player is not a busy player but a wall. The same read failed open once
+  // in the named path — an error left `count` null and `?? 0` read that as
+  // "none" — so an unreadable count is a refusal here too.
+  const { count, error: countError } = await db()
+    .from("challenges")
+    .select("id", { count: "exact", head: true })
+    .eq("challenger_id", challengerId)
+    .eq("status", "pending")
+    .is("opponent_id", null);
+
+  if (countError || count === null) {
+    return { ok: false, reason: "Could not check your open challenges. Try again." };
+  }
+  if (count >= MAX_OPEN_PER_PLAYER) {
+    return {
+      ok: false,
+      reason: `You already have ${MAX_OPEN_PER_PLAYER} challenges on the board. Wait for somebody to take one.`,
+    };
+  }
+
+  const { data, error } = await db()
+    .from("challenges")
+    .insert({
+      challenger_id: challengerId,
+      opponent_id: null,
+      event,
+      scramble: await freshScramble(event),
+      expires_at: new Date(now + CHALLENGE_TTL_MS).toISOString(),
+    })
+    .select("id")
+    .single();
+
+  if (error || !data) return { ok: false, reason: "Could not create the challenge." };
+  return { ok: true, challengeId: data.id };
+}
+
+/** One offer on the board, as everybody but its author sees it. */
+export interface OpenChallengeView {
+  id: string;
+  event: string;
+  createdAt: string;
+  expiresAt: string;
+  by: { handle: string; displayName: string | null };
+  /** Whether its author has already taken their own attempt. */
+  authorSolved: boolean;
+}
+
+/**
+ * The board: offers nobody has taken yet, newest first.
+ *
+ * Excludes your own, because the one thing you cannot do with an offer is take
+ * it, and a board where half the rows refuse you is a worse board. Your own
+ * offers appear in your challenge list, marked as waiting.
+ */
+export async function listOpenChallenges(
+  viewerId: string | null,
+  limit = 20,
+): Promise<OpenChallengeView[]> {
+  const query = db()
+    .from("challenges")
+    .select("*")
+    .is("opponent_id", null)
+    .eq("status", "pending")
+    .gt("expires_at", new Date().toISOString())
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  const { data, error } = viewerId ? await query.neq("challenger_id", viewerId) : await query;
+  if (error) raise(error, "challenges", "Could not load the open challenges");
+
+  const rows = data as ChallengeRow[];
+  if (rows.length === 0) return [];
+
+  const { data: profiles } = await db()
+    .from("profiles")
+    .select("id, handle, display_name")
+    .in("id", [...new Set(rows.map((row) => row.challenger_id))]);
+  const byId = new Map((profiles ?? []).map((profile) => [profile.id, profile]));
+
+  return rows.map((row) => ({
+    id: row.id,
+    event: row.event,
+    createdAt: row.created_at,
+    expiresAt: row.expires_at,
+    by: {
+      handle: byId.get(row.challenger_id)?.handle ?? "unknown",
+      displayName: byId.get(row.challenger_id)?.display_name ?? null,
+    },
+    // Worth knowing before you take it: a time you cannot see has already been
+    // set, and the challenge will settle as soon as you solve.
+    authorSolved: row.challenger_penalty !== null,
+  }));
+}
+
+export type AcceptResult =
+  | { ok: true; challengeId: string }
+  | { ok: false; reason: string; refusal: AcceptRefusal | "missing" };
+
+/**
+ * Takes the second seat of an open challenge.
+ *
+ * Two people pressing accept in the same second is the ordinary case on a public
+ * board, so the seat is filled by a write guarded on the row it read — `is
+ * opponent_id null` — rather than by checking first and writing after. The
+ * checks above it exist to give the reason in words; this is what makes only one
+ * of them land.
+ */
+export async function acceptChallenge(profileId: string, id: string): Promise<AcceptResult> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) {
+    return { ok: false, reason: "No such challenge.", refusal: "missing" };
+  }
+
+  const { data: row, error } = await db()
+    .from("challenges")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) raise(error, "challenges", "Could not read the challenge");
+  if (!row) return { ok: false, reason: "No such challenge.", refusal: "missing" };
+
+  const challenge = row as ChallengeRow;
+  const verdict = canAccept(
+    {
+      challengerId: challenge.challenger_id,
+      opponentId: challenge.opponent_id,
+      status: challenge.status,
+      expiresAt: Date.parse(challenge.expires_at),
+    },
+    profileId,
+    Date.now(),
+  );
+  if (!verdict.ok) {
+    return { ok: false, reason: acceptRefusalText(verdict.reason), refusal: verdict.reason };
+  }
+
+  const { data: taken, error: takeError } = await db()
+    .from("challenges")
+    .update({ opponent_id: profileId })
+    .eq("id", id)
+    .eq("status", "pending")
+    .is("opponent_id", null)
+    .select("id")
+    .maybeSingle();
+
+  if (takeError) raise(takeError, "challenges", "Could not take the challenge");
+  if (!taken) {
+    return { ok: false, reason: acceptRefusalText("already taken"), refusal: "already taken" };
+  }
+
+  return { ok: true, challengeId: id };
 }
 
 export type StartResult =
@@ -543,5 +721,47 @@ export async function challengeRecord(profileId: string): Promise<ChallengeRecor
     losses: views.filter((v) => v.outcome === "loss").length,
     draws: views.filter((v) => v.outcome === "draw").length,
     awaitingYou: views.filter((v) => v.awaitingYou).length,
+  };
+}
+
+/**
+ * What a link preview may say about a challenge.
+ *
+ * Narrower than the board's view on purpose. Anybody with the id can ask for
+ * this, so it names only the player who created the challenge — who published
+ * the link by sending it — and never the opponent, whose involvement is between
+ * the two of them. No scramble, for the reason every other card here has none:
+ * a preview that showed the cube would let a group chat study it.
+ *
+ * Reads without settling, like the race card: a robot fetching a preview should
+ * not be able to expire somebody's challenge by looking at it.
+ */
+export interface ChallengeCard {
+  event: string;
+  status: ChallengeStatus;
+  open: boolean;
+  by: string;
+  expiresAt: string;
+}
+
+export async function challengeCard(id: string): Promise<ChallengeCard | null> {
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
+
+  const { data } = await db().from("challenges").select("*").eq("id", id).maybeSingle();
+  if (!data) return null;
+
+  const row = data as ChallengeRow;
+  const { data: author } = await db()
+    .from("profiles")
+    .select("handle, display_name")
+    .eq("id", row.challenger_id)
+    .maybeSingle();
+
+  return {
+    event: row.event,
+    status: row.status,
+    open: row.opponent_id === null,
+    by: author?.display_name ?? author?.handle ?? "A cuber",
+    expiresAt: row.expires_at,
   };
 }

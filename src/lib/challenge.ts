@@ -35,6 +35,17 @@ export const CHALLENGE_TTL_MS = 48 * 60 * 60 * 1000;
 /** Outstanding challenges one player may have waiting at once. */
 export const MAX_OUTGOING_PENDING = 10;
 
+/**
+ * Unclaimed offers one player may have sitting on the open board at once.
+ *
+ * Tighter than the cap above, and for a different reason. A challenge to a named
+ * player lands in one inbox; an open challenge sits on a board everybody sees,
+ * so ten of them from one person is not a busy player but a wall. Three is
+ * enough to offer every event a player cares about and not enough to own the
+ * page.
+ */
+export const MAX_OPEN_PER_PLAYER = 3;
+
 export type ChallengeStatus = "pending" | "complete" | "expired" | "declined";
 
 export type Winner = "challenger" | "opponent" | "draw";
@@ -88,6 +99,71 @@ export interface ChallengeState {
   opponent: Side;
   createdAt: number;
   expiresAt: number;
+}
+
+/**
+ * A challenge nobody has been named for: anyone may take the second seat.
+ *
+ * The asynchronous argument above is about *time* — two people need not be
+ * online together. This is the same argument about *people*: a player who knows
+ * nobody here has, until now, had nothing to play. A named challenge needs a
+ * handle you already know, and a live race needs a friend to send a link to. An
+ * open challenge is the version that works when you have neither: leave the
+ * offer, and whoever turns up next takes it.
+ *
+ * Everything that makes a named challenge fair applies unchanged. The scramble
+ * is still generated at creation and shown to neither side until their own
+ * attempt opens, and neither time is shown until both have solved — so being
+ * the one who accepts, possibly hours later, confers nothing.
+ */
+export interface OpenChallenge {
+  challengerId: string;
+  /** Null while the offer stands. Set once, by whoever accepts it. */
+  opponentId: string | null;
+  status: ChallengeStatus;
+  expiresAt: number;
+}
+
+export type AcceptRefusal =
+  | "your own"
+  | "already taken"
+  | "not open"
+  | "expired";
+
+/**
+ * Whether this player may take the second seat, and if not, why.
+ *
+ * Every one of these is checked again by the write itself, guarded on the row it
+ * read — two people pressing accept in the same second is the ordinary case on a
+ * public board, not the unlucky one. This exists so the reason can be said in
+ * words before that happens, and so the rules can be tested without a database.
+ */
+export function canAccept(
+  challenge: OpenChallenge,
+  viewerId: string,
+  now: number,
+): { ok: true } | { ok: false; reason: AcceptRefusal } {
+  // Accepting your own offer would be a free win against a real record, which
+  // is the same reason a challenge cannot name yourself.
+  if (challenge.challengerId === viewerId) return { ok: false, reason: "your own" };
+  if (challenge.status !== "pending") return { ok: false, reason: "not open" };
+  if (challenge.opponentId !== null) return { ok: false, reason: "already taken" };
+  if (now >= challenge.expiresAt) return { ok: false, reason: "expired" };
+  return { ok: true };
+}
+
+/** What to tell somebody whose accept did not land. */
+export function acceptRefusalText(reason: AcceptRefusal): string {
+  switch (reason) {
+    case "your own":
+      return "That is your own challenge — somebody else has to take it.";
+    case "already taken":
+      return "Somebody got there first.";
+    case "expired":
+      return "That challenge has lapsed.";
+    case "not open":
+      return "That challenge is no longer open.";
+  }
 }
 
 export type Resolution =

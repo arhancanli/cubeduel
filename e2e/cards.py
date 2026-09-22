@@ -106,6 +106,11 @@ with sync_playwright() as p:
         missing_solve = check_card(
             host, "a solve that never existed", "/s/00000000-0000-0000-0000-000000000000/opengraph-image"
         )
+        missing_challenge = check_card(
+            host,
+            "a challenge that never existed",
+            "/challenge/00000000-0000-0000-0000-000000000000/opengraph-image",
+        )
 
         print("\n== a real race ==")
         host_email = probe_email("card-host")
@@ -197,6 +202,24 @@ with sync_playwright() as p:
                 check("it is not the missing-solve card", solve != missing_solve)
             else:
                 check("the solve is on the profile to draw a card for", False, "no rows")
+
+        print("\n== an open challenge, which is a link worth posting ==")
+        host.goto("/duel", wait_until="networkidle")
+        host.wait_for_timeout(3000)
+        if host.locator("[data-testid=challenge-open]").count() == 1:
+            host.locator("[data-testid=challenge-open]").first.click()
+            host.wait_for_timeout(5000)
+            host.goto("/duel", wait_until="networkidle")
+            host.wait_for_timeout(2000)
+            link = host.locator("a[href^='/challenge/']").first
+            if link.count() == 1:
+                path = link.get_attribute("href")
+                offer = check_card(host, "an open challenge", f"{path}/opengraph-image")
+                check("it is not the missing-challenge card", offer != missing_challenge)
+            else:
+                check("the open challenge is linked from the page", False, "no link")
+        else:
+            check("the duel page offers to leave a challenge open", False, "no button")
 
         print("\n== console ==")
         check("no page errors", len(errors) == 0, "; ".join(errors[:2])[:160])

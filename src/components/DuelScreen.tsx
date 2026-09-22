@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
-import { ChallengePanel, type ChallengeItem } from "@/components/ChallengePanel";
+import {
+  ChallengePanel,
+  type ChallengeItem,
+  type OpenChallengeItem,
+} from "@/components/ChallengePanel";
 import { MovePad } from "@/components/MovePad";
 import { KeyMapHint } from "@/components/KeyMapHint";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -51,9 +55,11 @@ interface DuelFinishResponse {
 export function DuelScreen({
   record,
   challenges,
+  openChallenges,
 }: {
   record: { wins: number; losses: number };
   challenges: ChallengeItem[];
+  openChallenges: OpenChallengeItem[];
 }) {
   const [opponent, setOpponent] = useState<BotProfile>(BOTS[2]);
   const [duel, setDuel] = useState<DuelStartResponse | null>(null);
@@ -176,6 +182,7 @@ export function DuelScreen({
             tally={tally}
             onStart={() => void session.startRound()}
             challenges={challenges}
+            openChallenges={openChallenges}
           />
         ) : null}
 
@@ -290,19 +297,21 @@ function OpponentPicker({
   tally,
   onStart,
   challenges,
+  openChallenges,
 }: {
   selected: BotProfile;
   onSelect: (bot: BotProfile) => void;
   tally: { wins: number; losses: number };
   onStart: () => void;
   challenges: ChallengeItem[];
+  openChallenges: OpenChallengeItem[];
 }) {
   return (
     <div className="flex w-full flex-col items-center gap-10 pt-4">
       {/* Players first. Racing a person is the better game; the bots are what is
           always available when nobody has answered yet, and putting them at the
           top would say the opposite. */}
-      <ChallengePanel initial={challenges} />
+      <ChallengePanel initial={challenges} initialOpen={openChallenges} />
 
       <div className="flex w-full max-w-2xl flex-col gap-6">
       <div className="flex flex-col gap-1">

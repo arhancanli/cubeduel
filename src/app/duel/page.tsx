@@ -3,7 +3,7 @@ import Link from "next/link";
 
 import { DuelScreen } from "@/components/DuelScreen";
 import { SiteHeader } from "@/components/SiteHeader";
-import { listChallenges } from "@/lib/server/challenges";
+import { listChallenges, listOpenChallenges } from "@/lib/server/challenges";
 import { duelRecord } from "@/lib/server/duels";
 import { MissingTableError } from "@/lib/server/schema";
 import { ensureProfile } from "@/lib/server/profiles";
@@ -49,11 +49,13 @@ export default async function DuelPage() {
 
   let record: Awaited<ReturnType<typeof duelRecord>>;
   let challenges: Awaited<ReturnType<typeof listChallenges>>;
+  let openChallenges: Awaited<ReturnType<typeof listOpenChallenges>>;
 
   try {
-    [record, challenges] = await Promise.all([
+    [record, challenges, openChallenges] = await Promise.all([
       duelRecord(profile.id),
       listChallenges(profile.id),
+      listOpenChallenges(profile.id),
     ]);
   } catch (error) {
     // Only a missing table is caught. Applying `0001` and stopping is the most
@@ -76,6 +78,7 @@ export default async function DuelPage() {
     <DuelScreen
       record={{ wins: record.wins, losses: record.losses }}
       challenges={challenges}
+      openChallenges={openChallenges}
     />
   );
 }

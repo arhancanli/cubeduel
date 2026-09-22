@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  challengeCardContent,
   profileCardContent,
   raceCardContent,
   solveCardContent,
@@ -201,4 +202,27 @@ test("a name that is only the handle is not printed twice", () => {
   });
   assert.equal(profile.headline, "arhan");
   assert.equal(profile.subheading, null);
+});
+
+test("an open challenge card invites whoever reads it", () => {
+  const card = challengeCardContent({ event: "333", status: "pending", open: true, by: "Arhan" });
+  assert.match(card.headline, /Arhan left a challenge open/);
+  assert.match(card.subheading ?? "", /first person to take it/i);
+  assert.match(card.footnote ?? "", /open to anybody/);
+});
+
+test("a challenge sent to somebody names only who sent it", () => {
+  // Anybody with the id can fetch this card; who it is against is between the
+  // two of them.
+  const card = challengeCardContent({ event: "444", status: "pending", open: false, by: "Arhan" });
+  assert.equal(card.headline, "Arhan sent a challenge");
+  assert.ok(!/against|versus| v /i.test(card.subheading ?? ""));
+  assert.match(card.footnote ?? "", /4x4/);
+});
+
+test("a finished challenge does not pretend to be open", () => {
+  for (const status of ["complete", "expired", "declined"] as const) {
+    const card = challengeCardContent({ event: "333", status, open: true, by: "Arhan" });
+    assert.match(card.headline, /over/);
+  }
 });

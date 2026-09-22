@@ -197,13 +197,13 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 676 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 686 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 23 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, and the link previews fetched the way a chat app fetches them. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
 | `npm run integration:local` | 12 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
 | `npm run integration` | local Postgres | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
-| `npm run integration:challenges` | local Postgres | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts — and each was mutation-tested by breaking the guarantee and confirming the suite goes red. |
+| `npm run integration:challenges` | local Postgres | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts, and a third player racing for the same open seat — one accept lands, the other is refused, the board drops the row, and the scramble stays hidden through all of it. Each guarantee was mutation-tested by breaking it and confirming the suite goes red. |
 | `npm run integration:rush` | local Postgres | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
 | `npm run integration:events` | local Postgres | Every event's ranked path end to end: a server-issued 4x4 scramble, solved, verified against a 4x4 and stored — plus a check that the scales really do differ, since 25 seconds is world class on 4x4 and nowhere near it on 3x3. |
 | `npm run integration:profile-race` | local Postgres | Eight concurrent first visits for the same new account, including the path where every candidate handle is taken. Exists because a new player's first page load could render "Something broke", intermittently enough to look like a fluke. |
@@ -590,6 +590,18 @@ seconds of inspection.
 **Neither time is shown until both have solved.** Going second is otherwise a real
 advantage — knowing you need 12.40 tells you exactly how much risk to take, and a
 solve attempted at a known target is not the same event as one attempted blind.
+
+**A challenge can be left open to anybody.** The two rules above assume you know
+somebody's handle, and a live race assumes you have a friend to send a link to.
+Neither is true for the person who arrives here knowing nobody — which, on a new
+site, is everybody. So the opponent is optional: leave the offer on the board and
+whoever turns up next takes it. Every rule above then applies unchanged, because
+it is the same row with the second seat filled later — so accepting an offer six
+hours after it was left confers nothing. Two people pressing "take it" in the same
+instant is the ordinary case on a public board rather than the unlucky one, so the
+seat is filled by a write guarded on the row it read; the second person is told
+somebody got there first. One player may have three offers on the board at once:
+ten would not be a busy player but a wall.
 
 Both are decided in one place (`visibleTo`) that every read goes through, because
 a rule enforced separately in four route handlers is enforced in three of them.

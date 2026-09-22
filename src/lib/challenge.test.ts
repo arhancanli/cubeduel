@@ -3,8 +3,13 @@ import assert from "node:assert/strict";
 
 import {
   CHALLENGE_TTL_MS,
+  MAX_OPEN_PER_PLAYER,
+  MAX_OUTGOING_PENDING,
   type ChallengeState,
+  type OpenChallenge,
   type Side,
+  acceptRefusalText,
+  canAccept,
   decideWinner,
   effectiveMs,
   resolve,
@@ -149,4 +154,57 @@ test("it says whose turn it is", () => {
 
   const settled = state({ status: "complete", challenger: ok(9000), opponent: ok(11_000) });
   assert.equal(visibleTo("opponent", settled, "s", true).awaitingYou, false);
+});
+
+// ---------------------------------------------------------------------------
+// Open challenges: the second seat is empty and anybody may take it.
+// ---------------------------------------------------------------------------
+
+const open: OpenChallenge = {
+  challengerId: "poster",
+  opponentId: null,
+  status: "pending",
+  expiresAt: 2_000,
+};
+
+test("anybody but the poster may take an open challenge", () => {
+  assert.deepEqual(canAccept(open, "somebody", 1_000), { ok: true });
+});
+
+test("you cannot accept your own offer", () => {
+  // The same reason a challenge cannot name yourself: it would be a free win
+  // against a real record.
+  assert.deepEqual(canAccept(open, "poster", 1_000), { ok: false, reason: "your own" });
+});
+
+test("the second person to accept is told somebody got there first", () => {
+  const taken = { ...open, opponentId: "first" };
+  const refusal = canAccept(taken, "second", 1_000);
+  assert.deepEqual(refusal, { ok: false, reason: "already taken" });
+  assert.match(acceptRefusalText("already taken"), /first/);
+});
+
+test("a lapsed offer cannot be taken, and the boundary is the moment it lapses", () => {
+  assert.deepEqual(canAccept(open, "somebody", 1_999), { ok: true });
+  assert.deepEqual(canAccept(open, "somebody", 2_000), { ok: false, reason: "expired" });
+});
+
+test("an offer that is no longer pending is not open, whatever its seat says", () => {
+  for (const status of ["complete", "expired", "declined"] as const) {
+    assert.deepEqual(canAccept({ ...open, status }, "somebody", 1_000), {
+      ok: false,
+      reason: "not open",
+    });
+  }
+});
+
+test("every refusal has words for it", () => {
+  for (const reason of ["your own", "already taken", "not open", "expired"] as const) {
+    assert.ok(acceptRefusalText(reason).length > 10);
+  }
+});
+
+test("the open board cap is tighter than the inbox cap", () => {
+  // One offer lands in one inbox; an open one sits on a page everybody sees.
+  assert.ok(MAX_OPEN_PER_PLAYER < MAX_OUTGOING_PENDING);
 });

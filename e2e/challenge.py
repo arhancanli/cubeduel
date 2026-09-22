@@ -272,6 +272,44 @@ with sync_playwright() as p:
               len(re.findall(r"\b\d+\.\d{2}\b", final_a)) >= 2,
               str(re.findall(r"\b\d+\.\d{2}\b", final_a)[:4]))
 
+        # ------------------------------------------------------------------
+        print("\n== a challenge left open to anybody ==")
+        # The case the rest of this suite cannot cover: B knows nobody's handle
+        # and takes an offer from the board instead. On a site with no players
+        # yet, this is the only head-to-head that works.
+        page_a.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_a.wait_for_timeout(5000)
+        page_a.locator("[data-testid=challenge-open]").first.click()
+        page_a.wait_for_timeout(6000)
+        board_a = page_a.inner_text("body")
+        check("A's offer says it is waiting for anybody",
+              "waiting for anybody" in board_a.lower(),
+              [l for l in board_a.split("\n") if "waiting" in l.lower()][:2])
+        # Not "A has no board": other players' offers may well be sitting there.
+        # The claim is that A's own is not among them, because the one thing you
+        # cannot do with your own offer is take it.
+        a_board = page_a.locator("[data-testid=open-board]")
+        check("A's own offer is not on A's board",
+              a_board.count() == 0 or handle_a not in a_board.inner_text(),
+              a_board.inner_text()[:80] if a_board.count() else "no board")
+
+        page_b.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_b.wait_for_timeout(5000)
+        board = page_b.locator("[data-testid=open-board]")
+        check("B sees the open challenge", board.count() == 1)
+        check("and who left it", handle_a in (board.inner_text() if board.count() else ""),
+              board.inner_text()[:60] if board.count() else "no board")
+
+        if board.count() == 1:
+            page_b.locator("[data-testid=open-board] button:has-text('Take it')").first.click()
+            page_b.wait_for_url("**/challenge/**", timeout=20000)
+            page_b.wait_for_timeout(3000)
+            check("taking it opens the challenge", "/challenge/" in page_b.url, page_b.url)
+            # Every rule the named flow has still holds: taking a seat is not
+            # being shown the cube.
+            check("and B still has not been shown the scramble", scramble_on(page_b) == "",
+                  scramble_on(page_b)[:40])
+
     print("\n== console ==")
     check("no page errors", len(errors) == 0, "; ".join(errors[:2])[:200])
 

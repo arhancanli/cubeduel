@@ -475,7 +475,8 @@ export interface Database {
         Row: {
           id: string;
           challenger_id: string;
-          opponent_id: string;
+          /** Null while an open challenge waits for somebody to take it. */
+          opponent_id: string | null;
           event: string;
           source: string;
           scramble: string;
@@ -496,7 +497,7 @@ export interface Database {
         Insert: {
           id?: string;
           challenger_id: string;
-          opponent_id: string;
+          opponent_id?: string | null;
           event?: string;
           source?: string;
           scramble: string;
