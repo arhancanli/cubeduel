@@ -12,6 +12,7 @@ established rating is LISTED, without a number and without a position. A board
 that showed only the rated would greet a beginner on the day they join with a
 list they are not on, which is exactly the person a club exists to keep.
 """
+import atexit
 import os
 import re
 import sys
@@ -19,12 +20,14 @@ import sys
 from playwright.sync_api import sync_playwright
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from account import delete_account, probe_email, sign_up  # noqa: E402
+from account import delete_account, delete_club, probe_email, sign_up  # noqa: E402
 
 BASE = os.environ.get("BASE", "http://localhost:3000")
 CAPTAIN = probe_email("club-captain")
 MEMBER = probe_email("club-member")
 SLUG = f"e2e-club-{os.getpid()}"
+# Registered before anything is created, so a crash partway still removes it.
+atexit.register(delete_club, SLUG)
 
 fails = 0
 

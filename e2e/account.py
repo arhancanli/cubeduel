@@ -19,6 +19,7 @@ Addresses end in `@cubeduel.test`, a reserved TLD that cannot resolve, so
 nothing here can mail a real person however wrong the configuration is.
 """
 
+import atexit
 import os
 import time
 import urllib.parse
@@ -71,6 +72,11 @@ def sign_up(page, email, password=None):
     )
     if result["status"] != 200:
         raise RuntimeError(f"sign-up failed ({result['status']}): {result['body'][:200]}")
+    # Deleted when the suite exits, however it exits. Suites clean up at the end
+    # of their run, and a suite that crashed before the end used to leave its
+    # accounts behind — which, once these ran against production, meant test
+    # accounts sitting in the live database. Deleting twice is harmless.
+    atexit.register(delete_account, email)
     return email
 
 
@@ -102,6 +108,29 @@ def delete_account(email):
             # bad key if you do not know to expect it.
             "User-Agent": "Mozilla/5.0",
         },
+    )
+    try:
+        urllib.request.urlopen(request)
+        return True
+    except Exception:  # noqa: BLE001 - cleanup must never fail a run
+        return False
+
+
+def delete_club(slug):
+    """Removes a club a suite created. Members go with it by cascade.
+
+    A club outlives the account that created it (`created_by` is set null, so a
+    real club survives its founder leaving), which means deleting the test
+    accounts left an empty "E2E Cubing Club" on the public site.
+    """
+    url = env("NEXT_PUBLIC_SUPABASE_URL")
+    key = env("SUPABASE_SECRET_KEY")
+    if not url or not key:
+        return False
+    request = urllib.request.Request(
+        f"{url}/rest/v1/clubs?slug=eq.{urllib.parse.quote(slug)}",
+        method="DELETE",
+        headers={"apikey": key, "Authorization": f"Bearer {key}", "User-Agent": "Mozilla/5.0"},
     )
     try:
         urllib.request.urlopen(request)
