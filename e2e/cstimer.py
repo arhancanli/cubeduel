@@ -38,6 +38,8 @@ with sync_playwright() as p:
     page = browser.new_page(viewport={"width": 1280, "height": 1000})
     errors = []
     page.on("pageerror", lambda e: errors.append(str(e)))
+    tracked = []
+    page.on("request", lambda r: tracked.append(r.url) if "/api/events" in r.url else None)
 
     print("\n== an empty history offers the import ==")
     page.goto(BASE + "/progress", wait_until="networkidle")
@@ -92,6 +94,12 @@ with sync_playwright() as p:
     alert = page.locator("[data-testid=cstimer-import] [role=alert]")
     check("it is refused, and says why", alert.count() == 1 and "not a csTimer export" in alert.inner_text())
     check("and nothing is written", len(history(page)) == 3)
+
+    print("\n== measurement ==")
+    # An import fires an analytics event — for a person. A browser driven by
+    # software announces itself (navigator.webdriver) and is not counted, or
+    # every run of these suites against production would read as new visitors.
+    check("an automated browser is never counted as a visitor", len(tracked) == 0, str(tracked[:2]))
 
     print("\n== console ==")
     check("no page errors", len(errors) == 0, "; ".join(errors[:2])[:160])

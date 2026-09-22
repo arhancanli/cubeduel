@@ -77,6 +77,15 @@ function optedOut(): boolean {
   for (const signal of [nav.doNotTrack, win.doNotTrack, nav.msDoNotTrack]) {
     if (signal === "1" || signal === "yes") return true;
   }
+
+  // A browser driven by software is not a visitor. The WebDriver standard makes
+  // every automated browser say so — Playwright, Selenium, Puppeteer, and the
+  // headless crawlers built on them — and without this, each run of this
+  // project's own browser suites against production arrived as a handful of
+  // new visitors who solved once and never came back: exactly the pattern the
+  // retention numbers exist to detect, manufactured by the tests.
+  if ((navigator as Navigator & { webdriver?: boolean }).webdriver === true) return true;
+
   return false;
 }
 
