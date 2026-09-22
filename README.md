@@ -24,13 +24,15 @@ by the time you would actually get back.</sub>
 Three things here are unusual enough to be worth naming before the feature list.
 
 **A cube solver written from scratch.** Kociemba two-phase, searching every cube
-from six sides at once, no solver library: 19.02 moves on average at the server's
-settings with a 91ms median, or a 9ms median at the browser's — short routes, not
-proven-shortest ones (a random cube's true minimum averages about 17.7). It
-powers the move efficiency figure — *you used 52 moves; the engine's route was
-20* — and the duel opponent. [How it works](docs/solver.md), including the
-pruning-table mistake that quietly turned the search into brute force, and the
-40× cold start fix.
+from six sides at once, no solver library: 18.93 moves on average at the server's
+settings with a 27ms median, or an 8ms median at the quicker default — short
+routes, not proven-shortest ones (a random cube's true minimum averages about
+17.7). Phase one knows the exact distance to its goal for all 141 million
+positions, which is 2.2 billion folded down by the cube's own symmetry. It powers
+the move efficiency figure — *you used 52 moves; the engine's route was 20* — and
+the duel opponent. [How it works](docs/solver.md), including the pruning-table
+mistake that quietly turned the search into brute force, and the 40× cold start
+fix.
 
 **Results are proven rather than trusted.** The server generates the scramble,
 stores it, and replays your move stream against it. If the cube does not end
@@ -124,9 +126,14 @@ guarantee broken in turn to confirm the suite catches it. See
 **It ships its own solving engine.** Kociemba's two-phase algorithm, written from
 scratch in TypeScript — cube model, coordinates, pruning tables and IDA* search.
 Over 200 uniformly random states at the server's settings: every cube solved,
-mean **19.02 moves**, median **91ms** — searching each cube from six sides at once
-(turned about its diagonal, and inverted) and never re-solving the same phase two
-twice, which together cut the median at the old settings from 125ms to 16ms.
+mean **18.93 moves**, median **27ms**, nothing over 451ms — searching each cube
+from six sides at once (turned about its diagonal, and inverted), never
+re-solving the same phase two twice, and looking up how far phase one really is
+from its goal rather than guessing. That last one is a table of 141 million exact
+distances: all three phase-one coordinates at once would be 2.2 billion, and the
+sixteen symmetries that leave the up-down axis alone fold them into 67MB, built
+in eleven seconds. It cut phase one from 773 million search nodes across sixty
+cubes to 118 million.
 Those routes are short, not proven shortest: a random cube's true minimum is 17
 or 18 moves about 95% of the time, so the engine runs a little over a move long,
 and the app says "the engine's route", never
@@ -190,7 +197,7 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 645 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 662 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 22 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
@@ -207,6 +214,7 @@ in the commit history was caught by exactly one of them.
 | `npm run integration:solve` | local Postgres | A solve permalink says the same thing a fortnight later: faster solves added afterwards must not rewrite its verdict. |
 | `npm run integration:sync` | local Postgres | Practice solves keep their move stream, and the stored breakdown, cases and counts are derived from it — a request that lies about any of them changes nothing stored. A stream longer than its own solve is dropped, and junk never reaches the splits column. |
 | `npm run integration:race` | local Postgres | A whole live race between two players: one seat taken once and never by a third, the scramble existing through the countdown and sent to neither player until the start, both pressing ready at once starting it exactly once, a forged solve becoming a DNF, the server's winner, and a rematch that lands both players in the same new race. |
+| `npm run verify:tables` | 141 million distances | The generated phase-one table against an independent search: its distance is the true shortest for random positions, the same position mirrored or turned is the same distance away, every entry was reached, the hardest needs twelve moves, and solving with it visits less than half the nodes. Its numbers are believed completely by the search — one too high and the branch holding the shortest solution is cut, silently — so deleting a rule from the fill and rebuilding is checked to make it go red. |
 | `npm run check:bundle` | build invariants | Two things that fail silently: future daily scrambles must not reach the client bundle, and the startup scramble pool must. |
 
 The e2e suite exists because of one specific failure mode: an anonymous request

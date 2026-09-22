@@ -3,6 +3,49 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.3.0 — 2026-09-22
+
+The release where the solver stopped guessing how far phase one was from its
+goal and started knowing.
+
+### A solver that knows the distance
+
+- **An exact phase-one table.** All three phase-one coordinates at once are 2.2
+  billion positions; the sixteen symmetries that leave the up-down axis alone
+  fold them into **141 million**, which fits in 67MB at four bits each and builds
+  in eleven seconds. Where the old pair tables gave a lower bound that sagged
+  with depth, this gives the answer: exactly how many moves the position needs.
+  Phase one went from 773 million search nodes across sixty cubes to 118 million.
+- **Shorter routes, sooner.** At the server's settings the mean fell from 19.15
+  to **18.93 moves** and the median from 147ms to **27ms**, with nothing over
+  451ms. The quicker default now takes 20 moves rather than 21 — a whole move
+  shorter — and is no slower than the old default was.
+- **The symmetries are derived from the cube's shape**, not transcribed: the same
+  code, asked for the six face turns, reproduces the move tables the engine has
+  always used, and asked for the rotation about the corner diagonal reproduces
+  the one the six-sided search uses. That is what makes the other sixteen — which
+  cannot be compared against anything — trustworthy.
+- **The daily scrambles' routes were recomputed**: mean 18.73 moves before, 18.32
+  now.
+- **`npm run verify:tables`** checks the generated table against the same question
+  asked the slow way, and against itself under every symmetry. Two ways of
+  building it wrong were tried on purpose to confirm it goes red — including the
+  subtle one, which produces distances that are too high, and so loses shortest
+  solutions without ever looking broken.
+
+### Fixed
+
+- **Deploys were uploading eleven files git has never tracked**, among them a
+  backup of old database keys and the private key of the local test certificate,
+  into the deployment's source. Nothing was served — the files 404 and the source
+  view needs the owner's login — but Vercel does not read `.gitignore`, so
+  `.vercelignore` now ignores everything and lets back in only what git tracks.
+  The audit fails if either half drifts.
+- **The tables are carried only into the two routes that solve**, rather than
+  into every API route. The audit works out which routes reach the solver and
+  fails if that list and the configuration disagree — a route without the tables
+  solves several times slower and says nothing.
+
 ## 1.2.0 — 2026-09-22
 
 The release where two people can race the same scramble at the same moment, and
@@ -203,6 +246,7 @@ The ones worth knowing about:
 - **Boards rendered "Nobody is ranked yet" during an outage**, which is
   indistinguishable from the truth and so gets investigated by nobody.
 
+[1.3.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.3.0
 [1.2.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.2.0
 [1.1.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.1.0
 [1.0.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.0.0

@@ -171,7 +171,20 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { gunzipSync } from "node:zlib";
 
-import { TABLE_CACHE_PATH, TABLE_FORMAT_VERSION, type TableHeader } from "./cache";
+import {
+  BYTES_PER_ELEMENT,
+  PHASE1_CACHE_PATH,
+  PHASE1_FORMAT_VERSION,
+  TABLE_CACHE_PATH,
+  TABLE_FORMAT_VERSION,
+  type TableHeader,
+} from "./cache";
+import {
+  FLIPSLICE_COUNT,
+  PHASE1_TABLE_SIZE,
+  UD_SYMMETRY_COUNT,
+  type Phase1Lookup,
+} from "./phase1Table";
 
 export interface SolverTables {
   twistMove: Int32Array;
@@ -199,6 +212,17 @@ export interface SolverTables {
   cornerSlicePrune: Uint8Array;
   /** Lower bound on phase-two moves remaining, from (edge8Perm, slicePerm). */
   edgeSlicePrune: Uint8Array;
+  /**
+   * The exact phase-one distance for every position, or null when it has not
+   * been generated (`npm run tables:build` writes it).
+   *
+   * With it, phase one stops guessing: the number is what the position actually
+   * needs rather than a bound that sags with depth. Without it the search uses
+   * the three pair tables above and is several times slower for the same
+   * solution length — so this is the difference between two speeds, never
+   * between a right answer and a wrong one.
+   */
+  phase1: Phase1Lookup | null;
   buildMs: number;
 }
 
@@ -220,7 +244,7 @@ export function buildTables(): SolverTables {
   // at 2.07s and one well under half a second.
   const loaded = loadPrecomputedTables();
   if (loaded) {
-    cached = loaded;
+    cached = { ...loaded, phase1: loadPhase1Lookup() };
     return cached;
   }
 
@@ -293,6 +317,7 @@ export function buildTables(): SolverTables {
       slicePermMove,
       PHASE2_MOVE_COUNT,
     ),
+    phase1: loadPhase1Lookup(),
     buildMs: Date.now() - started,
   };
 
@@ -319,11 +344,25 @@ export function resetTables(): void {
  * build expects, and refuses on the slightest disagreement.
  */
 function loadPrecomputedTables(): SolverTables | null {
-  // Node-only by construction: the solver is reached only through
-  // `server-only` code, so `node:fs` is a static import rather than a guarded
-  // one. If that ever changes, this is the line that has to change with it.
+  const out = readTableFile(TABLE_CACHE_PATH, TABLE_FORMAT_VERSION, expectedTableLengths());
+  if (!out) return null;
+  return { ...(out as unknown as SolverTables), phase1: null, buildMs: 0 };
+}
+
+/**
+ * Reads one generated table file, or returns null.
+ *
+ * Node-only by construction: the solver is reached only through `server-only`
+ * code, so `node:fs` is a static import rather than a guarded one. If that ever
+ * changes, this is the line that has to change with it.
+ */
+function readTableFile(
+  path: string,
+  version: number,
+  expected: Record<string, number>,
+): Record<string, ArrayBufferView> | null {
   try {
-    const packed = readFileSync(join(process.cwd(), TABLE_CACHE_PATH));
+    const packed = readFileSync(join(process.cwd(), path));
     const raw = gunzipSync(packed);
 
     const headerLength = raw.readUInt32LE(0);
@@ -331,9 +370,8 @@ function loadPrecomputedTables(): SolverTables | null {
       raw.subarray(4, 4 + headerLength).toString("utf8"),
     ) as TableHeader;
 
-    if (header.version !== TABLE_FORMAT_VERSION) return null;
+    if (header.version !== version) return null;
 
-    const expected = expectedTableLengths();
     const out: Record<string, ArrayBufferView> = {};
     let offset = 4 + headerLength;
 
@@ -343,7 +381,7 @@ function loadPrecomputedTables(): SolverTables | null {
       // file was written by different code.
       if (want === undefined || want !== entry.length) return null;
 
-      const bytes = entry.kind === "Int32Array" ? entry.length * 4 : entry.length;
+      const bytes = entry.length * BYTES_PER_ELEMENT[entry.kind];
       if (offset + bytes > raw.length) return null;
 
       // Copied rather than viewed onto the shared buffer: an Int32Array needs
@@ -354,7 +392,11 @@ function loadPrecomputedTables(): SolverTables | null {
         raw.byteOffset + offset + bytes,
       );
       out[entry.key] =
-        entry.kind === "Int32Array" ? new Int32Array(slice) : new Uint8Array(slice);
+        entry.kind === "Int32Array"
+          ? new Int32Array(slice)
+          : entry.kind === "Uint16Array"
+            ? new Uint16Array(slice)
+            : new Uint8Array(slice);
       offset += bytes;
     }
 
@@ -364,10 +406,30 @@ function loadPrecomputedTables(): SolverTables | null {
       if (!(key in out)) return null;
     }
 
-    return { ...(out as unknown as SolverTables), buildMs: 0 };
+    return out;
   } catch {
     return null;
   }
+}
+
+/**
+ * The exact phase-one table, if it has been generated.
+ *
+ * Absent is a normal state, not a failure: it is 67MB that only a server which
+ * solves a great many cubes is worth loading, and everything works without it.
+ * What must never happen is loading a *stale* one — its numbers are exact
+ * distances the search trusts completely — so the same version and length checks
+ * apply, and the class count it declares must be the one this build computes.
+ */
+function loadPhase1Lookup(): Phase1Lookup | null {
+  const out = readTableFile(PHASE1_CACHE_PATH, PHASE1_FORMAT_VERSION, {
+    classIndex: FLIPSLICE_COUNT,
+    classSym: FLIPSLICE_COUNT,
+    twistConj: TWIST_COUNT * UD_SYMMETRY_COUNT,
+    distances: PHASE1_TABLE_SIZE >> 1,
+  });
+  if (!out) return null;
+  return out as unknown as Phase1Lookup;
 }
 
 /**

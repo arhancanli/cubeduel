@@ -6,12 +6,13 @@ each piece is shaped the way it is, what was measured, and which of my first
 attempts were wrong.
 
 **Result.** Over 200 uniformly random states, searching from six sides at the
-settings the server uses: every cube solved, mean **19.02 moves** (half-turn
-metric), median **91ms**, p95 one second. At the browser's quicker settings,
-mean 20.54 with a median of **9ms**. Tables load in about 30ms from the
-precomputed file. That is short, not shortest: the average true minimum for a
-random cube is about 17.7 moves, so these routes run a little over one move long.
-See [What this is not](#10-what-this-is-not).
+settings the server uses: every cube solved, mean **18.93 moves** (half-turn
+metric), median **27ms**, nothing over 451ms. At the quicker default, mean 19.70
+with a median of **8ms**. Tables load in about 170ms from the precomputed files,
+the larger of which is 141 million exact distances (§8). That is short, not
+shortest: the average true minimum for a random cube is about 17.7 moves, so
+these routes run a little over one move long. See
+[What this is not](#11-what-this-is-not).
 
 ---
 
@@ -88,8 +89,12 @@ IDA* needs an admissible heuristic: a lower bound on moves remaining that never
 overestimates. Each pruning table stores the exact distance to the goal for a
 *pair* of coordinates, computed by breadth-first search backwards from the goal.
 
-Pairs rather than the full triple purely for memory — the exact phase-one table
-would need 2,187 × 2,048 × 495 ≈ 2.2 billion entries.
+Pairs rather than the full triple purely for memory — all three phase-one
+coordinates at once would be 2,187 × 2,048 × 495 ≈ 2.2 billion entries. That is
+how the engine worked for its whole first life, and §8 is how the full table was
+had anyway: the cube's own symmetry folds those 2.2 billion into 141 million.
+The pair tables below are still built, and still used wherever the bigger one has
+not been generated.
 
 My first version used the two obvious pairs, (twist, slice) and (flip, slice).
 Both max out at **9**. A phase-one solution runs to 12, so near the root the
@@ -186,38 +191,114 @@ permutation of the faces, and that a solution found from every one of the six
 views, translated back, solves the original — and two mutations (translating an
 inverse without reversing it, and using the wrong rotation's map) each fail them.
 
-## 8. Measurements
+## 8. The exact phase-one table
 
-200 uniformly random legal states, laptop, tables loaded. "Before" is the
-single-direction search this document used to describe.
+The pair tables above are projections, and a projection underestimates. Near the
+goal they are nearly right; deep in the search, where it matters, they are not,
+and the measurements said so plainly: at the server's settings **86% of the time
+went to phase one** — 773 million nodes across sixty cubes against 38 million in
+phase two. The bound was the bottleneck.
 
-| Options | Views | Mean length | Median | p95 | Hit the budget |
+All three phase-one coordinates at once would be exact, and there are
+2,187 × 2,048 × 495 ≈ 2.2 billion of them, which is why this document used to
+stop here. But the cube does not care which way up it is. Sixteen symmetries
+leave the U-D axis alone — four turns about it, each with and without a half
+turn about F-B, each with and without a mirror — and phase one's goal is stated
+entirely in terms of that axis, so positions related by one of them are the same
+distance from G1. Storing one position per class turns 1,013,760 (flip, slice)
+pairs into **64,430**, and the table into 64,430 × 2,187 ≈ 141 million entries:
+**67MB at four bits each**, built in eleven seconds.
+
+Its number is not a bound. It is how many moves the position needs.
+
+### Where the symmetries come from
+
+`cube.ts` describes states as permutations of pieces, which cannot answer "what
+does this look like mirrored?". `geometry.ts` puts the cube back in space —
+where each face points, which stickers each slot holds, in order — and derives
+the symmetries from the shape. Derived, not transcribed, and that is checkable:
+the same code, asked for the six face turns, produces `BASE_MOVES` exactly, and
+asked for the rotation about the URF-DBL diagonal produces the `URF3` of
+`symmetry.ts`. Two of its outputs can be compared against tables that were
+checked against cubing.js; the other sixteen cannot be compared against
+anything, and come off the same machinery.
+
+A mirror is not a turn — no sequence of moves mirrors a cube — so a mirrored
+state is a description rather than a position, and it exists only inside a
+conjugation `S⁻¹ X S`, where the two reflections cancel. While it exists, a
+corner's stickers run the other way round; Kociemba's convention, followed here,
+extends corner orientation to 0-5, and `multiplyFull` is ordinary composition
+everywhere else. The search never sees a value above 2.
+
+### Filling it
+
+Breadth-first from solved, scanned rather than queued: a queue of 141 million
+indices would cost more than the table it fills. Each pass walks the whole table,
+expanding forwards while the frontier is the smaller side and turning around when
+most of the table is known — at depth 10, asking each unknown position whether a
+neighbour is one move nearer is far less work than expanding 76 million known
+ones.
+
+One subtlety decides whether the result is right. A class representative fixed by
+some symmetry is the same position under more than one corner twist, and a fill
+that sets only the entry it arrived at leaves the others looking further away
+than they are. Distances that are too high are exactly the failure that cannot be
+seen: the search cuts the branch holding the shortest solution and returns a
+longer one, with nothing reporting a problem. Deleting that rule and rebuilding
+is one of the mutations `scripts/verify-solver-tables.mts` is checked against —
+it reports positions whose mirror image is a different distance from G1.
+
+### What it bought
+
+Phase one went from 773 million nodes to 118 million for the same sixty cubes,
+and then to fewer still once the cube handed to phase two stopped being rebuilt
+from scratch two million times a solve — a depth-first search changes only the
+tail of its path, so only the tail needs redoing. At the server's settings the
+mean fell from 19.15 moves to 18.93 and the median from 147ms to 27ms; the table
+of §9 has the rest.
+
+It is generated, never committed — a stale table of exact distances is worse than
+no table — and the loader refuses any file whose version or declared lengths do
+not match this build, falling back to the pair bounds. That fallback is a real
+path, not a theoretical one: it runs wherever the file has not been generated, so
+`search.test.ts` exercises both on purpose rather than whichever the file system
+happens to offer.
+
+## 9. Measurements
+
+200 uniformly random legal states, laptop, tables loaded. "Pair bounds" is the
+same search with the exact phase-one table withheld (`exactTable: false`), which
+is what a caller that has not generated it gets.
+
+| Options | Bound | Mean length | Median | p95 | Mean time |
 |---|---|---|---|---|---|
-| **browser default** (`21`, `250ms`) | 1 | 20.50 | 17ms | 175ms | 3 |
-| **browser default** (`21`, `250ms`) | 6 | 20.54 | **9ms** | **35ms** | 0 |
-| `20`, `1500ms` | 1 | 19.74 | 125ms | 1501ms | 38 |
-| `20`, `1500ms` | 6 | 19.64 | 16ms | 176ms | 2 |
-| **server** (`19`, `1000ms`) | 6 | **19.02** | 91ms | 1001ms | 41 |
-| `18`, `1500ms` | 6 | 18.77 | 1500ms | 1501ms | 135 |
+| `21`, `250ms` | pair | 20.55 | 7ms | 30ms | 10ms |
+| `21`, `250ms` | exact | 20.55 | 6ms | 27ms | 8ms |
+| **default** (`20`, `150ms`) | pair | 19.81 | 15ms | 150ms | 33ms |
+| **default** (`20`, `150ms`) | exact | **19.70** | **8ms** | **39ms** | 13ms |
+| **server** (`19`, `450ms`) | pair | 19.15 | 147ms | 451ms | 211ms |
+| **server** (`19`, `450ms`) | exact | **18.93** | **27ms** | 451ms | 105ms |
+| `18`, `450ms` | exact | 18.66 | 451ms | 451ms | 311ms |
 
-At the browser default the six views change nothing about length — the target
-stops them at 21 either way — and cut the slowest solves by five. At a target of
-20, one solve in five used to run out the clock and some settled for 21; now one
-in a hundred does, and none is longer than 20. The server takes 19: it computes
-each scramble's answer once for everybody and caches it, so a mean of 19.02 is
-worth a median of 91ms.
+Two things to read out of it. The default now takes 20 rather than 21 and is no
+slower than the old default was, which is the exact table paying for itself; and
+each move nearer the true minimum still costs several times the last, because
+what is expensive is no longer the bound but the number of phase ones that have
+to be tried before one of them has a short phase two. That is why the server
+takes 19 at 450ms rather than 18: 18 is only 0.27 of a move better and spends
+the whole budget on nearly every scramble instead of 27ms.
 
-Each move nearer the true minimum costs several times the last, because the
-pruning tables are two-coordinate projections that underestimate more the deeper
-the search goes. The next gain is a stronger phase-one bound — Kociemba's
-symmetry-reduced table over all three phase-one coordinates at once — at the cost
-of tens of megabytes and a much longer build.
+The historical figures, before any of this, were a mean of 20.50 at the old
+default and 19.74 at target 20 with a 1.5 second budget, with one solve in five
+running out the clock. The six-sided search (§7) took that to 19.64, and the
+exact table took target 19 from 19.02 to 18.93 while cutting its median from
+91ms to 27ms.
 
 Every solution in every run was verified by applying it and checking the cube
 ended solved. A solver that returns plausible-looking moves which do not solve is
 worse than one that returns nothing.
 
-## 9. Testing
+## 10. Testing
 
 The move tables are transcribed by hand from Kociemba's definitions, which is
 exactly the kind of thing that is silently wrong: one swapped index produces a
@@ -248,10 +329,10 @@ something kills it, which is indistinguishable from an infinitely slow solver.
 That cost three ten-minute timeouts and a wrong diagnosis before I noticed the
 one script that *worked* was the one using a hardcoded scramble.
 
-## 10. What this is not
+## 11. What this is not
 
 - **Not optimal.** Two-phase trades a provable minimum for speed. At the server's
-  settings its mean of 19.02 moves is about 1.3 above the true average minimum:
+  settings its mean of 18.93 moves is about 1.2 above the true average minimum:
   per Rokicki, Kociemba, Davidson and Dethridge's distance table (cube20.org),
   about two thirds of all positions need exactly 18 moves and about a quarter need
   17, which puts the average near 17.7. (An earlier version of this line compared

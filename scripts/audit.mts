@@ -400,6 +400,100 @@ console.log("Every commit is the owner's, and credits nobody else");
 }
 
 // ---------------------------------------------------------------------------
+console.log("Every route that solves carries the solver's tables");
+// ---------------------------------------------------------------------------
+{
+  // The tables are read from disk at runtime by a path the compiler cannot see,
+  // so `next.config.ts` names the routes whose bundles must carry them. Getting
+  // that list wrong is silent twice over: a route without the file computes the
+  // small tables on every cold start, and does without the 67MB phase-one table
+  // altogether — solving several times slower for the same answers, with
+  // nothing reporting it.
+  //
+  // So the list is checked against the code: which route files actually reach
+  // `lib/solver`, following imports.
+  const config = read("next.config.ts");
+  const block = /outputFileTracingIncludes:\s*\{([^}]*)\}/.exec(config);
+  if (!block) fail("next.config.ts no longer declares outputFileTracingIncludes");
+
+  const configured = new Set(
+    [...(block?.[1] ?? "").matchAll(/"([^"]+)":\s*\[[^\]]*\.solver-cache/g)].map((m) => m[1]),
+  );
+
+  // `walk` deals in paths relative to the repository root, and so does this.
+  const resolve = (from: string, specifier: string): string | null => {
+    const base = specifier.startsWith("@/")
+      ? join("src", specifier.slice(2))
+      : specifier.startsWith(".")
+        ? join(dirname(from), specifier)
+        : null;
+    if (!base) return null;
+    for (const candidate of [`${base}.ts`, `${base}.tsx`, join(base, "index.ts")]) {
+      if (existsSync(join(root, candidate))) return candidate;
+    }
+    return null;
+  };
+
+  const reachesSolver = (entry: string): boolean => {
+    const seen = new Set<string>();
+    const stack = [entry];
+    while (stack.length > 0) {
+      const file = stack.pop() as string;
+      if (seen.has(file)) continue;
+      seen.add(file);
+      if (file.includes(join("src", "lib", "solver"))) return true;
+      for (const m of readFileSync(join(root, file), "utf8").matchAll(/from\s+"([^"]+)"/g)) {
+        const next = resolve(file, m[1]);
+        if (next) stack.push(next);
+      }
+    }
+    return false;
+  };
+
+  // A route's key is its URL: `src/app/api/solve/route.ts` is `/api/solve`, and
+  // a page is its directory. Route groups `(name)` are not part of the path.
+  const needed = new Set<string>();
+  for (const file of walk("src/app", (name) => name === "route.ts" || name === "page.tsx")) {
+    if (!reachesSolver(file)) continue;
+    const url = dirname(file)
+      .slice("src/app".length)
+      .split("/")
+      .filter((part) => part && !part.startsWith("("))
+      .join("/");
+    needed.add(`/${url}`);
+  }
+
+  // Reaching the solver through an import is not the same as solving. These
+  // routes share a module with one that does and never call it, so carrying
+  // 67MB into their bundles would be waste. Written down with the reason rather
+  // than inferred, and checked below for staleness: an entry here that no
+  // longer reaches the solver at all is a note nobody removed.
+  const NOT_SOLVING: Record<string, string> = {
+    "/api/duel/finish": "imports server/duels for finishDuel; only startDuel solves",
+    "/duel": "imports server/duels for duelRecord only",
+  };
+
+  const missing = [...needed].filter(
+    (route) => !configured.has(route) && !(route in NOT_SOLVING),
+  );
+  const stale = Object.keys(NOT_SOLVING).filter((route) => !needed.has(route));
+  const extra = [...configured].filter((route) => !needed.has(route));
+  if (missing.length > 0) {
+    fail(`Routes that solve but do not carry the tables: ${missing.join(", ")}`);
+  }
+  if (stale.length > 0) {
+    fail(`Listed as not solving, but no longer reach the solver at all: ${stale.join(", ")}`);
+  }
+  if (extra.length > 0) {
+    fail(`next.config.ts carries the tables into routes that never solve: ${extra.join(", ")}`);
+  }
+
+  console.log(
+    `  ${needed.size} route(s) reach the solver: ${configured.size} carry the tables, ${Object.keys(NOT_SOLVING).length} never solve`,
+  );
+}
+
+// ---------------------------------------------------------------------------
 console.log("A deploy uploads the committed files and nothing else");
 // ---------------------------------------------------------------------------
 {

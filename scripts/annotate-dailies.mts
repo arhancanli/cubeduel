@@ -47,8 +47,10 @@ for (const [index, day] of days.entries()) {
   // so a shorter solution is strictly better and costs nobody anything.
   const result = solveScramble(data.scrambles[day], {
     // Offline and once, so it can afford to aim near the true minimum: a
-    // random cube needs 17 or 18 moves about 95% of the time.
-    targetLength: 18,
+    // random cube needs 17 or 18 moves about 95% of the time. With the exact
+    // phase-one table the same budget reaches deeper, so the target is the true
+    // minimum and the budget is what actually stops it.
+    targetLength: 17,
     timeBudgetMs: 2500,
   });
 

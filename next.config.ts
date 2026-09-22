@@ -26,13 +26,18 @@ const nextConfig: NextConfig = {
    * be traced into the function bundle — nothing imports them, so the compiler
    * cannot see the dependency on its own.
    *
-   * If this is ever wrong the solver still works: the loader returns null on any
-   * failure and the tables are computed instead. That costs about two seconds on
-   * a cold start, which is exactly the regression this file exists to prevent,
-   * so it is worth checking the deployed cold latency after touching it.
+   * If this is ever wrong the solver still works, and that is the danger. The
+   * loader returns null on any failure and the tables are computed instead,
+   * which costs about two seconds on a cold start; the exact phase-one table is
+   * not computed at all, and the search quietly falls back to the weaker pair
+   * bounds. Both are silent. So `npm run audit` works out which routes actually
+   * reach the solver and fails if this list is not exactly those — the 67MB
+   * table is listed route by route rather than for `/api/**` because every
+   * route named here carries its own copy into its bundle.
    */
   outputFileTracingIncludes: {
-    "/api/**": [".solver-cache/**"],
+    "/api/solve": [".solver-cache/**"],
+    "/api/duel/start": [".solver-cache/**"],
   },
 };
 

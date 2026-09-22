@@ -168,8 +168,7 @@ export function setSlice(cube: CubieCube, index: number): void {
  * matters — the particular numbering scheme is arbitrary as long as it is
  * consistent, and the tests check the round trip over every value.
  */
-function permutationIndex(perm: number[]): number {
-  const n = perm.length;
+function permutationIndex(perm: ArrayLike<number>, n: number = perm.length): number {
   let index = 0;
   for (let i = 0; i < n - 1; i++) {
     index *= n - i;
@@ -188,8 +187,11 @@ function permutationFromIndex(index: number, n: number): number[] {
   return digits.map((d) => available.splice(d, 1)[0]);
 }
 
+// Read straight off the state, never through a copy. These three run once per
+// phase-one solution — nearly two million times in a single hard solve — and
+// `Array.from` on each was allocating more than the arithmetic cost.
 export function getCornerPerm(cube: CubieCube): number {
-  return permutationIndex(Array.from(cube.cp));
+  return permutationIndex(cube.cp, CORNER_COUNT);
 }
 
 export function setCornerPerm(cube: CubieCube, index: number): void {
@@ -206,7 +208,7 @@ export function setCornerPerm(cube: CubieCube, index: number): void {
  * permutation of its own.
  */
 export function getEdge8Perm(cube: CubieCube): number {
-  return permutationIndex(Array.from(cube.ep.slice(0, 8)));
+  return permutationIndex(cube.ep, 8);
 }
 
 export function setEdge8Perm(cube: CubieCube, index: number): void {
@@ -214,11 +216,12 @@ export function setEdge8Perm(cube: CubieCube, index: number): void {
   for (let i = 0; i < 8; i++) cube.ep[i] = perm[i];
 }
 
+/** Scratch for the four slice edges. Single-threaded by construction. */
+const slicePermScratch = new Uint8Array(4);
+
 export function getSlicePerm(cube: CubieCube): number {
-  const perm = Array.from(cube.ep.slice(SLICE_START, EDGE_COUNT)).map(
-    (piece) => piece - SLICE_START,
-  );
-  return permutationIndex(perm);
+  for (let i = 0; i < 4; i++) slicePermScratch[i] = cube.ep[SLICE_START + i] - SLICE_START;
+  return permutationIndex(slicePermScratch, 4);
 }
 
 export function setSlicePerm(cube: CubieCube, index: number): void {

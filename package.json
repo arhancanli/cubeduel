@@ -1,6 +1,6 @@
 {
   "name": "cubeduel",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "private": true,
   "engines": {
     "node": ">=22"
@@ -41,7 +41,8 @@
     "dailies:annotate": "tsx scripts/annotate-dailies.mts",
     "integration:solve": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-solve-page.mts",
     "integration:sync": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-sync.mts",
-    "integration:race": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-race.mts"
+    "integration:race": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-race.mts",
+    "verify:tables": "tsx scripts/verify-solver-tables.mts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.109.0",

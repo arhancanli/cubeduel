@@ -33,6 +33,20 @@ jobs:
 
       - run: npm run typecheck
       - run: npm run lint
+
+      # The solver's tables are generated, never committed, and the exact
+      # phase-one table is 141 million distances the search trusts completely —
+      # one entry too high and it cuts the branch holding the shortest solution,
+      # silently. So it is built and then checked against an independent search
+      # before anything else runs on it. Built here rather than only by the
+      # build step below so the tests exercise the search that production runs,
+      # not just its fallback.
+      - name: Build the solver tables
+        run: npm run tables:build
+
+      - name: Verify the exact phase-one table
+        run: npm run verify:tables
+
       - run: npm test
 
       # No credentials at all, deliberately.

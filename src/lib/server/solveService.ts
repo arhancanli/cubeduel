@@ -92,14 +92,16 @@ export function summariseScramble(scramble: string): SolveSummary | null {
       // quality worth much more than latency here. At the default 250ms a slower
       // serverless CPU was returning 22 moves where a second returns 20.
       //
-      // Measured over 200 random states once the search looked from six sides
-      // (docs/solver.md): target 20 / 1.5s averaged 19.64 moves with a median of
-      // 16ms; target 19 / 1s averages 19.02 with a median of 91ms and a p95 of
-      // one second. Before the six-sided search, target 20 / 1.5s averaged 19.74
-      // and one solve in five ran into the budget. 19 is the better trade for a
-      // line that appears when it is ready and is then cached for everybody.
+      // Measured over 200 uniformly random states with the exact phase-one
+      // table (docs/solver.md §9): target 19 / 450ms averages 18.93 moves, with
+      // a median of 27ms and nothing over 451ms. Target 18 at the same budget
+      // averages 18.66, but spends the whole 450ms on nearly every scramble
+      // rather than 27 — for a line that is computed once and then cached for
+      // everybody, the shorter wait on a fresh scramble is worth 0.27 of a move.
+      //
+      // Before the table, these settings averaged 19.15 and took 211ms.
       targetLength: 19,
-      timeBudgetMs: 1000,
+      timeBudgetMs: 450,
     });
   } catch {
     // `solveScramble` throws only for states no cube can reach. A scramble that

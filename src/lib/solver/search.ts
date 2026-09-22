@@ -1,8 +1,9 @@
-import { compose, isSolved, validate, cubeFromAlg, type CubieCube } from "./cube";
+import { cloneCube, isSolved, multiply, validate, cubeFromAlg, type CubieCube } from "./cube";
 import {
   SLICE_COUNT,
   SLICE_PERM_COUNT,
   FLIP_COUNT,
+  TWIST_COUNT,
   getCornerPerm,
   getEdge8Perm,
   getFlip,
@@ -10,6 +11,7 @@ import {
   getSlicePerm,
   getTwist,
 } from "./coords";
+import { UD_SYMMETRY_COUNT } from "./phase1Table";
 import { directionsOf } from "./symmetry";
 import {
   MOVES,
@@ -82,6 +84,16 @@ export interface SolveOptions {
    * easiest.
    */
   directions?: 1 | 6;
+  /**
+   * Whether to use the exact phase-one table when it is loaded. True unless
+   * asked otherwise.
+   *
+   * Exists so both paths can be run on purpose. The table is generated, so
+   * whether it is there varies by machine, and "whichever the file system
+   * happens to offer" is not a thing to test or measure against — the fallback
+   * has to be exercised deliberately or it rots unnoticed.
+   */
+  exactTable?: boolean;
 }
 
 export interface SolveResult {
@@ -112,25 +124,36 @@ const CLOCK_CHECK_INTERVAL = 4096;
 
 /**
  * Defaults chosen from measurement, not taste. Over 200 uniformly random states,
- * searching from all six sides (`scripts/bench-solver.mts`):
+ * searching from all six sides, with the exact phase-one table loaded
+ * (`scripts/bench-solver.mts`):
  *
- *   target 21,  250ms budget -> mean 20.54 htm, median   9ms, p95   35ms
- *   target 20, 1500ms budget -> mean 19.64 htm, median  16ms, p95  176ms
- *   target 19, 1000ms budget -> mean 19.02 htm, median  91ms, p95 1001ms
- *   target 18, 1500ms budget -> mean 18.77 htm, median 1.5s — mostly the budget
+ *   target 21, 250ms budget -> mean 20.55 htm, median  6ms, p95  27ms
+ *   target 20, 150ms budget -> mean 19.70 htm, median  8ms, p95  39ms
+ *   target 19, 450ms budget -> mean 18.93 htm, median 27ms, p95 451ms
+ *   target 18, 450ms budget -> mean 18.66 htm — the budget, nearly every time
  *
- * Each move nearer the true minimum costs several times the last, because the
- * pruning tables here are projections that underestimate more the deeper the
- * search goes — not because of anything special about the number. The browser
- * default takes 21; the server, which computes each answer once for everybody,
- * takes 19 (see `server/solveService.ts`).
+ * Twenty at 150ms is the default: it is a whole move shorter than the old
+ * default of 21 and no slower, which is what the exact table bought. Wanting
+ * one move better than that costs roughly ten times the time, because the
+ * search has to enumerate a great many more phase ones to find the one whose
+ * phase two is short.
+ *
+ * These are also the numbers with the table. Without it — it is generated, and
+ * a caller may not have it — the same settings give 19.81 at 33ms, and the gap
+ * widens the harder the target: 19.15 against 18.93 at target 19. The default
+ * is chosen to be sensible either way.
+ *
+ * The duel opponent solves at these defaults while a player waits, so its
+ * ceiling is what matters there; the server, which computes each answer once
+ * for everybody and caches it, takes 19 (see `server/solveService.ts`).
  */
 const DEFAULTS: Required<SolveOptions> = {
-  targetLength: 21,
+  targetLength: 20,
   maxLength: 26,
-  timeBudgetMs: 250,
+  timeBudgetMs: 150,
   hardCeilingMs: 5000,
   directions: 6,
+  exactTable: true,
 };
 
 /** Face index of each move, for the redundancy filters. */
@@ -223,7 +246,30 @@ export function solve(cube: CubieCube, options: SolveOptions = {}): SolveResult 
   function searcher(direction: ReturnType<typeof directionsOf>[number]) {
     const start = direction.cube;
     const phase1Stack = new Int32Array(MAX_PHASE1_DEPTH);
+
+    /**
+     * The cube after each move of the path phase one is currently walking:
+     * `path[i]` is `start` with the first `i` moves of `phase1Stack` applied.
+     *
+     * Phase two needs the whole state, not the three numbers phase one tracks,
+     * and it used to be rebuilt from `start` every time a phase-one solution
+     * turned up — allocating a cube per move, two million times over a hard
+     * solve. A depth-first search changes only the tail of its path between one
+     * solution and the next, so all that is really needed is to redo the part
+     * that changed: `valid` is how much of `path` still matches the stack.
+     */
+    const path = Array.from({ length: MAX_PHASE1_DEPTH + 1 }, () => cloneCube(start));
+    let valid = 0;
     const phase2Stack = new Int32Array(MAX_PHASE2_DEPTH);
+    // Hoisted out of the search: the exact table's four arrays are read on
+    // every node, and reaching them through `t.phase1` each time costs more
+    // than the lookup itself.
+    const exact = opts.exactTable ? t.phase1 : null;
+    const classIndex = exact?.classIndex;
+    const classSym = exact?.classSym;
+    const twistConj = exact?.twistConj;
+    const distances = exact?.distances;
+
     const twist0 = getTwist(start);
     const flip0 = getFlip(start);
     const slice0 = getSlice(start);
@@ -310,12 +356,12 @@ export function solve(cube: CubieCube, options: SolveOptions = {}): SolveResult 
      * shallow depths and is bounded by the budget at deep ones.
      */
     function tryFinish(length: number): void {
-      // Rebuild the post-phase-one state at cubie level: phase two needs the
-      // permutation detail the phase-one coordinates deliberately discarded.
-      let state = start;
-      for (let i = 0; i < length; i++) {
-        state = compose(state, MOVE_CUBES[phase1Stack[i]]);
+      // Bring the path up to date from wherever the search last changed it.
+      for (let i = valid; i < length; i++) {
+        multiply(path[i], MOVE_CUBES[phase1Stack[i]], path[i + 1]);
       }
+      if (valid < length) valid = length;
+      const state = path[length];
 
       const cap = found.moves ? found.moves.length - length - 1 : opts.maxLength - length;
       if (cap < 0) return;
@@ -357,18 +403,34 @@ export function solve(cube: CubieCube, options: SolveOptions = {}): SolveResult 
       }
       if (budgetSpent()) return;
 
-      const lower = Math.max(
-        t.twistFlipPrune[twist * FLIP_COUNT + flip],
-        t.twistSlicePrune[twist * SLICE_COUNT + slice],
-        t.flipSlicePrune[flip * SLICE_COUNT + slice],
-      );
-      if (lower > remaining) return;
+      // With the exact table this is not a bound but the answer: the number of
+      // moves this position needs to reach G1. Anything above what is left
+      // cannot get there, and — unlike a bound that underestimates — nothing
+      // below it is explored for nothing.
+      if (classIndex !== undefined && classSym !== undefined
+        && twistConj !== undefined && distances !== undefined) {
+        const pair = slice * FLIP_COUNT + flip;
+        const index = classIndex[pair] * TWIST_COUNT
+          + twistConj[twist * UD_SYMMETRY_COUNT + classSym[pair]];
+        const byte = distances[index >> 1];
+        if ((index & 1 ? byte >> 4 : byte & 15) > remaining) return;
+      } else {
+        const lower = Math.max(
+          t.twistFlipPrune[twist * FLIP_COUNT + flip],
+          t.twistSlicePrune[twist * SLICE_COUNT + slice],
+          t.flipSlicePrune[flip * SLICE_COUNT + slice],
+        );
+        if (lower > remaining) return;
+      }
 
       for (let m = 0; m < MOVE_COUNT; m++) {
         const face = FACE_OF[m];
         if (!allowed(face, lastFace)) continue;
 
         phase1Stack[ply] = m;
+        // Everything the path held beyond this move describes a different
+        // branch now.
+        if (valid > ply) valid = ply;
         searchPhase1(
           remaining - 1,
           t.twistMove[twist * MOVE_COUNT + m],

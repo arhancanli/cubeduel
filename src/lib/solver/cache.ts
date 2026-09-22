@@ -21,7 +21,28 @@ export const TABLE_CACHE_PATH = ".solver-cache/tables.bin.gz";
  */
 export const TABLE_FORMAT_VERSION = 1;
 
+/**
+ * The exact phase-one table, in a file of its own.
+ *
+ * Separate because it is a different size of thing — 67MB against 11MB, and
+ * where the tables above are needed by anything that solves at all, this one is
+ * an optimisation. A caller that has not generated it still solves, a little
+ * slower, on the pair tables. One file for both would make that all-or-nothing.
+ */
+export const PHASE1_CACHE_PATH = ".solver-cache/phase1.bin.gz";
+
+export const PHASE1_FORMAT_VERSION = 1;
+
+export type TableKind = "Int32Array" | "Uint16Array" | "Uint8Array";
+
 export interface TableHeader {
   version: number;
-  entries: { key: string; kind: "Int32Array" | "Uint8Array"; length: number }[];
+  entries: { key: string; kind: TableKind; length: number }[];
 }
+
+/** Bytes per element, by kind — the one place the two sides agree on it. */
+export const BYTES_PER_ELEMENT: Record<TableKind, number> = {
+  Int32Array: 4,
+  Uint16Array: 2,
+  Uint8Array: 1,
+};
