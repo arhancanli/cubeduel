@@ -46,8 +46,10 @@ for (const [index, day] of days.entries()) {
   // Worth the extra time here: this runs once and the answer ships to everyone,
   // so a shorter solution is strictly better and costs nobody anything.
   const result = solveScramble(data.scrambles[day], {
-    targetLength: 20,
-    timeBudgetMs: 2000,
+    // Offline and once, so it can afford to aim near the true minimum: a
+    // random cube needs 17 or 18 moves about 95% of the time.
+    targetLength: 18,
+    timeBudgetMs: 2500,
   });
 
   if (!result) {

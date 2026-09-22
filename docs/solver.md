@@ -5,11 +5,13 @@ in `src/lib/solver/`. This document is the reasoning: what the algorithm is, why
 each piece is shaped the way it is, what was measured, and which of my first
 attempts were wrong.
 
-**Result.** Over 100 random-state scrambles: every cube solved, mean **20.65
-moves** (half-turn metric), median **69ms**, maximum **815ms**. Tables build once
-in ~750ms. That is short, not shortest: the average true minimum for a random
-cube is about 17.7 moves, so these routes run about three moves long. See
-[What this is not](#9-what-this-is-not).
+**Result.** Over 200 uniformly random states, searching from six sides at the
+settings the server uses: every cube solved, mean **19.02 moves** (half-turn
+metric), median **91ms**, p95 one second. At the browser's quicker settings,
+mean 20.54 with a median of **9ms**. Tables load in about 30ms from the
+precomputed file. That is short, not shortest: the average true minimum for a
+random cube is about 17.7 moves, so these routes run a little over one move long.
+See [What this is not](#10-what-this-is-not).
 
 ---
 
@@ -27,9 +29,9 @@ reaches it, and a solver handed one will search forever rather than report a
 problem. `validate()` refuses it at the door and names which law it breaks.
 
 In 2010 the diameter of this group was proven to be **20** in the half-turn
-metric: every cube is at most 20 moves from solved. Finding that 20-move solution
-is expensive — optimal solvers can take minutes per cube. Almost nobody needs
-optimal. They need short, now.
+metric: every cube is at most 20 moves from solved. Finding a PROVABLY shortest
+solution is expensive — optimal solvers can take minutes per cube. Almost nobody
+needs optimal. They need short, now.
 
 ## 2. Two phases
 
@@ -154,25 +156,68 @@ is useless to a caller, and at tight budgets that is exactly what happened for
 roughly one state in eight. The first solution is always found; the budget
 decides how hard the solver then tries to beat it.
 
-## 7. Measurements
+## 7. Looking from six sides
 
-100 random-state scrambles, laptop, tables pre-built.
+Profiling the search at a target of 19 put **85% of the time inside phase one**.
+Phase two, the part that looks expensive on paper, was under 5%. So the question
+was not how to finish faster but how to reach a good phase one sooner — and two
+changes did most of it.
 
-| Options | Solved | Mean length | Median | p95 | Max |
+**Stop re-solving the same phase two.** A phase one that ends on a move phase two
+could have made — U, D, or a half turn — reaches G1 from a state that was already
+in G1, because G1 is closed under its own moves. That state was handed to phase
+two one depth earlier, with the move as phase two's first. The search was
+re-solving it for every such ending. Skipping them is exact, not a heuristic.
+
+**Search the cube from six directions at once.** Phase one's goal, G1, is defined
+by one axis. A cube can be awkward from U-D and easy from R-L, and a search that
+only ever looks one way cannot tell. So the cube is also searched turned a third
+and two thirds of the way round its URF-DBL diagonal (U→R→F), and all three of
+those inverted. A solution to any of the six converts back: rotate each move back,
+and for an inverse, reverse and invert the sequence. The six share one
+best-so-far and one clock and take turns depth by depth, so every depth is tried
+from every side before any side goes deeper — and six views cost no more time than
+one, because the time goes where the cube is easiest.
+
+The rotation is written out once, in `symmetry.ts`. Which face becomes which is
+*derived* by conjugating the six face turns and matching the result, not typed.
+The tests check that three rotations are no rotation, that each derived map is a
+permutation of the faces, and that a solution found from every one of the six
+views, translated back, solves the original — and two mutations (translating an
+inverse without reversing it, and using the wrong rotation's map) each fail them.
+
+## 8. Measurements
+
+200 uniformly random legal states, laptop, tables loaded. "Before" is the
+single-direction search this document used to describe.
+
+| Options | Views | Mean length | Median | p95 | Hit the budget |
 |---|---|---|---|---|---|
-| `targetLength: 22, timeBudgetMs: 100` | 100/100 | 21.62 | 42ms | 101ms | 168ms |
-| **default** (`21`, `250ms`) | 100/100 | **20.65** | **69ms** | 251ms | 815ms |
-| `targetLength: 20, timeBudgetMs: 1000` | 100/100 | 19.98 | 727ms | 1001ms | 1001ms |
+| **browser default** (`21`, `250ms`) | 1 | 20.50 | 17ms | 175ms | 3 |
+| **browser default** (`21`, `250ms`) | 6 | 20.54 | **9ms** | **35ms** | 0 |
+| `20`, `1500ms` | 1 | 19.74 | 125ms | 1501ms | 38 |
+| `20`, `1500ms` | 6 | 19.64 | 16ms | 176ms | 2 |
+| **server** (`19`, `1000ms`) | 6 | **19.02** | 91ms | 1001ms | 41 |
+| `18`, `1500ms` | 6 | 18.77 | 1500ms | 1501ms | 135 |
 
-Chasing an exact 20 costs roughly five times the time for less than a move,
-because 20 is the diameter and the last move is the expensive one. The defaults
-sit where the curve flattens.
+At the browser default the six views change nothing about length — the target
+stops them at 21 either way — and cut the slowest solves by five. At a target of
+20, one solve in five used to run out the clock and some settled for 21; now one
+in a hundred does, and none is longer than 20. The server takes 19: it computes
+each scramble's answer once for everybody and caches it, so a mean of 19.02 is
+worth a median of 91ms.
+
+Each move nearer the true minimum costs several times the last, because the
+pruning tables are two-coordinate projections that underestimate more the deeper
+the search goes. The next gain is a stronger phase-one bound — Kociemba's
+symmetry-reduced table over all three phase-one coordinates at once — at the cost
+of tens of megabytes and a much longer build.
 
 Every solution in every run was verified by applying it and checking the cube
 ended solved. A solver that returns plausible-looking moves which do not solve is
 worse than one that returns nothing.
 
-## 8. Testing
+## 9. Testing
 
 The move tables are transcribed by hand from Kociemba's definitions, which is
 exactly the kind of thing that is silently wrong: one swapped index produces a
@@ -203,16 +248,16 @@ something kills it, which is indistinguishable from an infinitely slow solver.
 That cost three ten-minute timeouts and a wrong diagnosis before I noticed the
 one script that *worked* was the one using a hardcoded scramble.
 
-## 9. What this is not
+## 10. What this is not
 
-- **Not optimal.** Two-phase trades a provable minimum for speed. Its mean of
-  about 20.6 moves is roughly three above the true average minimum: per
-  Rokicki, Kociemba, Davidson and Dethridge's distance table (cube20.org), about
-  two thirds of all positions need exactly 18 moves and about a quarter need 17,
-  which puts the average near 17.7. (An earlier version of this line compared
-  the mean to God's number, 20 — but that is the worst case, not the typical
-  one, so the comparison made the engine look closer to optimal than it is.) A
-  genuinely optimal solver — IDA* over a much larger pattern database — would
-  take minutes per cube for those last three moves.
+- **Not optimal.** Two-phase trades a provable minimum for speed. At the server's
+  settings its mean of 19.02 moves is about 1.3 above the true average minimum:
+  per Rokicki, Kociemba, Davidson and Dethridge's distance table (cube20.org),
+  about two thirds of all positions need exactly 18 moves and about a quarter need
+  17, which puts the average near 17.7. (An earlier version of this line compared
+  the mean to God's number, 20 — but that is the worst case, not the typical one,
+  so the comparison made the engine look closer to optimal than it is.) A
+  genuinely optimal solver — IDA* over a much larger pattern database — would take
+  minutes per cube for those last moves.
 - **Not multi-puzzle.** 3x3 only. The coordinate scheme is specific to it.
 - **Not incremental.** It solves a state; it does not resume or explain.

@@ -23,12 +23,14 @@ by the time you would actually get back.</sub>
 
 Three things here are unusual enough to be worth naming before the feature list.
 
-**A cube solver written from scratch.** Kociemba two-phase, no solver library:
-16 ms median, 20.54 moves mean — short routes, not proven-shortest ones (a
-random cube's true minimum averages about 17.7). It powers the move efficiency
-figure — *you used 52 moves; the engine's route was 20* — and the duel
-opponent. [How it works](docs/solver.md), including the pruning-table mistake
-that quietly turned the search into brute force, and the 40× cold start fix.
+**A cube solver written from scratch.** Kociemba two-phase, searching every cube
+from six sides at once, no solver library: 19.02 moves on average at the server's
+settings with a 91ms median, or a 9ms median at the browser's — short routes, not
+proven-shortest ones (a random cube's true minimum averages about 17.7). It
+powers the move efficiency figure — *you used 52 moves; the engine's route was
+20* — and the duel opponent. [How it works](docs/solver.md), including the
+pruning-table mistake that quietly turned the search into brute force, and the
+40× cold start fix.
 
 **Results are proven rather than trusted.** The server generates the scramble,
 stores it, and replays your move stream against it. If the cube does not end
@@ -121,10 +123,13 @@ guarantee broken in turn to confirm the suite catches it. See
 
 **It ships its own solving engine.** Kociemba's two-phase algorithm, written from
 scratch in TypeScript — cube model, coordinates, pruning tables and IDA* search.
-Over 100 random-state scrambles: every cube solved, mean **20.65 moves**, median
-**69ms**, all under a second. Those routes are short, not proven shortest: a
-random cube's true minimum is 17 or 18 moves about 95% of the time, so the
-engine runs about three moves long, and the app says "the engine's route", never
+Over 200 uniformly random states at the server's settings: every cube solved,
+mean **19.02 moves**, median **91ms** — searching each cube from six sides at once
+(turned about its diagonal, and inverted) and never re-solving the same phase two
+twice, which together cut the median at the old settings from 125ms to 16ms.
+Those routes are short, not proven shortest: a random cube's true minimum is 17
+or 18 moves about 95% of the time, so the engine runs a little over a move long,
+and the app says "the engine's route", never
 "the shortest possible". Earlier versions of this README said the average was
 "within a move of the proven optimum", comparing it with God's number — which is
 the worst case, not the typical one.
@@ -185,7 +190,7 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 625 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 631 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 21 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, and an accessibility pass over every page. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |

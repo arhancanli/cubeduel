@@ -14,18 +14,19 @@
  *   - **The coach.** Comparing what somebody did against what was available is
  *     the only way to say anything specific about a particular solve.
  *
- * Measured over 100 random-state scrambles on a laptop, with the default
- * options: every cube solved, mean 20.65 moves in the half-turn metric, median
- * 69ms, maximum 815ms. Tables build once in about 750ms.
+ * Measured over 200 uniformly random states on a laptop, searching from six
+ * sides (see `symmetry.ts`): at the defaults, mean 20.54 moves in the half-turn
+ * metric with a 9ms median; at the server's settings (target 19, 1s), mean 19.02
+ * with a 91ms median. Tables load from the precomputed file in about 30ms.
  *
- * That is about three moves above optimal on average: God's number, 20, is the
+ * That is over a move above optimal on average: God's number, 20, is the
  * WORST case, and a random cube's true minimum averages about 17.7 (two thirds
  * of positions need 18, a quarter need 17 — cube20.org). An earlier version of
  * this comment compared the mean with God's number and called it within a move
  * of optimal, which is the comparison that flatters.
  * This is not an optimal solver and does not claim to be — it is a two-phase
  * solver, which trades a provable minimum for finishing in milliseconds instead
- * of minutes. Ask for `targetLength: 20` and it will spend the extra time.
+ * of minutes. Ask for a lower `targetLength` and it will spend the extra time.
  *
  * ```ts
  * import { buildTables, solveScramble } from "@/lib/solver";

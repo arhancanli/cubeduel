@@ -114,7 +114,7 @@ for (let i = 0; i < COUNT; i++) {
   const scramble = (await randomScrambleForEvent("333")).toString();
 
   const started = performance.now();
-  const result = solveScramble(scramble, { targetLength: 20, timeBudgetMs: 1500 });
+  const result = solveScramble(scramble, { targetLength: 19, timeBudgetMs: 1000 });
   const ms = performance.now() - started;
 
   if (!result) {
