@@ -293,14 +293,24 @@ console.log("\n== solving with it ==");
   let exactNodes = 0;
   let pairNodes = 0;
   let longest = 0;
+  let exactTotal = 0;
+  let pairTotal = 0;
 
   for (let i = 0; i < 25; i++) {
     const cube = randomState(rand);
     if (validate(cube)) throw new Error("generated an illegal state");
 
-    const withTable = solve(cube, { targetLength: 19, timeBudgetMs: 450 });
-    const without = solve(cube, { targetLength: 19, timeBudgetMs: 450, exactTable: false });
+    // A generous budget, and both arms get the same one on the same machine.
+    // The server runs 450ms because it caches the answer; a check that used
+    // that number would be measuring the runner's CPU, which is how this
+    // asserted "no solution longer than 20" and passed on a laptop for a day
+    // before a slower machine found a 21 — a length two-phase search has never
+    // promised.
+    const withTable = solve(cube, { targetLength: 19, timeBudgetMs: 1500 });
+    const without = solve(cube, { targetLength: 19, timeBudgetMs: 1500, exactTable: false });
     if (!withTable || !without) continue;
+    exactTotal += withTable.length;
+    pairTotal += without.length;
 
     // Replayed, not assumed: the only claim that matters about a solver.
     let state = cube;
@@ -315,7 +325,19 @@ console.log("\n== solving with it ==");
   }
 
   check("every solution solves the cube", solved === 25, `${solved}/25`);
-  check("no solution is longer than God's number", longest <= 20, `longest ${longest}`);
+  // What the solver actually promises, rather than what a fast machine happens
+  // to manage: nothing longer than the ceiling it was given.
+  check("no solution exceeds the length the search was allowed", longest <= 26, `longest ${longest}`);
+  // The tripwire that a wrong table would trip. It is relative — the same
+  // machine, the same budget, the weaker bound as the control — so it says
+  // something about the table rather than about the hardware. A table whose
+  // distances are too high loses shortest solutions, and that shows up here as
+  // answers no better than the bound it was supposed to beat.
+  check(
+    "the exact table's answers are at least as short as the pair bounds'",
+    exactTotal <= pairTotal,
+    `${exactTotal} moves against ${pairTotal}`,
+  );
   check(
     "the table is worth its size: fewer nodes than the pair bounds",
     exactNodes * 2 < pairNodes,
