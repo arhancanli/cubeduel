@@ -1,0 +1,101 @@
+# What `vercel deploy` uploads: the committed files, and nothing else.
+#
+# Vercel does not read .gitignore. Without this file the 1.2.0 deploy carried
+# eleven files git has never tracked — among them a backup of old database
+# keys, the private key of the local test certificate and a plugin's working
+# files — into the deployment's source, which the project's owners can browse.
+# Nothing was served, but none of it belonged there.
+#
+# So everything is ignored, then only the top-level names git tracks are let
+# back in, and inside those the .gitignore rules apply again. `npm run audit`
+# fails if the list below differs from the top-level names in `git ls-files`
+# or if any .gitignore rule is missing here, so neither can drift.
+
+/*
+!/.env.example
+!/.github
+!/AGENTS.md
+!/CHANGELOG.md
+!/CLAUDE.md
+!/CODE_OF_CONDUCT.md
+!/CONTRIBUTING.md
+!/LICENSE
+!/README.md
+!/SECURITY.md
+!/docs
+!/e2e
+!/eslint.config.mjs
+!/next.config.ts
+!/package-lock.json
+!/package.json
+!/postcss.config.mjs
+!/public
+!/scripts
+!/src
+!/supabase
+!/tsconfig.json
+!/vercel.json
+
+# --- every rule from .gitignore, unchanged ---
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# Self-signed certificate for the https e2e suite. Generated on first run by
+# scripts/tls-dev.mjs; never committed.
+.tls/
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# ...except the example, which documents every variable this app needs and
+# contains no values. It was ignored by the rule above for this project's whole
+# life, which quietly broke the README's first setup step for everybody who
+# cloned it. `npm run audit` now fails if a file the docs tell you to use is not
+# committed.
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Scratch benchmark files, never committed.
+_*.mts
+_*.mjs
+
+# Generated before every build from the current solver source. Never committed:
+# a stale pruning table is not a slow solver but a wrong one, because the search
+# trusts those numbers as lower bounds and prunes away the real solution.
+.solver-cache/

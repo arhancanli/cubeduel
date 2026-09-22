@@ -400,6 +400,48 @@ console.log("Every commit is the owner's, and credits nobody else");
 }
 
 // ---------------------------------------------------------------------------
+console.log("A deploy uploads the committed files and nothing else");
+// ---------------------------------------------------------------------------
+{
+  // Vercel does not read .gitignore, and the 1.2.0 deploy carried eleven
+  // untracked files into the deployment's source — a backup of old database
+  // keys and the test certificate's private key among them. `.vercelignore`
+  // ignores everything and lets back in only the top-level names git tracks,
+  // then applies every .gitignore rule inside them. Both halves are derived
+  // from the repository, so both are checked against it here: a new tracked
+  // top-level file that is not let back in would silently miss the build, and
+  // a new .gitignore rule missing here would upload what git refuses.
+  const vercelignore = read(".vercelignore").split("\n").map((line) => line.trim());
+  if (!vercelignore.includes("/*")) {
+    fail(".vercelignore does not start by ignoring everything (`/*`)");
+  }
+
+  const allowed = vercelignore.filter((line) => line.startsWith("!/")).map((line) => line.slice(2));
+  const topLevel = [
+    ...new Set(
+      execFileSync("git", ["ls-files"], { cwd: root, encoding: "utf8" })
+        .split("\n")
+        .filter(Boolean)
+        .map((file) => file.split("/")[0]),
+    ),
+  ].filter((name) => name !== ".gitignore" && name !== ".vercelignore");
+
+  const notLetIn = topLevel.filter((name) => !allowed.includes(name));
+  const notTracked = allowed.filter((name) => !topLevel.includes(name));
+  if (notLetIn.length > 0) fail(`Tracked but never uploaded (add to .vercelignore): ${notLetIn.join(", ")}`);
+  if (notTracked.length > 0) fail(`Let into the upload but not tracked by git: ${notTracked.join(", ")}`);
+
+  const rules = read(".gitignore")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith("#"));
+  const missing = rules.filter((rule) => !vercelignore.includes(rule));
+  if (missing.length > 0) fail(`.gitignore rules missing from .vercelignore: ${missing.join(", ")}`);
+
+  console.log(`  ${allowed.length} top-level names let in, ${rules.length} .gitignore rules applied`);
+}
+
+// ---------------------------------------------------------------------------
 
 if (failures.length > 0) {
   console.error(`\nAudit FAILED — ${failures.length} claim(s) the repository does not support:\n`);
