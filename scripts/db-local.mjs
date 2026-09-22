@@ -151,10 +151,17 @@ async function up() {
     POSTGRES_IMAGE,
   ]);
 
-  // pg_isready answers yes during the image's own init restart, so ask for a
-  // real query instead — it only succeeds once the final server is accepting.
+  // The image initialises with a temporary server, then shuts it down and starts
+  // the real one. The temporary server listens only on the Unix socket — which
+  // is what `docker exec psql` uses by default — so a query over the socket can
+  // succeed during init and the next statement land on a server that is
+  // shutting down ("terminating connection due to administrator command"). That
+  // happened in CI. Over TCP only the real server answers, so the probe asks
+  // over TCP.
   await waitFor("Postgres", () =>
-    docker(["exec", DB, "psql", "-U", "postgres", "-tAc", "select 1"], { allowFailure: true }).status === 0,
+    docker(["exec", DB, "psql", "-h", "127.0.0.1", "-U", "postgres", "-tAc", "select 1"], {
+      allowFailure: true,
+    }).status === 0,
   );
 
   psql(BOOTSTRAP_SQL, "the Supabase role setup");
