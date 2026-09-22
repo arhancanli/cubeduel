@@ -10,8 +10,7 @@ import { db } from "./supabase";
  * `sessionFromToken` answers "is this token valid and whose is it", which is the
  * right question for a write path. The header asks a different one — "what name
  * do I put in the corner" — and answering it by calling that and then reading
- * `profiles` is two round trips to a database in Tokyo on every single page
- * load.
+ * `profiles` is two round trips to the database on every single page load.
  *
  * So this does it as one embedded read. PostgREST follows the foreign keys:
  * session to user to profile. The saving is not theoretical — each round trip

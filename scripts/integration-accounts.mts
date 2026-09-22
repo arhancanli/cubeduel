@@ -140,8 +140,8 @@ async function main() {
     // ## Measured pairwise, and that is the whole trick
     //
     // Comparing the two sign-in paths directly does NOT work: both include a
-    // round trip to a database in Tokyo costing four to six hundred
-    // milliseconds against a hash of barely a hundred, so deleting the burn
+    // round trip to a remote database — four to six hundred milliseconds when
+    // it was measured — against a hash of barely a hundred, so deleting the burn
     // moves the ratio from 1.0 to about 1.3 — inside any threshold loose enough
     // not to flake.
     //

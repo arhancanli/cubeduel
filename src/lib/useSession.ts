@@ -13,8 +13,8 @@ import { useEffect, useState } from "react";
  * ## Fetched once per page load, shared by every caller
  *
  * The header wants this, the history sync wants it, and any screen that shows
- * an account-only control wants it. Left naive, that is three requests to a
- * database in Tokyo for one answer.
+ * an account-only control wants it. Left naive, that is three requests to the
+ * database for one answer.
  *
  * So the promise is memoised at module scope. The second and third callers
  * await the same request the first one started, and mounting ten components

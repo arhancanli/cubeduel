@@ -94,7 +94,7 @@ def main():
         page.click("button[type=submit]")
 
         # Waited for as a condition, never as a fixed delay. Sign-up makes four
-        # round trips to a database in Tokyo, so any constant chosen here is
+        # round trips to a remote database, so any constant chosen here is
         # either too short on a bad connection or wasted time on a good one —
         # and a suite that flakes on latency gets its failures ignored.
         try:
