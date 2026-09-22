@@ -226,7 +226,11 @@ console.log("Every browser suite is in `npm run e2e`");
 // ---------------------------------------------------------------------------
 {
   const pkg = JSON.parse(read("package.json")) as { scripts: Record<string, string> };
-  const listed = new Set(pkg.scripts.e2e.match(/e2e\/[A-Za-z0-9]+\.py/g) ?? []);
+  // Underscores and dashes included: without them a suite named `share_cards.py`
+  // is simply not seen in the script, which reads as "not wired up" and fails —
+  // the safe direction, but for the wrong reason, and the fix is not obvious
+  // from the message.
+  const listed = new Set(pkg.scripts.e2e.match(/e2e\/[A-Za-z0-9_-]+\.py/g) ?? []);
 
   for (const suite of readdirSync(join(root, "e2e"))) {
     if (!suite.endsWith(".py")) continue;
@@ -453,7 +457,14 @@ console.log("Every route that solves carries the solver's tables");
   // A route's key is its URL: `src/app/api/solve/route.ts` is `/api/solve`, and
   // a page is its directory. Route groups `(name)` are not part of the path.
   const needed = new Set<string>();
-  for (const file of walk("src/app", (name) => name === "route.ts" || name === "page.tsx")) {
+  // Image routes count: `opengraph-image.tsx` is a route handler with a
+  // different name, it runs on the server, and it imports the same modules a
+  // page does — so it can reach the solver exactly as easily and would need the
+  // tables just as much.
+  for (const file of walk(
+    "src/app",
+    (name) => name === "route.ts" || name === "page.tsx" || name === "opengraph-image.tsx",
+  )) {
     if (!reachesSolver(file)) continue;
     const url = dirname(file)
       .slice("src/app".length)

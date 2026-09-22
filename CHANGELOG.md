@@ -3,6 +3,42 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.4.0 — 2026-09-22
+
+The release where a link to this site stops being a bare URL.
+
+### Every link carries its own picture
+
+- **A race link is an invitation, and now looks like one.** Paste it into a chat
+  and the preview says who is asking, on which event, and the rule people get
+  wrong before they press ready — the faster solve wins, not the first to
+  finish. Once both players are in, it names them; once it is over, it says who
+  won and by how much.
+- **Solve permalinks** show the time, the moves, the turns per second, and
+  whether the solve was replayed and verified — which is the claim this site
+  exists to make, so its absence is written out rather than left off.
+- **Player pages** show the rating with its ±, or the word "unrated" where it
+  has not settled. A card is the most screenshotted surface here and the least
+  likely to carry its context, so it follows the same rule as everywhere else.
+- **No card ever mentions the scramble.** A race and a challenge are one cube
+  shared between two people, and a preview showing it would let whoever opened
+  the link study the solve in the group chat. There is a test for it.
+- **Fetching a card cannot change anything.** The race preview reads without
+  settling the race: a link preview is a robot looking at a message, and a robot
+  should not be able to declare somebody's race abandoned by looking at it.
+- **`e2e/cards.py`** fetches every card the way a chat app does, against real
+  rows, and checks each is a real PNG of the right size and not the picture the
+  site draws when the thing does not exist.
+
+### Fixed
+
+- **A long name pushed a card off its own edges**, and a display name that was
+  just the handle printed twice: "arhan (@arhan)". Both found by looking at the
+  rendered image rather than the code.
+- **The audit could not see a browser suite whose name had an underscore.** It
+  failed, which was the safe direction, but for a reason the message did not
+  explain.
+
 ## 1.3.0 — 2026-09-22
 
 The release where the solver stopped guessing how far phase one was from its
@@ -246,6 +282,7 @@ The ones worth knowing about:
 - **Boards rendered "Nobody is ranked yet" during an outage**, which is
   indistinguishable from the truth and so gets investigated by nobody.
 
+[1.4.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.4.0
 [1.3.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.3.0
 [1.2.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.2.0
 [1.1.0]: https://github.com/arhancanli/cubeduel/releases/tag/v1.1.0

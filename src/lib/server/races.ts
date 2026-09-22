@@ -17,6 +17,7 @@ import {
   type RaceProgress,
   type RaceSeat,
   type RaceState,
+  type RaceStatus,
   type RaceWinner,
 } from "../race";
 import type { Penalty } from "../types";
@@ -475,4 +476,58 @@ export async function rematch(profileId: string, code: string): Promise<CreateRa
     return winner?.rematch_code ? { ok: true, code: winner.rematch_code } : { ok: true, code: next };
   }
   return { ok: false, reason: "Could not start a rematch." };
+}
+
+/**
+ * What a link preview may say about a race, for the card a chat app renders.
+ *
+ * Three rules shape it. It never touches the scramble — the same rule the
+ * daily's card follows, and it matters more here: a preview that leaked the
+ * cube would let the person who opened the link first study it before pressing
+ * ready. It does not settle the race, unlike every other read, because a link
+ * preview is a robot looking at a message and not a player looking at a race,
+ * and a robot should not be able to declare somebody's race abandoned. And it
+ * says nothing a player has not already shared by sending the link.
+ */
+export interface RaceCard {
+  event: string;
+  status: RaceStatus;
+  hostName: string;
+  guestName: string | null;
+  winner: RaceWinner | null;
+  hostResult: { durationMs: number; penalty: Penalty } | null;
+  guestResult: { durationMs: number; penalty: Penalty } | null;
+}
+
+export async function raceCard(code: string): Promise<RaceCard | null> {
+  const row = await load(code);
+  if (!row) return null;
+
+  const ids = [row.host_id, row.guest_id].filter((id): id is string => id !== null);
+  const { data: profiles } = await db()
+    .from("profiles")
+    .select("id, handle, display_name")
+    .in("id", ids);
+  const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+  const name = (id: string | null) => {
+    if (!id) return null;
+    const profile = byId.get(id);
+    return profile?.display_name ?? profile?.handle ?? null;
+  };
+
+  const result = (seat: RaceSeat) => {
+    const durationMs = seat === "host" ? row.host_duration_ms : row.guest_duration_ms;
+    const penalty = (seat === "host" ? row.host_penalty : row.guest_penalty) as Penalty | null;
+    return durationMs !== null && penalty !== null ? { durationMs, penalty } : null;
+  };
+
+  return {
+    event: row.event,
+    status: row.status as RaceStatus,
+    hostName: name(row.host_id) ?? "A cuber",
+    guestName: name(row.guest_id),
+    winner: (row.winner as RaceWinner | null) ?? null,
+    hostResult: result("host"),
+    guestResult: result("guest"),
+  };
 }
