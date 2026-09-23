@@ -19,7 +19,7 @@ import sys
 from playwright.sync_api import sync_playwright
 
 BASE = os.environ.get("BASE", "http://localhost:3000")
-PAGES = ["/", "/play", "/daily", "/train", "/timer", "/progress", "/leaderboard", "/ranked", "/duel"]
+PAGES = ["/", "/play", "/daily", "/train", "/timer", "/progress", "/review", "/leaderboard", "/ranked", "/duel"]
 FAILS = []
 
 
@@ -137,7 +137,7 @@ with sync_playwright() as p:
           str(labelled.get("Compete")))
     check("the practice half is everything not on the record",
           set(labelled.get("Practice", []))
-          == {"Play", "Timer", "How to solve", "Learn", "Train", "Progress", "Your cube"},
+          == {"Play", "Timer", "How to solve", "Learn", "Train", "Progress", "Review", "Your cube"},
           str(labelled.get("Practice")))
 
     print("\n== the landing page demonstrates the solver ==")

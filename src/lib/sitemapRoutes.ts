@@ -66,6 +66,7 @@ export const EXCLUDED: Record<string, string> = {
   // and their solves that nobody asked to be in.
   "/u/[handle]": "A person's page. Ours to serve, not ours to advertise.",
   "/s/[id]": "Somebody's solve. Shared by them, when they choose to.",
+  "/review": "Reads solves kept in this browser; to a crawler it is an empty page.",
   "/c/[slug]": "A club's board. Private to the people who were given the code.",
   "/challenge/[id]": "A one-off link between two players.",
   "/race/[code]": "A one-off race between two players, over in minutes.",

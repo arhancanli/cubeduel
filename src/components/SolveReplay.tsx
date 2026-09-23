@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
 import type { PhaseSplit, TimedMove } from "@/lib/cfop";
@@ -33,6 +33,8 @@ export interface SolveReplayProps {
   moves: TimedMove[];
   splits: PhaseSplit[];
   durationMs: number;
+  /** Lets a review beside the replay jump it to a moment. */
+  controlRef?: React.Ref<ReplayControl>;
 }
 
 /** Where each phase sits on the timeline, for the coloured track and the jumps. */
@@ -57,7 +59,13 @@ function lookOf(split: PhaseSplit): number | null {
 /** How far before a pause the jump lands, so the move that ended the last phase is seen. */
 const LEAD_IN_MS = 600;
 
-export function SolveReplay({ scramble, moves, splits, durationMs }: SolveReplayProps) {
+/** What a review can ask of the replay beside it. */
+export interface ReplayControl {
+  /** Play from just before `atMs`, at normal speed. */
+  watch(atMs: number): void;
+}
+
+export function SolveReplay({ scramble, moves, splits, durationMs, controlRef }: SolveReplayProps) {
   const [atMs, setAtMs] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState<Speed>(1);
@@ -169,6 +177,18 @@ export function SolveReplay({ scramble, moves, splits, durationMs }: SolveReplay
     : undefined;
   const looking =
     currentSegment?.lookMs != null && atMs < currentSegment.startMs + currentSegment.lookMs;
+
+  useImperativeHandle(
+    controlRef,
+    () => ({
+      watch(ms: number) {
+        setSpeed(1);
+        setAtMs(Math.max(0, ms - LEAD_IN_MS));
+        setPlaying(true);
+      },
+    }),
+    [],
+  );
 
   const watchLongestLook = useCallback(() => {
     if (!longestLook) return;

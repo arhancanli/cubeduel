@@ -178,6 +178,48 @@ export function crossDistance(
   return table[stateIndex(positions, orientations)];
 }
 
+/**
+ * One shortest cross, written out.
+ *
+ * The table holds exact distances, so a route falls straight out of it: from
+ * wherever the cube is, some turn always leads one step closer, and following
+ * those turns to zero is a shortest cross by construction. No search, and
+ * never longer than `crossDistance` says.
+ *
+ * A turn of the same face twice in a row is never useful, so the walk skips
+ * the face it just turned — which is also why the route reads like one a
+ * person would write.
+ */
+export function crossRoute(
+  table: Uint8Array,
+  pattern: Pattern,
+  crossEdgeSlots: readonly number[],
+): string[] {
+  const route: string[] = [];
+  let current = pattern;
+  let distance = crossDistance(table, current, crossEdgeSlots);
+  let lastFace = "";
+
+  while (distance > 0 && distance !== 0xff) {
+    let stepped = false;
+    for (const move of HTM_MOVES) {
+      if (move[0] === lastFace) continue;
+      const next = current.applyMove(move);
+      if (crossDistance(table, next, crossEdgeSlots) === distance - 1) {
+        route.push(move);
+        current = next;
+        distance -= 1;
+        lastFace = move[0];
+        stepped = true;
+        break;
+      }
+    }
+    // Unreachable with a correct table; a guard rather than an infinite loop.
+    if (!stepped) break;
+  }
+  return route;
+}
+
 /** Exposed for tests: the encoding must round-trip or the search walks a wrong graph. */
 export const encodeForTest = placementIndex;
 export const decodeForTest = decodePlacement;

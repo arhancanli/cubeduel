@@ -3,6 +3,57 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.7.0 — 2026-09-23
+
+Solve review: every solve read back one turn at a time.
+
+### What it finds
+
+Chess has game review. Cubing never had the equivalent, because nothing else
+keeps the turns. This does, so after a keyboard or smart-cube solve the first
+button is now **Review this solve**, and it stops the tape at:
+
+- **The cross route** — your cross against the shortest one on the same face,
+  from the same scramble, with that route written out. The one judgement here
+  made against something other than you, and it is made against a proven
+  optimum: the route is walked down the exact distance table, so it is never
+  longer than the shortest possible.
+- **Pauses** — a gap at least four times your ordinary one and at least 0.8s.
+  Before a phase's first turn it is named as looking for the next thing; inside
+  a phase, as the hands stopping. The three costliest are kept.
+- **Turns undone** — R then R'. Across a phase boundary this is named as two
+  algorithms cancelling, with the technique that removes both, rather than as a
+  misread piece.
+- **The long way round** — R R R where R' would do. R R is left alone: it is how
+  a keyboard makes R2.
+- **Rotations during F2L**, counted once rather than listed one by one.
+- **A two-look last layer** — an OLL or PLL that took far more turns than the one
+  algorithm for that case — with a link to learn the case.
+- **Skips**, credited as the luck they are.
+
+Choosing a moment plays the replay from just before it. Every cost is priced
+at your own pace in that part of the solve; the total is called *recoverable*,
+never *wasted*, and the page says it is a ceiling rather than a promise.
+
+### Where it is
+
+- **`/review`** lists every solve on this device that kept its turns, signed in
+  or not. Everything is worked out in the browser — the cross table is 190,080
+  bytes built in milliseconds — so it needs no account and works offline.
+- **Shared solve pages** (`/s/…`) now carry the full review beside the replay.
+- **Review** joins the Practice half of the nav.
+
+### Fixed
+
+- **Phase splits credited a pair mid-insertion.** A pair counted as in whenever
+  its two pieces sat in their slot — including the instant in U' L' U L when the
+  L' has lifted a cross edge and the slot happens to look solved. The pair's
+  boundary landed two turns early and every later phase slid by one: the front
+  page's own demo solve was read with a two-turn F2L 2 and a twelve-turn OLL. A
+  pair now counts only with the cross intact beside it. Found because the
+  review's browser suite planted a pause before the third pair and was told it
+  came before the fourth.
+
 ## 1.6.0 — 2026-09-23
 
 The release where it stops looking like a document and starts looking like a

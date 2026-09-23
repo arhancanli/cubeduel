@@ -376,3 +376,30 @@ test("a live stage can go down while an algorithm lifts a pair out", async () =>
   // The first move of the OLL algorithm (R) takes the front-right pair out.
   assert.ok((await liveStage(scramble, [...f2l, "R"])) < 5);
 });
+
+test("a pair is not credited while the cross is broken mid-insertion", async () => {
+  // The front page's demo solve, typed the way a keyboard types it: a half turn
+  // is two quarter turns. In U' L' U L the L' lifts a cross edge, and at that
+  // instant the back-left slot's two pieces happen to sit home — crediting the
+  // pair there ended F2L 2 two turns early, and every later phase slid by one.
+  const steps = [
+    "D2 R' D'",
+    "U R U' R'",
+    "U' L' U L",
+    "U' R' U R",
+    "U L U' L'",
+    "R U R' U R U2 R'",
+    "R U R' U' R' F R2 U' R' U' R U R' F'",
+  ];
+  const quarter = (alg: string) =>
+    alg.split(" ").flatMap((m) => (m.endsWith("2") ? [m[0], m[0]] : [m])).join(" ");
+  const typed = steps.map(quarter);
+  const moves = timed(typed.join(" "));
+  const splits = await splitsOf(invert(steps.join(" ")), moves);
+  assert.deepEqual(names(splits), ["Cross", "F2L 1", "F2L 2", "F2L 3", "F2L 4", "OLL", "PLL"]);
+  let index = 0;
+  typed.forEach((step, i) => {
+    index += step.split(" ").length;
+    assert.equal(splits[i].endMs, moves[index - 1].atMs, `${splits[i].phase} ends on its own step`);
+  });
+});

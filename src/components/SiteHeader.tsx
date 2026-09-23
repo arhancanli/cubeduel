@@ -37,7 +37,8 @@ export type NavKey =
   | "leaderboard"
   | "clubs"
   | "race"
-  | "progress";
+  | "progress"
+  | "review";
 
 type Icon = { face: FaceKey } | { line: LineIconName };
 
@@ -81,6 +82,9 @@ const PRACTICE: NavLink[] = [
   { key: "learn", href: "/learn", label: "Learn", icon: { line: "cases" } },
   { key: "train", href: "/train", label: "Train", icon: { line: "target" } },
   { key: "progress", href: "/progress", label: "Progress", icon: { line: "chart" } },
+  // Beside Progress: that page says which phase is slow, this one shows the
+  // moment in a single solve where it happened.
+  { key: "review", href: "/review", label: "Review", icon: { line: "review" } },
   // Last: connecting hardware is something you do once, not an activity.
   { key: "cube", href: "/cube", label: "Your cube", icon: { line: "cube" } },
 ];
@@ -341,7 +345,7 @@ function NavIcon({ icon, size = 18, lit = false }: { icon: Icon; size?: number; 
   return <LineIcon name={icon.line} size={size} className={lit ? "text-foreground" : "text-muted-dim"} />;
 }
 
-type LineIconName = "podium" | "people" | "keys" | "book" | "cases" | "target" | "chart" | "cube" | "more";
+type LineIconName = "podium" | "people" | "keys" | "book" | "cases" | "target" | "chart" | "cube" | "review" | "more";
 
 const LINE_PATHS: Record<LineIconName, string> = {
   podium: "M4 20V13h5v7M9 20V8h6v12M15 20v-9h5v9M3 20h18",
@@ -352,6 +356,7 @@ const LINE_PATHS: Record<LineIconName, string> = {
   target: "M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM12 12h.01",
   chart: "M4 20V4M4 20h16M8 16l4-5 3 3 5-7",
   cube: "M12 3 20 7.5v9L12 21l-8-4.5v-9L12 3ZM4 7.5 12 12l8-4.5M12 12v9",
+  review: "M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM15.2 15.2 20 20M8 10.5h5M10.5 8v5",
   more: "M4 7h16M4 12h16M4 17h16",
 };
 

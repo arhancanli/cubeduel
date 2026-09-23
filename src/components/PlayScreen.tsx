@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
@@ -38,6 +39,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
   const [optimal, setOptimal] = useState<number | null>(null);
   /** Shortest cross available on the face they actually built on. */
   const [optimalCross, setOptimalCross] = useState<number | null>(null);
+  const [reviewId, setReviewId] = useState<string | null>(null);
 
   // Consumed once: a challenge link pins the first scramble, then the session
   // continues with fresh ones rather than trapping the player on that puzzle.
@@ -74,7 +76,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
         )
         .catch(() => {});
 
-      recordSolve({
+      const saved = recordSolve({
         scramble,
         durationMs: recording.durationMs,
         penalty: "OK",
@@ -88,6 +90,10 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
         source,
         moves: encodeMoveStream(recording.moves),
       });
+      // The id the review page will look it up by. Null when storage refused
+      // the write, so the button never promises a solve that is not there.
+      const entry = saved[saved.length - 1];
+      setReviewId(entry?.scramble === scramble ? entry.id : null);
     },
   });
 
@@ -169,10 +175,19 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
         {splits && splits.length > 0 ? <SolveBreakdown splits={splits} /> : null}
 
         <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* After a solve the review is the first button, not the next
+              scramble: a recommendation that has to win a click against
+              "again" at the moment of highest emotion only gets read if it
+              is the obvious one. */}
+          {phase === "solved" && reviewId ? (
+            <Link href={`/review?id=${encodeURIComponent(reviewId)}`} className="btn-go px-5 py-2.5 text-sm">
+              Review this solve
+            </Link>
+          ) : null}
           <button
             type="button"
             onClick={() => void session.startRound()}
-            className="btn-go px-5 py-2.5 text-sm"
+            className={`${phase === "solved" && reviewId ? "btn-secondary" : "btn-go"} px-5 py-2.5 text-sm`}
           >
             {phase === "solved" ? "Next scramble" : "New scramble"}
           </button>

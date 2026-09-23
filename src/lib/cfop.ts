@@ -393,7 +393,11 @@ function interpret(
   const pending = new Set(groups.slots.map((_, i) => i).filter((i) => !timeline[cursor].slots[i]));
   let pairNumber = 1;
   while (pending.size > 0) {
-    const at = firstAfter(cursor, (m) => [...pending].some((s) => m.slots[s]));
+    // A pair counts only with the cross intact beside it. Mid-insertion — the
+    // L' of U' L' U L lifts a cross edge — a slot's two pieces can sit home for
+    // an instant while the cross is broken, and crediting that instant put the
+    // pair boundary two turns early and named the next phase wrongly.
+    const at = firstAfter(cursor, (m) => m.cross && [...pending].some((s) => m.slots[s]));
     if (at === null) break;
     for (const s of [...pending]) {
       if (timeline[at].slots[s]) pending.delete(s);

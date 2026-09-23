@@ -64,3 +64,27 @@ test("the placement index round-trips", async () => {
     assert.equal(encodeForTest(positions), i, `round-trip failed at ${i}`);
   }
 });
+
+test("the written-out route is exactly as long as the distance, and builds the cross", async () => {
+  const { crossRoute } = await import("./crossSolver");
+  const { puzzles } = await import("cubing/puzzles");
+  const kpuzzle = await puzzles["3x3x3"].kpuzzle();
+  const solved = kpuzzle.defaultPattern() as never as {
+    applyAlg(a: string): never;
+  };
+  const table = buildCrossTable(solved as never, D_EDGES);
+  const scrambles = [
+    "R2 D' B' L2 F2 U' B2 U R2 U2 F2 L' B' D2 F' U' R' B",
+    "F2 U2 R2 B2 L' D2 R' U2 R' F2 U' L' B' D' R2 F L' U'",
+    "D2 L2 B' U2 F' R2 B U2 F2 R2 U' R' D2 F' L' U B2 R",
+    "",
+  ];
+  for (const scramble of scrambles) {
+    const pattern = scramble ? solved.applyAlg(scramble) : (solved as never);
+    const distance = crossDistance(table, pattern, D_EDGES);
+    const route = crossRoute(table, pattern, D_EDGES);
+    assert.equal(route.length, distance, `route for "${scramble}"`);
+    const after = (pattern as never as { applyAlg(a: string): never }).applyAlg(route.join(" "));
+    assert.equal(crossDistance(table, after, D_EDGES), 0, "the route builds the cross");
+  }
+});

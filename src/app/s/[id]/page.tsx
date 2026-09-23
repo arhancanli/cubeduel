@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { SiteHeader } from "@/components/SiteHeader";
 import { SolveBreakdown } from "@/components/SolveBreakdown";
-import { SolveReplay } from "@/components/SolveReplay";
+import { SolveStudy } from "@/components/SolveStudy";
 import { EVENTS } from "@/lib/events";
 import { formatMs } from "@/lib/format";
 import { solvePage } from "@/lib/server/solvePage";
@@ -75,11 +75,11 @@ export default async function SolvePage(props: PageProps<"/s/[id]">) {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="progress" />
 
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-6 pb-24 pt-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         {/* ---------------------------------------------------------------- */}
         <header className="flex flex-col gap-3">
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <h1 className="tnum font-mono text-4xl tracking-tight">
+            <h1 className="tnum text-5xl">
               {dnf ? "DNF" : formatMs(solve.durationMs)}
             </h1>
             {dnf ? (
@@ -120,11 +120,11 @@ export default async function SolvePage(props: PageProps<"/s/[id]">) {
 
         {/* ---------------------------------------------------------------- */}
         {solve.moves.length > 0 ? (
-          <SolveReplay
+          <SolveStudy
             scramble={solve.scramble}
             moves={solve.moves}
-            splits={solve.splits}
             durationMs={solve.durationMs}
+            showBreakdown={false}
           />
         ) : (
           <p className="rounded-lg border border-dashed border-border px-4 py-5 text-sm leading-relaxed text-muted-dim">
