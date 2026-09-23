@@ -70,6 +70,12 @@ export default async function LearnPage() {
             </span>
             <span className="text-sm text-muted">R, U&apos;, F2, M, x — every move, on a cube you can watch.</span>
           </Link>
+          <p className="text-sm text-muted-dim sm:col-span-2">
+            Cannot solve one yet? Start with{" "}
+            <Link href="/solve" className="text-foreground underline underline-offset-4">the 3&times;3 beginner guide</Link>
+            {" "}or{" "}
+            <Link href="/solve/2x2" className="text-foreground underline underline-offset-4">the 2&times;2</Link>.
+          </p>
         </Reveal>
 
         {SHAPE_ORDER.map((shape) => {

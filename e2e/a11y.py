@@ -21,7 +21,7 @@ from playwright.sync_api import sync_playwright
 import settle  # noqa: F401 — every page load waits for streamed pages to arrive
 
 BASE = os.environ.get("BASE", "http://localhost:3000")
-PAGES = ["/", "/play", "/daily", "/train", "/timer", "/progress", "/review", "/solver", "/learn/f2l", "/notation", "/leaderboard", "/ranked", "/duel"]
+PAGES = ["/", "/play", "/daily", "/train", "/timer", "/progress", "/review", "/solver", "/learn/f2l", "/notation", "/solve/2x2", "/leaderboard", "/ranked", "/duel"]
 FAILS = []
 
 

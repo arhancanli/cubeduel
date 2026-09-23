@@ -1,10 +1,11 @@
 """
-The lessons: all 41 F2L cases, and cube notation.
+The lessons: all 41 F2L cases, cube notation, and the 2x2 guide.
 
 F2L: the page lists every case, each opens onto a cube held white-cross-down,
 and the cube is set up in exactly the case the algorithm is for.
 Notation: pressing a move starts from a solved cube and plays that move, so
 the move is seen happening rather than undone.
+2x2: three steps, and every algorithm is shown on a 2x2, not a 3x3.
 
     BASE=http://localhost:3000 python3 e2e/lessons.py
 """
@@ -62,9 +63,21 @@ with sync_playwright() as p:
     setup = page.locator("twisty-player").first.get_attribute("experimental-setup-alg") or ""
     check("the cube starts solved, so the move is seen happening", setup.split() == ["R'", "R"], setup)
 
+    print("\n== the 2x2 guide ==")
+    page.goto(BASE + "/solve/2x2", wait_until="load")
+    page.wait_for_timeout(1000)
+    steps = page.locator("ol > li")
+    check("three steps", steps.count() == 3, str(steps.count()))
+    page.locator("#top-corners").scroll_into_view_if_needed()
+    page.wait_for_selector("twisty-player", timeout=30000)
+    players = page.locator("twisty-player")
+    puzzles = {players.nth(i).get_attribute("data-puzzle") for i in range(players.count())}
+    check("every algorithm is on a 2x2", puzzles == {"2x2x2"}, str(puzzles))
+    check("it links on to the 3x3 guide", page.locator("main a[href='/solve']").count() >= 1)
+
     print("\n== on a phone ==")
     phone = browser.new_page(viewport={"width": 390, "height": 844})
-    for path in ["/learn/f2l", "/notation"]:
+    for path in ["/learn/f2l", "/notation", "/solve/2x2"]:
         phone.goto(BASE + path, wait_until="load")
         phone.wait_for_timeout(1000)
         overflow = phone.evaluate("() => document.documentElement.scrollWidth - document.documentElement.clientWidth")

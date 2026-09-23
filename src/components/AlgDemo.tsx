@@ -18,9 +18,11 @@ export function AlgDemo({
   alg,
   label,
   hold = "",
+  puzzle = "3x3x3",
 }: {
   alg: string;
   label: string;
+  puzzle?: "3x3x3" | "2x2x2";
   /**
    * How the cube is held before anything is applied.
    *
@@ -74,6 +76,7 @@ export function AlgDemo({
           interactive
           backView="none"
           cameraLatitude={45}
+          puzzle={puzzle}
           className="h-full w-full"
         />
       </div>

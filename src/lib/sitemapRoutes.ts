@@ -28,6 +28,8 @@ export const INDEXABLE: IndexableRoute[] = [
   // "Rubik's cube solver" is one of the largest searches in cubing, and this
   // answers it with the site's own engine.
   { path: "/solver", changeFrequency: "monthly", priority: 0.95 },
+  // "How to solve a 2x2" is its own search, and the 2×2 is where many start.
+  { path: "/solve/2x2", changeFrequency: "monthly", priority: 0.85 },
   { path: "/learn", changeFrequency: "monthly", priority: 0.9 },
   { path: "/learn/f2l", changeFrequency: "monthly", priority: 0.85 },
   { path: "/notation", changeFrequency: "yearly", priority: 0.8 },

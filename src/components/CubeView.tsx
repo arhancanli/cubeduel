@@ -76,6 +76,8 @@ interface Props {
    */
   cameraLatitude?: number;
   className?: string;
+  /** Which puzzle to draw. Everything else here is written for the 3×3. */
+  puzzle?: "3x3x3" | "2x2x2";
 }
 
 /** The slice of TwistyPlayer callers are allowed to touch. */
@@ -94,6 +96,7 @@ export function CubeView({
   movePressInput = false,
   onPlayerReady,
   cameraLatitude,
+  puzzle = "3x3x3",
   className = "",
 }: Props) {
   // Held in a ref so a caller passing an inline function cannot force the whole
@@ -147,7 +150,7 @@ export function CubeView({
         if (cancelled) return;
 
         const player = new TwistyPlayer({
-          puzzle: "3x3x3",
+          puzzle,
           visualization,
           // The page owns the background; the player must not paint its own.
           background: "none",
@@ -186,6 +189,9 @@ export function CubeView({
         if (scrambleRef.current) {
           player.setAttribute(SETUP_ALG_ATTR, scrambleRef.current);
         }
+        // The config is not reflected onto the element, so say which puzzle this
+        // is where a test (or anybody inspecting the page) can read it.
+        player.setAttribute("data-puzzle", puzzle);
         player.style.width = "100%";
         player.style.height = "100%";
         player.style.maxWidth = "100%";
@@ -235,7 +241,7 @@ export function CubeView({
       notifyOwner?.(null);
       host.replaceChildren();
     };
-  }, [interactive, backView, visualization, movePressInput, appearanceId, onReadyRef, scrambleRef, latitudeRef]);
+  }, [interactive, backView, visualization, movePressInput, appearanceId, onReadyRef, scrambleRef, latitudeRef, puzzle]);
 
   useEffect(() => {
     if (playerRef.current && scramble) {

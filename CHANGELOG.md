@@ -3,6 +3,29 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.14.0 — 2026-09-24
+
+### How to solve a 2×2, checked from every position
+
+- **`/solve/2x2`**: three steps and three algorithms — the white layer with
+  the same trigger as the 3×3, the yellow face with Sune, the top corners with
+  a T-perm or a Y-perm — each on a 3D 2×2 you can step through.
+- **The instructions are tested, not just the algorithms.** Every top layer a
+  solve can reach (24 arrangements × 27 twists = 648, generated rather than
+  listed) is followed through the rules exactly as the page words them. Step 2
+  must finish in at most three Sunes and step 3 in one algorithm, and neither
+  may disturb the bottom layer.
+- **That test caught a real mistake.** The first draft told people to turn
+  the top until a yellow sticker faced *them* on the front-left corner; from
+  some positions that takes four Sunes. The standard wording — the sticker
+  facing *left* — never takes more than three, and is what the page now says.
+
+### Also
+
+- The beginner guides share one step component, so the 3×3 and 2×2 read the
+  same way. The 3×3 guide and Algorithms link to the 2×2; it is in the sitemap.
+- The 3D cube says which puzzle it is drawing in a `data-puzzle` attribute.
+
 ## 1.13.0 — 2026-09-24
 
 ### All 41 F2L cases, found rather than copied
