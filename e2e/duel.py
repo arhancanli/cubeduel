@@ -22,6 +22,8 @@ import urllib.request
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
@@ -88,13 +90,13 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errors.append(str(e)))
 
     print("\n== signed out ==")
-    page.goto(BASE + "/duel", wait_until="domcontentloaded")
+    page.goto(BASE + "/duel", wait_until="load")
     page.wait_for_timeout(2500)
     check("duelling is gated behind an account", "Sign in to duel" in page.inner_text("body"))
 
     print("\n== signing in ==")
     sign_up(page, EMAIL)
-    page.goto(BASE + "/duel", wait_until="domcontentloaded")
+    page.goto(BASE + "/duel", wait_until="load")
     page.wait_for_timeout(4000)
     body_text = page.inner_text("body")
     signed_in = "Sign in to duel" not in body_text

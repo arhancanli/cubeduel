@@ -234,10 +234,10 @@ console.log("Every browser suite is in `npm run e2e`");
 
   for (const suite of readdirSync(join(root, "e2e"))) {
     if (!suite.endsWith(".py")) continue;
-    // `account.py` is a shared helper, and `https.py` needs its own production
+    // `account.py` and `settle.py` are shared helpers, and `https.py` needs its own production
     // build so it has its own script. Both are named here rather than skipped
     // by a pattern, so a third exception has to be a deliberate edit.
-    if (suite === "account.py" || suite === "https.py") continue;
+    if (suite === "account.py" || suite === "https.py" || suite === "settle.py") continue;
     if (!listed.has(`e2e/${suite}`)) {
       fail(`e2e/${suite} exists but \`npm run e2e\` does not run it.`);
     }

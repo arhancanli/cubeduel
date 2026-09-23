@@ -19,6 +19,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
@@ -60,7 +62,7 @@ with sync_playwright() as p:
     page = ctx.new_page()
 
     print("\n== an account with a password ==")
-    page.goto("/join", wait_until="domcontentloaded")
+    page.goto("/join", wait_until="load")
     page.wait_for_selector("#email", timeout=20_000)
     sign_up(page, EMAIL, FIRST)
     check("the account was created", True)
@@ -70,12 +72,20 @@ with sync_playwright() as p:
     token = link_from_log("verify")
     check("a verification link was produced", bool(token))
     if token:
-        page.goto(f"/verify?token={token}", wait_until="domcontentloaded")
+        page.goto(f"/verify?token={token}", wait_until="load")
+        # The page streams in over the loading skeleton; its h1 is the sign it
+        # has arrived. Reading the body before that read the skeleton.
+        page.wait_for_selector("main:not([aria-busy]) h1", timeout=15_000)
         body = page.inner_text("body").lower()
-        check("the address is confirmed", "confirmed" in body, body[:100])
+        # The heading, not the first 100 characters of the body: those are the
+        # navigation, and they said nothing about which way the page went.
+        check("the address is confirmed", "confirmed" in body, page.locator("h1").all_inner_texts())
 
         # The case a mail scanner causes on every real send.
-        page.goto(f"/verify?token={token}", wait_until="domcontentloaded")
+        page.goto(f"/verify?token={token}", wait_until="load")
+        # The page streams in over the loading skeleton; its h1 is the sign it
+        # has arrived. Reading the body before that read the skeleton.
+        page.wait_for_selector("main:not([aria-busy]) h1", timeout=15_000)
         again = page.inner_text("body").lower()
         check(
             "clicking a spent link still says confirmed, not 'invalid'",
@@ -84,7 +94,7 @@ with sync_playwright() as p:
         )
 
     print("\n== asking for a reset ==")
-    page.goto("/forgot", wait_until="domcontentloaded")
+    page.goto("/forgot", wait_until="load")
     page.fill("#email", EMAIL)
     page.click("button[type=submit]")
     page.wait_for_selector("text=Check your inbox", timeout=20_000)
@@ -98,7 +108,7 @@ with sync_playwright() as p:
 
     print("\n== setting a new password ==")
     if reset:
-        page.goto(f"/reset?token={reset}", wait_until="domcontentloaded")
+        page.goto(f"/reset?token={reset}", wait_until="load")
         page.wait_for_selector("#password", timeout=20_000)
 
         # Refused before the token is spent, so a bad choice does not cost the link.
@@ -128,7 +138,7 @@ with sync_playwright() as p:
             check(f"the {label} password returns {expected}", status == expected, str(status))
 
         print("\n== the link cannot be used twice ==")
-        page.goto(f"/reset?token={reset}", wait_until="domcontentloaded")
+        page.goto(f"/reset?token={reset}", wait_until="load")
         page.wait_for_selector("#password", timeout=20_000)
         page.fill("#password", "yet another fine password")
         page.click("button[type=submit]")

@@ -4,8 +4,8 @@ import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
-import { KeyMapHint } from "@/components/KeyMapHint";
 import { MovePad } from "@/components/MovePad";
+import { Figure, KeyboardCard, ModeLayout, ScrambleCard, SideCard } from "@/components/ModeLayout";
 import { SiteHeader } from "@/components/SiteHeader";
 import { DEFAULT_EVENT, EVENTS, EVENT_IDS, type EventId } from "@/lib/events";
 import { formatMs } from "@/lib/format";
@@ -211,35 +211,84 @@ export function RushScreen({
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="rush" fade={solving} />
 
-      <div className="flex flex-1 flex-col items-center gap-6 px-6 pb-12">
+      <ModeLayout
+        face="rush"
+        title="Rush"
+        blurb="Beat a target built from your own pace."
+        dim={solving}
+        controls={
+          !started ? (
+            <div className="flex gap-1 rounded-xl border border-border bg-surface p-1" role="group" aria-label="Event">
+              {EVENT_IDS.map((id) => (
+                <button
+                  key={id}
+                  type="button"
+                  aria-pressed={id === event}
+                  onClick={() => setEvent(id)}
+                  className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
+                    id === event ? "bg-surface-hi text-foreground" : "text-muted hover:text-foreground"
+                  }`}
+                >
+                  {EVENTS[id].name}
+                  {records[id] ? <span className="tnum ml-1.5 opacity-60">{records[id]!.score}</span> : null}
+                </button>
+              ))}
+            </div>
+          ) : null
+        }
+        aside={
+          <>
+            <SideCard title={`Your best · ${EVENTS[event].name}`}>
+              {record ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <Figure label="best run" value={String(record.score)} note="targets beaten" />
+                  <Figure label="streak" value={String(record.bestStreak)} note="longest in a row" />
+                </div>
+              ) : (
+                <p className="text-sm text-muted">No run yet on this event.</p>
+              )}
+            </SideCard>
+            <SideCard title="How Rush works">
+              <ul className="flex list-disc flex-col gap-1.5 pl-4 text-sm leading-relaxed text-muted">
+                <li>Solve under the target. Every time you beat it, it gets tighter.</li>
+                <li>Three misses and the run is over.</li>
+                <li>
+                  The target starts from your own {EVENTS[event].name} pace, so it is the same difficulty
+                  whether you average eight seconds or forty.
+                </li>
+              </ul>
+            </SideCard>
+            {!over ? <KeyboardCard activeKey={activeKey} /> : null}
+          </>
+        }
+      >
         {!started ? (
-          <Intro
-            event={event}
-            best={record}
-            bests={records}
-            onSelect={setEvent}
-            onStart={begin}
-          />
+          <div className="flex w-full flex-col items-center gap-4 rounded-3xl border border-border bg-surface px-6 py-12 text-center">
+            <p className="font-display text-3xl font-extrabold tracking-tight">Ready when you are.</p>
+            <p className="max-w-sm text-sm leading-relaxed text-muted">
+              The target appears before your first turn. Beat it and the next one is tighter.
+            </p>
+            {record ? (
+              <p className="tnum text-sm text-muted">
+                Your best: {record.score} solves · longest streak {record.bestStreak}
+              </p>
+            ) : null}
+            <button type="button" onClick={begin} className="btn-go px-7 py-3.5 text-base">
+              Start a run
+            </button>
+          </div>
         ) : (
           <>
             <Scoreboard state={state} target={target} solving={solving} />
 
-            <div
-              className={`mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-3 gap-y-1.5 font-mono text-base leading-snug transition-opacity duration-200 sm:text-lg ${
-                solving ? "opacity-30" : "opacity-100"
-              }`}
-            >
-              {!over && scramble
-                ? scramble.split(" ").map((move, i) => <span key={`${move}-${i}`}>{move}</span>)
-                : null}
-            </div>
+            {!over ? <ScrambleCard scramble={scramble} dim={solving} /> : null}
 
             {!over ? (
               <CubeView
                 scramble={scramble}
                 interactive
                 onPlayerReady={session.onPlayerReady}
-                className="h-[24vh] max-h-56 min-h-32 w-full max-w-md"
+                className="h-[26vh] max-h-64 min-h-36 w-full max-w-md"
               />
             ) : null}
 
@@ -256,7 +305,7 @@ export function RushScreen({
               >
                 0.00
               </div>
-              <p className="text-xs text-muted-dim">
+              <p className="text-sm text-muted">
                 {phase === "armed" && !over && "First turn starts the clock."}
                 {phase === "running" && `${moveCount} moves`}
                 {phase === "solved" && !over && (last ? verdictLine(last) : "Checking…")}
@@ -273,7 +322,7 @@ export function RushScreen({
                     type="button"
                     onClick={() => void session.startRound()}
                     autoFocus
-                    className="btn-go px-6 py-2.5 text-sm"
+                    className="btn-go px-6 py-3 text-[15px]"
                   >
                     Next scramble
                   </button>
@@ -290,13 +339,7 @@ export function RushScreen({
           </p>
         ) : null}
         {connectError ? <p className="text-xs text-danger">{connectError}</p> : null}
-
-        {!over ? (
-          <div className="mt-2 hidden md:block">
-            <KeyMapHint activeCode={activeKey} />
-          </div>
-        ) : null}
-      </div>
+      </ModeLayout>
     </main>
   );
 }
@@ -358,68 +401,6 @@ function Scoreboard({
   );
 }
 
-function Intro({
-  event,
-  best,
-  bests,
-  onSelect,
-  onStart,
-}: {
-  event: EventId;
-  best: { score: number; bestStreak: number } | null;
-  bests: Record<EventId, { score: number; bestStreak: number } | null>;
-  onSelect: (event: EventId) => void;
-  onStart: () => void;
-}) {
-  return (
-    <div className="flex max-w-md flex-col items-center gap-5 pt-10 text-center">
-      <h1 className="text-3xl tracking-tight">Rush</h1>
-      <p className="text-sm leading-relaxed text-muted">
-        Solve under the target. Every time you beat it, it gets tighter. Three
-        misses and the run is over.
-      </p>
-      <p className="text-xs leading-relaxed text-muted-dim">
-        The target starts from your own {EVENTS[event].name} pace, so this is the
-        same difficulty whether you average eight seconds or forty — it finds the
-        edge of what you can do right now, which is the only place anybody
-        improves.
-      </p>
-
-      <div className="flex justify-center gap-1" role="group" aria-label="Event">
-        {EVENT_IDS.map((id) => (
-          <button
-            key={id}
-            type="button"
-            aria-pressed={id === event}
-            onClick={() => onSelect(id)}
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-              id === event ? "bg-surface-hi text-foreground" : "text-muted-dim hover:text-muted"
-            }`}
-          >
-            {EVENTS[id].name}
-            {bests[id] ? (
-              <span className="tnum ml-1.5 opacity-60">{bests[id]!.score}</span>
-            ) : null}
-          </button>
-        ))}
-      </div>
-
-      {best ? (
-        <p className="tnum text-xs text-muted">
-          Your best: {best.score} solves · longest streak {best.bestStreak}
-        </p>
-      ) : null}
-
-      <button
-        type="button"
-        onClick={onStart}
-        className="btn-go px-7 py-3 text-sm"
-      >
-        Start a run
-      </button>
-    </div>
-  );
-}
 
 function Summary({
   state,

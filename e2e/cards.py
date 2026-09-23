@@ -27,6 +27,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
@@ -117,7 +119,7 @@ with sync_playwright() as p:
         guest_email = probe_email("card-guest")
         EMAILS += [host_email, guest_email]
 
-        host.goto("/join", wait_until="domcontentloaded")
+        host.goto("/join", wait_until="load")
         host.wait_for_selector("#email", timeout=20_000)
         sign_up(host, host_email)
         host.goto("/race", wait_until="networkidle")
@@ -138,7 +140,7 @@ with sync_playwright() as p:
         check("the race page advertises its card", bool(content) and "opengraph-image" in (content or ""), content or "no meta")
 
         print("\n== once both are in it ==")
-        guest.goto("/join", wait_until="domcontentloaded")
+        guest.goto("/join", wait_until="load")
         guest.wait_for_selector("#email", timeout=20_000)
         sign_up(guest, guest_email)
         guest.goto(f"/race/{code}", wait_until="networkidle")
@@ -183,7 +185,7 @@ with sync_playwright() as p:
                 host.wait_for_timeout(60)
         host.wait_for_timeout(6000)
 
-        host.goto("/settings", wait_until="domcontentloaded")
+        host.goto("/settings", wait_until="load")
         host.wait_for_timeout(4000)
         match = re.search(r"/u/([a-z0-9\-]+)", host.inner_text("body"))
         handle = match.group(1) if match else None

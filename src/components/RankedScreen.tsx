@@ -5,8 +5,8 @@ import { useCallback, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
 import { InspectionCountdown } from "@/components/InspectionCountdown";
-import { KeyMapHint } from "@/components/KeyMapHint";
 import { MovePad } from "@/components/MovePad";
+import { Figure, KeyboardCard, ModeLayout, ScrambleCard, SideCard } from "@/components/ModeLayout";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
 import { INSPECTION_LIMIT_MS } from "@/lib/inspection";
@@ -229,8 +229,12 @@ export function RankedScreen({
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="ranked" />
 
-      <div className="flex flex-1 flex-col items-center gap-6 px-6 pb-10">
-        <div className={solving ? "opacity-0" : "opacity-100 transition-opacity"}>
+      <ModeLayout
+        face="ranked"
+        title="Ranked"
+        blurb="Verified solves, one rating you can read back as seconds."
+        dim={solving}
+        controls={
           <EventPicker
             selected={event}
             standings={ratings}
@@ -242,26 +246,34 @@ export function RankedScreen({
             disabled={phase !== "idle" || started}
             onSelect={setEvent}
           />
-          <RatingBar rating={rating} event={event} />
-        </div>
-
-        <div
-          className={`flex w-full flex-col items-center gap-6 transition-opacity duration-200 ${
-            solving ? "opacity-30" : "opacity-100"
-          }`}
-        >
-          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-3 gap-y-1.5 font-mono text-base leading-snug sm:text-lg">
-            {scramble
-              ? scramble.split(" ").map((move, i) => <span key={`${move}-${i}`}>{move}</span>)
-              : null}
-          </div>
-        </div>
+        }
+        aside={
+          <>
+            <SideCard title="Your rating">
+              <RatingBar rating={rating} event={event} />
+            </SideCard>
+            <SideCard title="How ranked works">
+              <ul className="flex list-disc flex-col gap-1.5 pl-4 text-sm leading-relaxed text-muted">
+                <li>The server gives you a scramble nobody has seen and replays your moves to check it.</li>
+                <li>Your rating moves every {WINDOW_SIZE} attempts, as a WCA average of 5.</li>
+                <li>
+                  Inspection is WCA: {INSPECTION_LIMIT_MS / 1000} seconds from the moment the scramble
+                  appears, then +2, then a DNF past 17 — timed by the server.
+                </li>
+                <li>Starting a new attempt before finishing this one records it as a DNF.</li>
+              </ul>
+            </SideCard>
+            <KeyboardCard activeKey={activeKey} />
+          </>
+        }
+      >
+        <ScrambleCard scramble={scramble} dim={solving} note={started ? "The first turn starts the clock" : undefined} />
 
         <CubeView
           scramble={scramble}
           interactive
           onPlayerReady={session.onPlayerReady}
-          className="h-[26vh] max-h-64 min-h-36 w-full max-w-lg"
+          className="h-[28vh] max-h-72 min-h-40 w-full max-w-md"
         />
 
         <div className="flex flex-col items-center gap-2">
@@ -274,7 +286,7 @@ export function RankedScreen({
             0.00
           </div>
           <InspectionCountdown active={phase === "armed"} />
-          <p className="text-xs text-muted-dim">
+          <p className="text-sm text-muted">
             {phase === "armed" && "Ranked attempt live — the first turn starts the clock."}
             {phase === "running" && `${moveCount} moves`}
             {phase === "solved" && (submitting ? "Verifying…" : "Solved")}
@@ -311,7 +323,7 @@ export function RankedScreen({
             type="button"
             onClick={() => void session.startRound()}
             disabled={submitting}
-            className="btn-go px-5 py-2.5 text-sm disabled:opacity-40"
+            className="btn-go px-6 py-3 text-[15px] disabled:opacity-40"
           >
             {!started
               ? "Start a ranked attempt"
@@ -325,24 +337,8 @@ export function RankedScreen({
           <p className="max-w-md text-center text-xs text-danger">{connectError}</p>
         ) : null}
 
-        <p className="max-w-md text-center text-xs leading-relaxed text-muted-dim">
-          Your rating moves every {WINDOW_SIZE} attempts, as a WCA average of 5.
-          Starting a new attempt before finishing this one records the current one
-          as a DNF. Inspection is WCA: {INSPECTION_LIMIT_MS / 1000} seconds from
-          the moment the scramble appears, then +2, then a DNF past 17.
-          It is timed by the server, not your browser.
-        </p>
-
         <MovePad onMove={session.pushMove} className="md:hidden" />
-
-        <div
-          className={`mt-2 hidden transition-opacity duration-200 md:block ${
-            solving ? "opacity-20" : "opacity-100"
-          }`}
-        >
-          <KeyMapHint activeCode={activeKey} />
-        </div>
-      </div>
+      </ModeLayout>
     </main>
   );
 }
@@ -356,43 +352,23 @@ export function RankedScreen({
  */
 function RatingBar({ rating, event }: { rating: RankedRating; event: EventId }) {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-      <div className="flex flex-col items-center gap-1">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
-          rating
-        </span>
-        <span className="tnum text-2xl font-medium">
-          {rating.rating === null ? "—" : Math.round(rating.rating)}
-        </span>
-        <span className="text-[11px] text-muted-dim">
-          {rating.rating === null
+    <div className="grid grid-cols-1 gap-2">
+      <Figure
+        label="rating"
+        value={rating.rating === null ? "—" : String(Math.round(rating.rating))}
+        note={
+          rating.rating === null
             ? "unrated"
-            : `${formatMs(msForRating(rating.rating, event), { truncate: false })} pace`}
-        </span>
-      </div>
-
-      <div className="flex flex-col items-center gap-1">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
-          confidence
-        </span>
-        <span className="tnum text-2xl font-medium text-muted">
-          ±{Math.round(rating.deviation)}
-        </span>
-        <span className="text-[11px] text-muted-dim">
-          {rating.established
-            ? "ranked"
-            : `unranked until ±${ESTABLISHED_DEVIATION}`}
-        </span>
-      </div>
-
-      <div className="flex flex-col items-center gap-1">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
-          next update
-        </span>
-        <span className="tnum text-2xl font-medium text-muted">
-          {rating.pendingAttempts}/{WINDOW_SIZE}
-        </span>
-        <span className="text-[11px] text-muted-dim">attempts gathered</span>
+            : `${formatMs(msForRating(rating.rating, event), { truncate: false })} pace`
+        }
+      />
+      <div className="grid grid-cols-2 gap-2">
+        <Figure
+          label="confidence"
+          value={`±${Math.round(rating.deviation)}`}
+          note={rating.established ? "ranked" : `unranked until ±${ESTABLISHED_DEVIATION}`}
+        />
+        <Figure label="next update" value={`${rating.pendingAttempts}/${WINDOW_SIZE}`} note="attempts gathered" />
       </div>
     </div>
   );
@@ -473,7 +449,7 @@ function EventPicker({
   onSelect: (event: EventId) => void;
 }) {
   return (
-    <div className="mb-4 flex justify-center gap-1" role="group" aria-label="Event">
+    <div className="flex gap-1 rounded-xl border border-border bg-surface p-1" role="group" aria-label="Event">
       {EVENT_IDS.map((id) => {
         const standing = standings[id];
         const active = id === selected;
@@ -489,10 +465,10 @@ function EventPicker({
                 ? `${EVENTS[id].longName} — unrated`
                 : `${EVENTS[id].longName} — ${Math.round(standing.rating)}`
             }
-            className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-40 ${
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors disabled:opacity-40 ${
               active
                 ? "bg-surface-hi text-foreground"
-                : "text-muted-dim hover:text-muted"
+                : "text-muted hover:text-foreground"
             }`}
           >
             {EVENTS[id].name}

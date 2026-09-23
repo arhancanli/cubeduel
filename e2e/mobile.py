@@ -18,6 +18,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 BASE = os.environ.get("BASE", "http://localhost:3000")
 IPHONE = (
     "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 "
@@ -83,7 +85,7 @@ with sync_playwright() as p:
 
     print("\n== nothing overflows sideways ==")
     for path in ["/", "/play", "/daily", "/train", "/timer", "/leaderboard"]:
-        page.goto(BASE + path, wait_until="domcontentloaded")
+        page.goto(BASE + path, wait_until="load")
         page.wait_for_timeout(3500)
         overflow = page.evaluate(
             "() => document.documentElement.scrollWidth - document.documentElement.clientWidth"
@@ -92,7 +94,7 @@ with sync_playwright() as p:
         check(f"{path}: no horizontal scroll", overflow <= 1, f"{overflow}px")
 
     print("\n== the daily is solvable by touch ==")
-    page.goto(BASE + "/daily", wait_until="domcontentloaded")
+    page.goto(BASE + "/daily", wait_until="load")
     page.wait_for_timeout(5000)
     body = page.inner_text("body")
     check("the solve button is not named after a keyboard",
@@ -124,7 +126,7 @@ with sync_playwright() as p:
               f"{taps} taps; page now: " + " | ".join(after.split("\n")[:3])[:120])
 
     print("\n== the trainer takes touch ==")
-    page.goto(BASE + "/train", wait_until="domcontentloaded")
+    page.goto(BASE + "/train", wait_until="load")
     page.wait_for_timeout(6000)
     body = page.inner_text("body")
     check("it no longer says drilling needs a keyboard",

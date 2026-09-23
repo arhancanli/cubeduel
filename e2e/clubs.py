@@ -19,6 +19,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, delete_club, probe_email, sign_up  # noqa: E402
 
@@ -50,7 +52,7 @@ with sync_playwright() as p:
         page.on("pageerror", lambda e: print("  PAGEERROR:", str(e)[:140]))
 
     print("\n== the clubs page works signed out ==")
-    captain.goto("/clubs", wait_until="domcontentloaded")
+    captain.goto("/clubs", wait_until="load")
     captain.wait_for_timeout(2500)
     body = captain.inner_text("body").lower()
     check("it explains what a club is without demanding an account",
@@ -59,11 +61,11 @@ with sync_playwright() as p:
           "same verified solves" in body or "same ladder" in body, body[:100])
 
     print("\n== a captain starts a club ==")
-    captain.goto("/join", wait_until="domcontentloaded")
+    captain.goto("/join", wait_until="load")
     captain.wait_for_selector("#email", timeout=20_000)
     sign_up(captain, CAPTAIN)
 
-    captain.goto("/clubs", wait_until="domcontentloaded")
+    captain.goto("/clubs", wait_until="load")
     captain.wait_for_selector("#club-name", timeout=20_000)
     captain.fill("#club-name", "E2E Cubing Club")
 
@@ -88,7 +90,7 @@ with sync_playwright() as p:
     print("\n== the page is public, and the code is not ==")
     stranger = browser.new_context(base_url=BASE)
     stranger_page = stranger.new_page()
-    stranger_page.goto(f"/c/{SLUG}", wait_until="domcontentloaded")
+    stranger_page.goto(f"/c/{SLUG}", wait_until="load")
     stranger_page.wait_for_timeout(2500)
     stranger_text = stranger_page.inner_text("body")
     check("a signed-out visitor can read the board", "E2E Cubing Club" in stranger_text)
@@ -99,7 +101,7 @@ with sync_playwright() as p:
 
     print("\n== a second cuber joins with the code ==")
     if code:
-        member.goto("/join", wait_until="domcontentloaded")
+        member.goto("/join", wait_until="load")
         member.wait_for_selector("#email", timeout=20_000)
         sign_up(member, MEMBER)
 
@@ -123,7 +125,7 @@ with sync_playwright() as p:
         check("the second cuber lands on the same club", SLUG in member.url, member.url)
 
         print("\n== both are on the same board ==")
-        captain.reload(wait_until="domcontentloaded")
+        captain.reload(wait_until="load")
         captain.wait_for_timeout(3000)
         after = captain.inner_text("body")
         check("the board now says two members", "2 member" in after, after[:0] or "")
@@ -132,7 +134,7 @@ with sync_playwright() as p:
         check("...and nobody is shown a rating of zero", " 0\n" not in after and "0\n0" not in after)
 
     print("\n== the club appears in the captain's list ==")
-    captain.goto("/clubs", wait_until="domcontentloaded")
+    captain.goto("/clubs", wait_until="load")
     captain.wait_for_timeout(2500)
     mine = captain.inner_text("body")
     check("their club is listed", "E2E Cubing Club" in mine)

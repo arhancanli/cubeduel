@@ -17,6 +17,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import probe_email, sign_up  # noqa: E402
 
@@ -71,7 +73,7 @@ with sync_playwright() as p:
         page.on("pageerror", lambda e: errors.append(str(e)))
 
     print("\n== the host creates a race ==")
-    host.goto("/join", wait_until="domcontentloaded")
+    host.goto("/join", wait_until="load")
     host.wait_for_selector("#email", timeout=20_000)
     sign_up(host, probe_email("race-host"))
     host.goto("/race", wait_until="networkidle")
@@ -84,7 +86,7 @@ with sync_playwright() as p:
     code = url.rsplit("/", 1)[-1]
 
     print("\n== the guest opens it ==")
-    guest.goto("/join", wait_until="domcontentloaded")
+    guest.goto("/join", wait_until="load")
     guest.wait_for_selector("#email", timeout=20_000)
     sign_up(guest, probe_email("race-guest"))
     guest.goto(f"/race/{code}", wait_until="networkidle")

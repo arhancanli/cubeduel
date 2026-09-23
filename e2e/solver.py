@@ -18,6 +18,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 BASE = os.environ.get("BASE", "http://localhost:3000")
 FAILS = []
 SCRAMBLE = "F2 D' B R2 L' U2 F' D B2 L R' U F2 D2 B' L2"

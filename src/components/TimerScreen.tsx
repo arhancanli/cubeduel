@@ -7,6 +7,7 @@ import { CubeView } from "@/components/CubeView";
 import type { PhaseSplit } from "@/lib/cfop";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SolveSwitch } from "@/components/SolveSwitch";
+import { FirstVisit } from "@/components/FirstVisit";
 import { SolveReviewPanel } from "@/components/SolveReview";
 import { formatAverage, formatMs, formatSolve } from "@/lib/format";
 import { nextScramble, warmScrambles } from "@/lib/scramble";
@@ -243,6 +244,7 @@ export function TimerScreen() {
       */}
       <div className="mx-auto grid w-full max-w-7xl flex-1 items-start gap-6 px-4 pb-10 pt-3 sm:px-8 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-8 lg:pt-8">
         <div className="flex min-w-0 flex-col items-center gap-5 md:gap-6">
+          <FirstVisit hasSolves={solves.length > 0} />
           <SolveSwitch active="timer" className={chromeClass} />
 
           <section className={`w-full rounded-2xl border border-border bg-surface px-4 py-4 sm:px-6 ${chromeClass}`}>

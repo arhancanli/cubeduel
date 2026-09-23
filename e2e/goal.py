@@ -11,6 +11,8 @@ would look better on the screen.
 
 import sys
 from playwright.sync_api import sync_playwright
+
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
 import os
 BASE = os.environ.get("BASE", "http://localhost:3000")
 FAILS = []
@@ -30,13 +32,13 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errors.append(str(e)))
 
     print("\n== a goal can be set with no solves ==")
-    page.goto(BASE + "/progress", wait_until="domcontentloaded"); page.wait_for_timeout(2500)
+    page.goto(BASE + "/progress", wait_until="load"); page.wait_for_timeout(2500)
     body = page.inner_text("body")
     check("the empty state offers solving", "starts filling in" in body and "Solve on the keyboard" in body)
 
     print("\n== record some solves ==")
     for i in range(3):
-        page.goto(BASE + "/play", wait_until="domcontentloaded")
+        page.goto(BASE + "/play", wait_until="load")
         page.wait_for_selector("twisty-player", timeout=30000)
         page.wait_for_function("() => { const e=document.querySelector('div.font-mono'); return !!e && e.innerText.trim().length>40; }", timeout=30000)
         page.wait_for_timeout(1200)
@@ -48,7 +50,7 @@ with sync_playwright() as p:
     print("  recorded 3 solves")
 
     print("\n== the goal panel ==")
-    page.goto(BASE + "/progress", wait_until="domcontentloaded"); page.wait_for_timeout(3000)
+    page.goto(BASE + "/progress", wait_until="load"); page.wait_for_timeout(3000)
     body = page.inner_text("body")
     check("a goal can be chosen", "sub-20" in body and "GOAL" in body.upper())
     check("the offer is honest about refusing", "cannot yet say" in body, [l for l in body.split("\n") if "cannot yet" in l][:1])
@@ -63,7 +65,7 @@ with sync_playwright() as p:
     check("the goal can be changed", page.locator("button:has-text('Change goal')").count() == 1)
 
     print("\n== it survives a reload ==")
-    page.reload(wait_until="domcontentloaded"); page.wait_for_timeout(2500)
+    page.reload(wait_until="load"); page.wait_for_timeout(2500)
     check("the goal persisted", "started at" in page.inner_text("body").lower())
 
     print("\n== console ==")

@@ -3,6 +3,39 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.12.0 — 2026-09-24
+
+### Ranked and Rush, rebuilt as game screens
+
+- **Every competitive mode now plays in one frame**, the same shape as the
+  timer: the mode's name and sticker colour at the top with its event picker
+  beside it, the scramble in a card, the cube and the clock, and down the right
+  the numbers this mode keeps, how it works, and the keyboard controls. They
+  used to be centred stacks of grey text with the rules as a paragraph and the
+  key map as a wall underneath.
+- **Ranked**: your rating, confidence and next update as tiles, and the rules
+  as four short lines — the server's scramble, a rating update every five
+  attempts, WCA inspection timed by the server, an abandoned attempt is a DNF.
+- **Rush**: a clear start card, your best run and longest streak on the side,
+  and the rules stated before you begin.
+- **Event pickers are proper segmented controls**, readable at a glance.
+
+### The first visit, the wait, the crash
+
+- **First time on the timer** a slim row says this is the timer for a cube in
+  your hands, with the way to the keyboard, a smart cube, or learning to solve —
+  gone after "Got it" or the first solve, and never in front of the clock.
+- **Pages that fetch from the server show their shape while they load**, so a
+  click on the ladder or a profile never looks like nothing happened.
+- **"Clear stored data" on the error page asks first.** It deletes every solve
+  on the device, and it used to do it on one press; now the second press says
+  exactly that.
+- **The browser suites wait for streamed pages to finish arriving.** With the
+  loading screen, a page can show its skeleton for a moment after the address
+  changes; three suites read it in that moment and reported missing features.
+  One shared helper now makes every page load and in-app navigation in every
+  suite wait until the skeleton is gone.
+
 ## 1.11.0 — 2026-09-23
 
 ### A Rubik's cube solver for the cube in your hands

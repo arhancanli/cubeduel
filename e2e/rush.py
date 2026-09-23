@@ -25,6 +25,8 @@ import urllib.request
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
@@ -120,16 +122,16 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errors.append(str(e)))
 
     print("\n== signed out ==")
-    page.goto(BASE + "/rush", wait_until="domcontentloaded")
+    page.goto(BASE + "/rush", wait_until="load")
     page.wait_for_timeout(3500)
     check("rush is gated behind an account", "Sign in to run" in page.inner_text("body"))
 
     print("\n== signing in ==")
     # The page has to be loaded before the fetch, so the request is same-origin
     # and the session cookie lands in this browser rather than nowhere.
-    page.goto(BASE + "/", wait_until="domcontentloaded")
+    page.goto(BASE + "/", wait_until="load")
     sign_up(page, EMAIL)
-    page.goto(BASE + "/rush", wait_until="domcontentloaded")
+    page.goto(BASE + "/rush", wait_until="load")
     page.wait_for_timeout(5000)
     body = page.inner_text("body")
     signed_in = "Sign in to run" not in body
@@ -184,7 +186,7 @@ with sync_playwright() as p:
         # The claim Rush rests on. If the score lived in the browser, a reload
         # would reset it — and a mode whose score can be reset by F5 is not a
         # mode, it is a toy.
-        page.reload(wait_until="domcontentloaded")
+        page.reload(wait_until="load")
         page.wait_for_timeout(5000)
         after = page.inner_text("body")
         check("the run survived a reload",

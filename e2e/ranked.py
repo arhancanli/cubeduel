@@ -26,6 +26,8 @@ import urllib.request
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
@@ -92,7 +94,7 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errors.append(str(e)))
 
     print("\n== signed out ==")
-    page.goto(BASE + "/ranked", wait_until="domcontentloaded")
+    page.goto(BASE + "/ranked", wait_until="load")
     page.wait_for_timeout(2500)
     check("ranked is gated behind an account", "Sign in to play ranked" in page.inner_text("body"))
 
@@ -101,7 +103,7 @@ with sync_playwright() as p:
     # must already be loaded so the fetch is same-origin and the cookie lands
     # in this browser.
     sign_up(page, EMAIL)
-    page.goto(BASE + "/ranked", wait_until="domcontentloaded")
+    page.goto(BASE + "/ranked", wait_until="load")
     page.wait_for_timeout(4000)
     body = page.inner_text("body")
     signed_in = "Sign in to play ranked" not in body
@@ -190,7 +192,7 @@ with sync_playwright() as p:
               counter.group(0) if counter else "no counter on screen")
 
         print("\n== the account is real ==")
-        page.goto(BASE + "/settings", wait_until="domcontentloaded")
+        page.goto(BASE + "/settings", wait_until="load")
         page.wait_for_timeout(3000)
         settings = page.inner_text("body")
         check("a profile was created with a handle", "/u/" in settings,

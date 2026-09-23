@@ -20,6 +20,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
@@ -97,7 +99,7 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: print("  PAGEERROR:", str(e)[:140]))
 
     print("\n== the default is the corrected pigments, not cubing.js's primaries ==")
-    page.goto("/play", wait_until="domcontentloaded")
+    page.goto("/play", wait_until="load")
     page.wait_for_timeout(6000)
 
     palette = page.evaluate("""async () => {
@@ -122,11 +124,11 @@ with sync_playwright() as p:
     classic = cube_pixels(page)
 
     print("\n== choosing a different cube changes the rendered cube ==")
-    page.goto("/join", wait_until="domcontentloaded")
+    page.goto("/join", wait_until="load")
     page.wait_for_selector("#email", timeout=20_000)
     sign_up(page, EMAIL)
 
-    page.goto("/settings", wait_until="domcontentloaded")
+    page.goto("/settings", wait_until="load")
     page.wait_for_selector("text=Your cube", timeout=20_000)
 
     # Chosen through the actual control, not by writing to storage — the point
@@ -135,33 +137,33 @@ with sync_playwright() as p:
     page.click("text=Carbon")
     page.wait_for_timeout(800)
 
-    page.goto("/play", wait_until="domcontentloaded")
+    page.goto("/play", wait_until="load")
     carbon = cube_pixels(page)
     check("the cube looks different after choosing Carbon", carbon != classic,
           f"{classic} -> {carbon}")
 
     print("\n== the choice survives a reload ==")
     carbon_palette = cube_palette(page)
-    page.reload(wait_until="domcontentloaded")
+    page.reload(wait_until="load")
     page.wait_for_timeout(6000)
     again = cube_palette(page)
     check("still Carbon after reloading", again == carbon_palette,
           f"{(again or '')[:60]}…")
 
     print("\n== the accessibility scheme is reachable and different again ==")
-    page.goto("/settings", wait_until="domcontentloaded")
+    page.goto("/settings", wait_until="load")
     page.wait_for_selector("text=High contrast", timeout=20_000)
     page.click("text=High contrast")
     page.wait_for_timeout(800)
 
-    page.goto("/play", wait_until="domcontentloaded")
+    page.goto("/play", wait_until="load")
     contrast = cube_pixels(page)
     check("high contrast renders differently again", contrast not in (classic, carbon),
           f"{contrast}")
 
     print("\n== and it is offered without an account ==")
     page.evaluate("async () => { await fetch('/api/auth/sign-out', { method: 'POST' }) }")
-    page.goto("/settings", wait_until="domcontentloaded")
+    page.goto("/settings", wait_until="load")
     page.wait_for_timeout(2500)
     body = page.inner_text("body").lower()
     # Settings needs an account, but the cube must never be something you earn:
@@ -184,11 +186,11 @@ with sync_playwright() as p:
     # there are cases to draw — and the regression this guard exists for was on
     # exactly that page. Without history the check passes having examined
     # nothing, which is the failure mode it is meant to prevent.
-    page.goto("/", wait_until="domcontentloaded")
+    page.goto("/", wait_until="load")
     page.evaluate("""(s) => localStorage.setItem('cubeduel.history.v1', JSON.stringify(s))""", history(40))
 
     for path in ("/play", "/timer", "/train", "/progress"):
-        page.goto(path, wait_until="domcontentloaded")
+        page.goto(path, wait_until="load")
         page.wait_for_timeout(7000)
         hosts = page.evaluate("""() => [...document.querySelectorAll('[data-cube-view]')]
             .map(h => ({

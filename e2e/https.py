@@ -28,6 +28,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email  # noqa: E402
 
@@ -55,7 +57,7 @@ with sync_playwright() as p:
         "automaticPresenceSimulation": True}})["authenticatorId"]
 
     print("\n== the __Host- cookie the browser actually kept ==")
-    page.goto("/join", wait_until="domcontentloaded")
+    page.goto("/join", wait_until="load")
     page.wait_for_selector("#email", timeout=20_000)
     page.fill("#email", EMAIL)
     page.click("button[type=submit]")
@@ -92,7 +94,7 @@ with sync_playwright() as p:
     # `domcontentloaded`, not `networkidle`: through a self-signed TLS proxy the
     # idle heuristic never settles even though every request fires exactly once
     # (checked, rather than assumed).
-    page.goto("/sign-in", wait_until="domcontentloaded")
+    page.goto("/sign-in", wait_until="load")
     page.wait_for_selector("text=Sign in with a passkey", timeout=20_000)
     page.click("text=Sign in with a passkey")
     try:

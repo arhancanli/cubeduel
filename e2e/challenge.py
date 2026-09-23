@@ -25,6 +25,8 @@ import urllib.request
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
@@ -54,7 +56,7 @@ def env(name):
 
 
 def handle_of(page):
-    page.goto(BASE + "/settings", wait_until="domcontentloaded")
+    page.goto(BASE + "/settings", wait_until="load")
     page.wait_for_timeout(4000)
     match = re.search(r"/u/([a-z0-9\-]+)", page.inner_text("body"))
     return match.group(1) if match else None
@@ -106,11 +108,11 @@ with sync_playwright() as p:
     print("\n== two accounts sign in ==")
     handles = {}
     for _, page, player in contexts:
-        page.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page.goto(BASE + "/duel", wait_until="load")
         page.wait_for_timeout(1500)
         sign_up(page, player["email"])
         # Reloaded so the page renders with the session it just acquired.
-        page.reload(wait_until="domcontentloaded")
+        page.reload(wait_until="load")
         page.wait_for_timeout(2500)
         handle = handle_of(page)
         handles[player["label"]] = handle
@@ -123,7 +125,7 @@ with sync_playwright() as p:
         handle_a, handle_b = handles["A"], handles["B"]
 
         print("\n== A challenges B ==")
-        page_a.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_a.goto(BASE + "/duel", wait_until="load")
         page_a.wait_for_timeout(5000)
         check("the challenge form is on the duel page",
               page_a.locator("#challenge-handle").count() == 1)
@@ -142,7 +144,7 @@ with sync_playwright() as p:
         check("the sender's page carries no scramble", scramble_on(page_a) == "",
               scramble_on(page_a)[:40])
 
-        page_b.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_b.goto(BASE + "/duel", wait_until="load")
         page_b.wait_for_timeout(5000)
         body_b = page_b.inner_text("body")
         check("B is told a challenge is waiting", "waiting on you" in body_b.lower(),
@@ -152,7 +154,7 @@ with sync_playwright() as p:
               scramble_on(page_b)[:40])
 
         print("\n== A opens their half and solves ==")
-        page_a.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_a.goto(BASE + "/duel", wait_until="load")
         page_a.wait_for_timeout(5000)
         page_a.locator("a[href^='/challenge/']").first.click()
         page_a.wait_for_timeout(5000)
@@ -195,7 +197,7 @@ with sync_playwright() as p:
               own_time.group(1) if own_time else "not found")
 
         print("\n== B still cannot see the time to beat ==")
-        page_b.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_b.goto(BASE + "/duel", wait_until="load")
         page_b.wait_for_timeout(5000)
         body_b = page_b.inner_text("body")
         if own_time:
@@ -234,7 +236,7 @@ with sync_playwright() as p:
         check("it is still B's turn", "waiting on you" in body_b.lower())
 
         print("\n== B solves the same scramble ==")
-        page_b.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_b.goto(BASE + "/duel", wait_until="load")
         page_b.wait_for_timeout(4000)
         page_b.locator("a[href^='/challenge/']").first.click()
         page_b.wait_for_timeout(4000)
@@ -263,7 +265,7 @@ with sync_playwright() as p:
               str(re.findall(r"\b\d+\.\d{2}\b", after_b)[:4]))
 
         print("\n== A sees the same result ==")
-        page_a.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_a.goto(BASE + "/duel", wait_until="load")
         page_a.wait_for_timeout(5000)
         final_a = page_a.inner_text("body")
         check("A is recorded as the winner", "won" in final_a,
@@ -277,7 +279,7 @@ with sync_playwright() as p:
         # The case the rest of this suite cannot cover: B knows nobody's handle
         # and takes an offer from the board instead. On a site with no players
         # yet, this is the only head-to-head that works.
-        page_a.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_a.goto(BASE + "/duel", wait_until="load")
         page_a.wait_for_timeout(5000)
         page_a.locator("[data-testid=challenge-open]").first.click()
         page_a.wait_for_timeout(6000)
@@ -293,7 +295,7 @@ with sync_playwright() as p:
               a_board.count() == 0 or handle_a not in a_board.inner_text(),
               a_board.inner_text()[:80] if a_board.count() else "no board")
 
-        page_b.goto(BASE + "/duel", wait_until="domcontentloaded")
+        page_b.goto(BASE + "/duel", wait_until="load")
         page_b.wait_for_timeout(5000)
         board = page_b.locator("[data-testid=open-board]")
         check("B sees the open challenge", board.count() == 1)

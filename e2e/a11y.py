@@ -18,6 +18,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 BASE = os.environ.get("BASE", "http://localhost:3000")
 PAGES = ["/", "/play", "/daily", "/train", "/timer", "/progress", "/review", "/solver", "/leaderboard", "/ranked", "/duel"]
 FAILS = []
@@ -34,14 +36,14 @@ with sync_playwright() as p:
     page = browser.new_page(viewport={"width": 1440, "height": 1000})
 
     print("\n== document level ==")
-    page.goto(BASE + "/", wait_until="domcontentloaded")
+    page.goto(BASE + "/", wait_until="load")
     page.wait_for_timeout(2000)
     check("the document declares a language", page.get_attribute("html", "lang") == "en")
     check("there is a main landmark", page.locator("main").count() >= 1)
 
     for path in PAGES:
         print(f"\n== {path} ==")
-        page.goto(BASE + path, wait_until="domcontentloaded")
+        page.goto(BASE + path, wait_until="load")
         page.wait_for_timeout(2500)
 
         # Exactly one, not "at most one". The first version of this check allowed
@@ -118,7 +120,7 @@ with sync_playwright() as p:
         check(f"{path}: graphics carry text alternatives", len(graphics) == 0, "; ".join(graphics[:3]))
 
     print("\n== the nav separates competing from practising ==")
-    page.goto(BASE + "/", wait_until="domcontentloaded")
+    page.goto(BASE + "/", wait_until="load")
     page.wait_for_timeout(3000)
     groups = page.evaluate(
         "() => [...document.querySelectorAll('nav [role=group]')].map(g => g.getAttribute('aria-label'))"
@@ -168,7 +170,7 @@ with sync_playwright() as p:
           "moves" in body_now and "ms to find" in body_now)
 
     print("\n== keyboard ==")
-    page.goto(BASE + "/", wait_until="domcontentloaded")
+    page.goto(BASE + "/", wait_until="load")
     page.wait_for_timeout(2000)
     page.keyboard.press("Tab")
     focused = page.evaluate(

@@ -22,6 +22,8 @@ import sys
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from account import delete_account, probe_email, sign_up  # noqa: E402
 
@@ -108,7 +110,7 @@ with sync_playwright() as p:
 
         # ------------------------------------------------------------------
         print("\n== finding it again ==")
-        page.goto(BASE + "/settings", wait_until="domcontentloaded")
+        page.goto(BASE + "/settings", wait_until="load")
         page.wait_for_timeout(4000)
         match = re.search(r"/u/([a-z0-9\-]+)", page.inner_text("body"))
         handle = match.group(1) if match else None

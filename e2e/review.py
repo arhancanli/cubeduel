@@ -17,6 +17,8 @@ from urllib.parse import quote
 
 from playwright.sync_api import sync_playwright
 
+import settle  # noqa: F401 — every page load waits for streamed pages to arrive
+
 BASE = os.environ.get("BASE", "http://localhost:3000")
 FAILS = []
 
