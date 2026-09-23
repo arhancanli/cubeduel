@@ -7,6 +7,7 @@ import { SolverDemo } from "@/components/SolverDemo";
 import { Reveal } from "@/components/Reveal";
 import { ScrollSolve } from "@/components/ScrollSolve";
 import { SiteHeader } from "@/components/SiteHeader";
+import { StreakCard } from "@/components/StreakCard";
 import { ratingForMs } from "@/lib/rating";
 import { CubeNet } from "@/components/CubeNet";
 import { HomeDashboard } from "@/components/HomeDashboard";
@@ -81,7 +82,10 @@ export function LandingScreen({ dailyStart }: { dailyStart: string }) {
           </div>
 
           {returning && history ? (
-            <ReturningStats history={history} />
+            <>
+              <ReturningStats history={history} />
+              <StreakCard compact />
+            </>
           ) : (
             <p className="text-sm text-muted-dim">Solving needs no account. Free, and it works offline.</p>
           )}

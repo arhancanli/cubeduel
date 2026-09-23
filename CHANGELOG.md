@@ -3,6 +3,20 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.9.0 — 2026-09-23
+
+### A solving streak
+
+- **Days in a row with at least one solve**, practice included, so it works
+  for somebody playing alone. It leads the signed-in home page and sits under
+  the stats for anyone returning signed out, with the last fourteen days drawn
+  as a strip of stickers, lit where you solved.
+- **Your days, not UTC.** The daily's streak runs on one world clock because it
+  is one shared puzzle; this one is your practice, so 11pm and 1am are two days.
+- **Forgiving, like the daily's.** It only breaks once a whole day has passed
+  with no solve. Opening the site in the morning never tells you it is gone —
+  it says today is not in yet, and that the streak is safe until midnight.
+
 ## 1.8.0 — 2026-09-23
 
 Insights: the habits that cost you the most, from your own turns.

@@ -58,6 +58,10 @@ with sync_playwright() as p:
     check("the modes are one click away", page.get_by_role("navigation", name="Modes").count() == 1)
     check("the handle is shown", "@" in page.locator("h1").inner_text(), page.locator("h1").inner_text())
 
+    streak = page.locator("[data-testid=streak]").inner_text()
+    check("a new player is shown how to start a streak",
+          "0 days" in streak and "start one" in streak, streak.replace("\n", " "))
+
     print("\n== on a phone ==")
     page.set_viewport_size({"width": 390, "height": 844})
     page.wait_for_timeout(600)

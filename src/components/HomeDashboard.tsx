@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import { CubeNet } from "@/components/CubeNet";
 import { Glyph } from "@/components/Glyph";
+import { StreakCard } from "@/components/StreakCard";
 import { TodayStrip } from "@/components/TodayStrip";
 import { utcDayKey } from "@/lib/daily";
 import { getEntry, type DailyEntry } from "@/lib/dailyStorage";
@@ -103,6 +104,8 @@ export function HomeDashboard({ handle, dailyStart }: { handle: string | null; d
           />
         </div>
       </div>
+
+      <StreakCard />
 
       <section className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)]">
         <div className="flex flex-col gap-3">

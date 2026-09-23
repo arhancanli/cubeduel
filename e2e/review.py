@@ -160,6 +160,15 @@ with sync_playwright() as p:
             check("and that solve's review shows the same stop",
                   any("before F2L 3" in m for m in page.locator("[data-testid=review-moments] > li").all_inner_texts()))
 
+        print("\n== the streak ==")
+        page.goto(BASE + "/", wait_until="networkidle")
+        page.wait_for_selector("[data-testid=streak]", timeout=15000)
+        streak = page.locator("[data-testid=streak]").inner_text()
+        check("solving today makes a one-day streak", "1 day" in streak and "Today counts" in streak,
+              streak.replace("\n", " "))
+        check("today is lit in the strip",
+              page.locator("[data-testid=streak] li").last.get_attribute("aria-label") == "Today: solved")
+
         print("\n== the list ==")
         page.goto(BASE + "/review", wait_until="networkidle")
         page.wait_for_timeout(1500)
