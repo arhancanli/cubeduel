@@ -2,14 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { mayHideOnStart } from "@/lib/reveal";
+
 /**
- * Fades a block up as it enters the viewport, once.
+ * Fades a block up as it scrolls into view, once.
  *
- * Deliberately small: a landing page earns motion by demonstrating the product,
- * which the scrolling cube does. Everything else only needs to not arrive flat.
- * Honours `prefers-reduced-motion` by showing immediately, and shows immediately if
- * IntersectionObserver is unavailable — content must never depend on an effect
- * having run.
+ * The block is sent visible. It used to be sent at opacity 0 and shown by an
+ * effect, which left every heading and paragraph on the page blank until the
+ * JavaScript had downloaded and run — seconds on a mid-range phone, and for
+ * ever to anything that does not run scripts. Now only a block that starts
+ * below the first screen is hidden, in the browser, where nobody has seen it
+ * yet. Honours `prefers-reduced-motion`, and without IntersectionObserver
+ * nothing is ever hidden.
  */
 export function Reveal({
   children,
@@ -21,22 +25,25 @@ export function Reveal({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [shown, setShown] = useState(false);
+  // "static": as sent, visible. "waiting": below the fold, hidden until seen.
+  // "shown": fading in.
+  const [state, setState] = useState<"static" | "waiting" | "shown">("static");
 
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
     if (
       typeof IntersectionObserver === "undefined" ||
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !mayHideOnStart(node.getBoundingClientRect().top, window.innerHeight)
     ) {
-      setShown(true);
       return;
     }
+    setState("waiting");
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setShown(true);
+          setState("shown");
           observer.disconnect();
         }
       },
@@ -46,13 +53,19 @@ export function Reveal({
     return () => observer.disconnect();
   }, []);
 
+  const motion =
+    state === "waiting"
+      ? "translate-y-4 opacity-0"
+      : state === "shown"
+        ? "transition-all duration-700 ease-out translate-y-0 opacity-100"
+        : "";
+
   return (
     <div
       ref={ref}
-      style={{ transitionDelay: `${delayMs}ms` }}
-      className={`transition-all duration-700 ease-out ${
-        shown ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"
-      } ${className}`}
+      data-reveal={state}
+      style={state === "shown" ? { transitionDelay: `${delayMs}ms` } : undefined}
+      className={`${motion} ${className}`}
     >
       {children}
     </div>

@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const KEY = "cubeduel:welcomed";
+import { WELCOMED_KEY as KEY } from "@/lib/firstVisit";
+
 
 /**
  * The first time somebody lands on the timer with nothing solved yet: which of
@@ -14,18 +15,22 @@ const KEY = "cubeduel:welcomed";
  * never stands between somebody who knows what they are doing and the clock.
  */
 export function FirstVisit({ hasSolves }: { hasSolves: boolean }) {
-  const [show, setShow] = useState(false);
+  // Sent to everyone and hidden before the first paint for anybody who has
+  // been here — see lib/firstVisit.ts. Adding it once the page ran instead
+  // pushed the whole timer down under a new visitor's eyes.
+  const [show, setShow] = useState(true);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
-        if (!hasSolves && window.localStorage.getItem(KEY) === null) setShow(true);
+        if (window.localStorage.getItem(KEY) !== null) setShow(false);
       } catch {
         /* storage blocked: skip the welcome rather than show it every time */
+        setShow(false);
       }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [hasSolves]);
+  }, []);
 
   if (!show || hasSolves) return null;
 
@@ -49,6 +54,7 @@ export function FirstVisit({ hasSolves }: { hasSolves: boolean }) {
     <section
       aria-label="First time here"
       data-testid="first-visit"
+      data-first-visit=""
       className="flex w-full flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border border-sticker-green/40 bg-surface px-4 py-3"
     >
       <p className="text-sm">

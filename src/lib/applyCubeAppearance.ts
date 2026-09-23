@@ -40,8 +40,28 @@ import { appearanceById, repaintMap, type CubeAppearance } from "./cubeAppearanc
 const ORIGINAL_KEY = "cubeduelOriginalColour";
 
 interface ThreeColour {
-  getHexString(): string;
+  getHexString?(): string;
   set(value: string): void;
+  setStyle?(value: string, colorSpace?: string): void;
+}
+
+/**
+ * Paints a colour so it appears on screen as written.
+ *
+ * Three.js takes a hex string to be sRGB and converts it to linear light for
+ * lighting maths, expecting the renderer to convert back on output. cubing.js's
+ * renderer does not convert back — so every repainted sticker came out darker,
+ * mid-tones worst: Rubik's red #B71234 was drawn as #780104, blue #0046AD as
+ * #00106B, and red and orange were hard to tell apart on the very cube a cuber
+ * checks their scramble against. Declaring the value already linear stores it
+ * untouched, which is what this renderer shows.
+ */
+export function paint(colour: ThreeColour, hex: string): void {
+  if (typeof colour.setStyle === "function") {
+    colour.setStyle(hex, "srgb-linear");
+  } else {
+    colour.set(hex);
+  }
 }
 
 interface ThreeMaterial {
@@ -133,7 +153,7 @@ export async function applyAppearance(
         // keyed on. Recorded once, on first sight, before anything changes it.
         material.userData ??= {};
         if (typeof material.userData[ORIGINAL_KEY] !== "string") {
-          material.userData[ORIGINAL_KEY] = `#${material.color.getHexString()}`.toLowerCase();
+          material.userData[ORIGINAL_KEY] = `#${material.color.getHexString?.() ?? ""}`.toLowerCase();
         }
         const original = material.userData[ORIGINAL_KEY] as string;
 
@@ -143,7 +163,7 @@ export async function applyAppearance(
           continue;
         }
 
-        material.color.set(next);
+        paint(material.color, next);
 
         // The finish is what separates a rendered cube from a photographed one.
         // Speedcube ABS scatters most of the light that hits it; leaving the

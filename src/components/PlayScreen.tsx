@@ -138,7 +138,8 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
               </span>
               <span className="text-[11px] text-muted-dim">The cube below is scrambled for you</span>
             </div>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-base leading-snug sm:text-lg">
+            {/* Height held for two lines until the scramble arrives; one on a wide screen. */}
+            <div className="flex min-h-[3.25rem] flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-base leading-snug sm:text-lg lg:min-h-7">
               {scramble.split(" ").map((move, i) => (
                 <span key={`${move}-${i}`}>{move}</span>
               ))}
@@ -169,7 +170,9 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
             >
               0.00
             </div>
-            <p className="text-sm text-muted">
+            {/* Two lines held open: the instruction that replaces "Loading…"
+                wraps on a phone, and pushed the move pad down as it arrived. */}
+            <p className="min-h-10 text-center text-sm text-muted md:min-h-5">
               {phase === "armed" &&
                 "Make your first turn to start the clock. It stops by itself when the cube is solved."}
               {phase === "running" && `${moveCount} moves`}

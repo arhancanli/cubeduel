@@ -264,7 +264,7 @@ export function TimerScreen() {
                 Scrambles are read in chunks; stretched tracking destroys the chunking
                 and is the single most common flaw in existing timers.
               */
-              <div className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-lg leading-snug sm:text-xl md:text-2xl">
+              <div className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-lg leading-snug sm:text-xl md:text-2xl lg:min-h-10">
                 {scramble
                   ? scramble.split(" ").map((move, i) => <span key={`${move}-${i}`}>{move}</span>)
                   : null}

@@ -3,6 +3,44 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.15.0 — 2026-09-24
+
+### Pages arrive readable, and nothing jumps
+
+- **Every heading and paragraph was sent invisible.** The fade-in wrapper used
+  on the home page, both beginner guides and Algorithms started each block at
+  opacity 0 and showed it from a script — so on a slow phone the first screen
+  was blank until the JavaScript had downloaded and run, and anything that does
+  not run scripts saw nothing at all. Blocks are now sent visible; only those
+  below the first screen are hidden, in the browser, to fade in when reached.
+  Lighthouse on a throttled phone: home 83 → 95, the solver page 86 → 96.
+- **The timer no longer jumps for a new visitor.** The welcome row for
+  first-timers was added once the page had started, and the scramble grew from
+  one line to two, pushing the clock down twice (layout shift 0.18 on a phone;
+  Google's line for "good" is 0.1). The row is now sent to everyone and hidden
+  before the first paint for anybody who has been here; the scramble's height
+  is held. Now 0.003. On the keyboard page the scramble and the line under
+  the clock grew the same way; both are held too.
+
+### The cube is drawn in the right colours
+
+- **Every 3D cube was drawn darker than chosen.** Three.js converts a colour
+  into linear light, and cubing.js's renderer never converts it back — so
+  Rubik's red #B71234 was drawn as maroon #780104, orange as scarlet, yellow as
+  amber, and red and orange were hard to tell apart on the very cube you check
+  a scramble against. Colours are now stored as they are drawn.
+- **The check that should have caught it read the colour back through the same
+  conversion,** so it passed. It now reads what the renderer draws, and a new
+  check measures pixels: the green face's blue-to-green ratio, which shading
+  cannot change and the fault did (0.20 before, 0.465 now, 0.46 intended).
+
+### Checks
+
+- New browser suite `e2e/vitals.py`: layout shift on a phone for somebody new
+  and somebody returning, across seven pages.
+- The accessibility suite now loads six pages with scripts off and requires
+  that nothing is sent invisible.
+
 ## 1.14.0 — 2026-09-24
 
 ### How to solve a 2×2, checked from every position

@@ -93,6 +93,11 @@ body {
   font-feature-settings: "tnum" 1;
 }
 
+/* The timer's welcome, for returning visitors: gone before the first paint. */
+html[data-welcomed] [data-first-visit] {
+  display: none;
+}
+
 /* Everything except the time recedes while a solve is in progress. */
 .solving-hidden {
   opacity: 0;

@@ -195,6 +195,49 @@ with sync_playwright() as p:
         outline,
     )
 
+    # Content that is only visible once scripts run is invisible to a slow
+    # phone until they do, and to anything that never runs them. The fade-in
+    # wrapper used to send every heading at opacity 0; this reads the page as
+    # sent, scripts off, and requires every block of it to be showing.
+    print("\n== the page as sent, before any script ==")
+    bare = browser.new_context(java_script_enabled=False, viewport={"width": 390, "height": 844}).new_page()
+    for path in ["/", "/solve", "/solve/2x2", "/learn", "/learn/f2l", "/solver"]:
+        bare.goto(BASE + path, wait_until="load")
+        hidden = bare.evaluate(
+            """() => {
+                const out = [];
+                for (const el of document.querySelectorAll('main *')) {
+                    if (!el.textContent.trim()) continue;
+                    if (getComputedStyle(el).opacity === '0') out.push(el.tagName + ': ' + el.textContent.trim().slice(0, 40));
+                }
+                return out;
+            }"""
+        )
+        check(f"{path}: nothing sent invisible", len(hidden) == 0, "; ".join(hidden[:2]))
+
+    # With scripts on, only blocks below the first screen may wait to fade in.
+    print("\n== the first screen, once running ==")
+    phone = browser.new_page(viewport={"width": 390, "height": 844})
+    for path in ["/", "/solve", "/solve/2x2"]:
+        phone.goto(BASE + path, wait_until="load")
+        phone.wait_for_timeout(1500)
+        on_screen_hidden = phone.evaluate(
+            """() => [...document.querySelectorAll('[data-reveal=waiting]')]
+                .filter(el => el.getBoundingClientRect().top < innerHeight).length"""
+        )
+        check(f"{path}: nothing on the first screen is hidden", on_screen_hidden == 0, str(on_screen_hidden))
+        waiting = phone.locator("[data-reveal=waiting]").count()
+        # Scroll the way a person does, a screen at a time.
+        for _ in range(60):
+            phone.mouse.wheel(0, 600)
+            phone.wait_for_timeout(120)
+        phone.wait_for_timeout(1000)
+        left = phone.evaluate(
+            """() => [...document.querySelectorAll('[data-reveal=waiting]')]
+                .filter(el => el.getBoundingClientRect().bottom < 0 || el.getBoundingClientRect().top < innerHeight).length"""
+        )
+        check(f"{path}: blocks below still fade in when reached", left == 0, f"{waiting} waited, {left} never shown")
+
     browser.close()
 
 print("\n" + "=" * 52)

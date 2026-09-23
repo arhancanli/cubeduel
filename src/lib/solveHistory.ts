@@ -1,6 +1,7 @@
 "use client";
 
 import { track } from "./analytics";
+import { HISTORY_KEY } from "./firstVisit";
 import type { PhaseSplit } from "./cfop";
 import { mergeImported, type Merge } from "./cstimerImport";
 import type { Penalty } from "./types";
@@ -14,7 +15,7 @@ import type { Penalty } from "./types";
  * useful until the splits are being kept.
  */
 
-const HISTORY_KEY = "cubeduel.history.v1";
+
 
 /**
  * Capped so a heavy user cannot fill their storage quota and start losing solves

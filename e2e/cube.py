@@ -15,10 +15,12 @@ code:
 Both reported success. Only comparing pixels found either.
 """
 import hashlib
+import io
 import os
 import sys
 
 from playwright.sync_api import sync_playwright
+from PIL import Image
 
 import settle  # noqa: F401 — every page load waits for streamed pages to arrive
 
@@ -77,7 +79,10 @@ def cube_palette(page):
         const seen = new Set();
         obj.traverse(n => { if (n.isMesh) {
             const ms = Array.isArray(n.material) ? n.material : [n.material];
-            for (const m of ms) if (m?.color) seen.add('#' + m.color.getHexString());
+            // The value the renderer draws. Plain getHexString() converts back
+            // from linear light, which this renderer never does — read that way,
+            // a cube drawn in the wrong colours passed.
+            for (const m of ms) if (m?.color) seen.add('#' + m.color.getHexString('srgb-linear'));
         }});
         return [...seen].sort().join(",");
     }""")
@@ -109,7 +114,10 @@ with sync_playwright() as p:
         const seen = new Set();
         obj.traverse(n => { if (n.isMesh) {
             const ms = Array.isArray(n.material) ? n.material : [n.material];
-            for (const m of ms) if (m?.color) seen.add('#' + m.color.getHexString());
+            // The value the renderer draws. Plain getHexString() converts back
+            // from linear light, which this renderer never does — read that way,
+            // a cube drawn in the wrong colours passed.
+            for (const m of ms) if (m?.color) seen.add('#' + m.color.getHexString('srgb-linear'));
         }});
         return [...seen].sort();
     }""")
@@ -209,6 +217,24 @@ with sync_playwright() as p:
         hidden = [h for h in hosts if h["opacity"] == "0" or not h["hasPlayer"]]
         check(f"{path}: all {len(hosts)} cube(s) visible", not hidden,
               f"{len(hidden)} hidden" if hidden else "")
+
+    # The colours on screen must be the colours chosen. Three.js converted each
+    # sticker into linear light and cubing.js's renderer never converted it
+    # back, so every repainted cube was drawn darker, mid-tones crushed: red and
+    # orange became maroon and scarlet. Shading scales a face's channels
+    # together, so the blue-to-green ratio of the green face survives it and
+    # the conversion does not: #009B48 reads 0.46 as chosen, 0.20 as broken.
+    print("\n== the colours drawn are the colours chosen ==")
+    look = browser.new_page(viewport={"width": 1440, "height": 1000})
+    look.goto(BASE + "/notation", wait_until="load")
+    look.wait_for_selector("twisty-player", timeout=30000)
+    look.wait_for_timeout(4000)
+    image = Image.open(io.BytesIO(look.locator("twisty-player").first.screenshot())).convert("RGB")
+    greens = sorted(b / g for r, g, b in image.getdata() if g > 40 and g > 1.5 * r and g > 1.2 * b)
+    check("the green face is drawn", len(greens) > 500, f"{len(greens)} px")
+    if greens:
+        middle = greens[len(greens) // 2]
+        check("in Rubik's green, not a darkened one", 0.38 < middle < 0.55, f"blue/green {middle:.3f}")
 
     browser.close()
 
