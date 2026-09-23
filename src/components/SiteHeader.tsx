@@ -38,7 +38,8 @@ export type NavKey =
   | "clubs"
   | "race"
   | "progress"
-  | "review";
+  | "review"
+  | "solver";
 
 type Icon = { face: FaceKey } | { line: LineIconName };
 
@@ -81,6 +82,7 @@ const IMPROVE: NavLink[] = [
   { key: "progress", href: "/progress", label: "Progress", icon: { line: "chart" } },
   { key: "train", href: "/train", label: "Train", icon: { line: "target" } },
   { key: "learn", href: "/learn", label: "Algorithms", icon: { line: "cases" } },
+  { key: "solver", href: "/solver", label: "Cube solver", icon: { line: "cube" } },
   { key: "solve", href: "/solve", label: "Beginner guide", icon: { line: "book" } },
 ];
 

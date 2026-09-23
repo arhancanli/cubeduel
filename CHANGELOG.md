@@ -3,6 +3,32 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.11.0 — 2026-09-23
+
+### A Rubik's cube solver for the cube in your hands
+
+- **`/solver`**: pick a colour, tap the stickers of a net, press solve. The
+  answer is about 19 moves, arrives in a few hundredths of a second from the
+  site's own two-phase engine, and plays on a 3D cube you can step through.
+- **Mistakes are explained, not rejected.** A colour used ten times says which
+  colours are off ("10 red, 8 white"); a corner with two stickers swapped, a
+  single twisted corner, a lone flipped edge or two swapped pieces each get a
+  sentence saying what to recheck — all caught before anything is solved.
+- **Any colour scheme works**: the centres define it.
+- **A scramble can fill the net**, for anybody who has one instead of a cube.
+- Under the hood: stickers are read into pieces by Kociemba's facelet tables,
+  checked against hand-written sticker positions after single turns and a round
+  trip on every test scramble, with every table entry mutation-tested.
+
+### Search
+
+- The solver page answers one of the largest searches in cubing, with its own
+  FAQ and structured data (a free web application, and its questions).
+- The beginner guide carries structured how-to steps, built from the same data
+  the page renders, and a title that says it is seven steps for beginners.
+- The front page declares the site to search engines; the solver is in the
+  sitemap, the menu (Improve → Cube solver) and the front page's list.
+
 ## 1.10.0 — 2026-09-23
 
 The release that makes it make sense the first time.

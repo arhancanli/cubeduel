@@ -1,5 +1,5 @@
 import { jsonError } from "@/lib/server/apiAuth";
-import { optimalCross, summariseScramble, tableBuildMs } from "@/lib/server/solveService";
+import { optimalCross, summariseFacelets, summariseScramble, tableBuildMs } from "@/lib/server/solveService";
 
 /**
  * How many moves a scramble actually needs.
@@ -33,11 +33,21 @@ function rateLimited(): boolean {
 }
 
 export async function POST(request: Request) {
-  let body: { scramble?: unknown; crossFace?: unknown } | null = null;
+  let body: { scramble?: unknown; crossFace?: unknown; facelets?: unknown } | null = null;
   try {
-    body = (await request.json()) as { scramble?: unknown; crossFace?: unknown };
+    body = (await request.json()) as { scramble?: unknown; crossFace?: unknown; facelets?: unknown };
   } catch {
     return jsonError("Malformed request.", 400);
+  }
+
+  // A cube typed in sticker by sticker, from the solver page. Checked for
+  // length before anything else for the same reason a scramble is.
+  if (typeof body?.facelets === "string") {
+    if (body.facelets.length > 64) return jsonError("That is not a cube.", 400);
+    if (rateLimited()) return jsonError("Too many solves. Try again shortly.", 429);
+    const answer = summariseFacelets(body.facelets);
+    if (!answer.ok) return jsonError(answer.error, 422);
+    return Response.json({ ...answer.summary, tableBuildMs: tableBuildMs() });
   }
 
   const scramble = body?.scramble;

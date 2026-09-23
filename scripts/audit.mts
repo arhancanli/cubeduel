@@ -483,6 +483,7 @@ console.log("Every route that solves carries the solver's tables");
     "/api/duel/finish": "imports server/duels for finishDuel; only startDuel solves",
     "/duel": "imports server/duels for duelRecord only",
     "/api/home": "imports server/duels for duelRecord only",
+    "/solver": "imports the cube model to fill the net from a scramble; the solve itself is /api/solve",
   };
 
   const missing = [...needed].filter(

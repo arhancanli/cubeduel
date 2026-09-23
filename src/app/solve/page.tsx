@@ -6,11 +6,13 @@ import { KeyMapHint } from "@/components/KeyMapHint";
 import { Reveal } from "@/components/Reveal";
 import { SiteHeader } from "@/components/SiteHeader";
 import { REGION_LABEL, SOLVE_STEPS, type SolveStep } from "@/lib/beginner";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "How to solve a Rubik's cube",
+  title: "How to solve a Rubik's cube — beginner's method in 7 steps",
   description:
-    "Seven steps, from a scrambled cube to a solved one. Every algorithm runs on a cube you can turn, and every promise about what it leaves alone is checked against the puzzle.",
+    "Learn to solve a Rubik's cube in seven steps, one layer at a time. Every algorithm runs on a 3D cube you can turn and step through, and every step says what it leaves alone. Free, for complete beginners.",
+  alternates: { canonical: "/solve" },
 };
 
 /**
@@ -29,6 +31,27 @@ export default function SolvePage() {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="solve" />
+      {/* The guide as structured steps, so a search result can show them. Built
+          from the same SOLVE_STEPS the page renders, never typed twice. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            name: "How to solve a Rubik's cube",
+            description: "The beginner's method: seven steps, one layer at a time.",
+            totalTime: "PT3H",
+            step: SOLVE_STEPS.map((step, i) => ({
+              "@type": "HowToStep",
+              position: i + 1,
+              name: step.title,
+              text: step.goal,
+              url: `${SITE_URL}/solve#${step.slug}`,
+            })),
+          }).replace(/</g, "\\u003c"),
+        }}
+      />
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-6 pb-24 pt-8">
         <Reveal className="flex flex-col gap-4">

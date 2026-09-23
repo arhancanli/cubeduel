@@ -19,7 +19,7 @@ import sys
 from playwright.sync_api import sync_playwright
 
 BASE = os.environ.get("BASE", "http://localhost:3000")
-PAGES = ["/", "/play", "/daily", "/train", "/timer", "/progress", "/review", "/leaderboard", "/ranked", "/duel"]
+PAGES = ["/", "/play", "/daily", "/train", "/timer", "/progress", "/review", "/solver", "/leaderboard", "/ranked", "/duel"]
 FAILS = []
 
 
@@ -58,6 +58,11 @@ with sync_playwright() as p:
                 for (const el of document.querySelectorAll('button, a[href]')) {
                   const rect = el.getBoundingClientRect();
                   if (rect.width === 0 && rect.height === 0) continue;
+                  // Inside a closed <details> (and not its summary) a control is
+                  // not on screen: Chrome keeps its box but innerText reads "",
+                  // so it would look nameless while being unreachable anyway.
+                  const shut = el.closest('details:not([open])');
+                  if (shut && !el.closest('summary')) continue;
                   const name = (el.innerText || '').trim()
                     || el.getAttribute('aria-label')
                     || el.getAttribute('title')
@@ -141,7 +146,7 @@ with sync_playwright() as p:
           str(labelled.get("Compete")))
     check("everything that looks back at your solves is under Improve",
           set(labelled.get("Improve", []))
-          == {"Review", "Progress", "Train", "Algorithms", "Beginner guide"},
+          == {"Review", "Progress", "Train", "Algorithms", "Cube solver", "Beginner guide"},
           str(labelled.get("Improve")))
     check("other people are under Community",
           set(labelled.get("Community", [])) == {"Leaderboard", "Clubs"},

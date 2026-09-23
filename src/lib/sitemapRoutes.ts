@@ -25,6 +25,9 @@ export const INDEXABLE: IndexableRoute[] = [
   // "How to solve a Rubik's cube" is the question; /solve is the answer, and it
   // is the only page here that is useful to a person who cannot cube at all.
   { path: "/solve", changeFrequency: "monthly", priority: 0.95 },
+  // "Rubik's cube solver" is one of the largest searches in cubing, and this
+  // answers it with the site's own engine.
+  { path: "/solver", changeFrequency: "monthly", priority: 0.95 },
   { path: "/learn", changeFrequency: "monthly", priority: 0.9 },
 
   { path: "/play", changeFrequency: "monthly", priority: 0.9 },

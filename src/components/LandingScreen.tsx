@@ -276,6 +276,7 @@ function ReturningStats({ history }: { history: StoredSolve[] }) {
 
 const EVERYTHING = [
   { href: "/solve", title: "Learn to solve", body: "Seven steps from never having solved one, each algorithm on a cube you can turn." },
+  { href: "/solver", title: "Cube solver", body: "Stuck? Enter your cube's colours and get it solved in about 19 moves." },
   { href: "/learn", title: "All 78 algorithms", body: "Every OLL and PLL case, grouped by what you see on top, each checked against the puzzle." },
   { href: "/train", title: "Drill your cases", body: "The cases you're slow on come back sooner, until each one is mastered." },
   { href: "/rush", title: "Rush", body: "Beat a target built from your own pace. It tightens every time you do. Three misses ends it." },

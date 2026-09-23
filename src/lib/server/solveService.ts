@@ -1,7 +1,8 @@
 import "server-only";
 
 import { isValidScramble } from "../scrambleParam";
-import { buildTables, solveScramble, type SolveResult } from "../solver";
+import { buildTables, solve, solveScramble, type SolveResult } from "../solver";
+import { faceletsToCube } from "../solver/facelets";
 import { buildCrossTable, crossDistance } from "../crossSolver";
 import { derivePieceGroups } from "../cfop";
 
@@ -117,6 +118,39 @@ export function summariseScramble(scramble: string): SolveSummary | null {
     solution: result.moves,
     cached: false,
     computeMs: result.elapsedMs,
+  };
+}
+
+/**
+ * The same answer for a cube typed in as its 54 stickers — the solver page,
+ * where somebody has a cube in their hands and no idea how it got that way.
+ *
+ * A sticker string that no real cube could show comes back as a sentence saying
+ * why, not as a failure: the person typed it in by hand and needs to know which
+ * sticker to look at again.
+ */
+export function summariseFacelets(
+  facelets: string,
+): { ok: true; summary: SolveSummary } | { ok: false; error: string } {
+  const read = faceletsToCube(facelets);
+  if (!read.ok) return read;
+
+  const key = `facelets:${facelets.replace(/\s+/g, "")}`;
+  const hit = cache.get(key);
+  if (hit) {
+    return { ok: true, summary: { optimalMoves: hit.length, solution: hit.moves, cached: true, computeMs: 0 } };
+  }
+
+  const tables = buildTables();
+  lastTableBuildMs = tables.buildMs;
+  // The same settings as a scramble, for the same reason: computed once per
+  // cube, so length is worth more than the milliseconds.
+  const result = solve(read.cube, { targetLength: 19, timeBudgetMs: 450 });
+  if (!result) return { ok: false, error: "The solver ran out of time on this one. Try again." };
+  remember(key, result);
+  return {
+    ok: true,
+    summary: { optimalMoves: result.length, solution: result.moves, cached: false, computeMs: result.elapsedMs },
   };
 }
 
