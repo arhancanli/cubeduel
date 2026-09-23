@@ -105,7 +105,7 @@ export function AlgDemo({
         <button
           type="button"
           onClick={toggle}
-          className="rounded-lg bg-foreground px-4 py-2 text-xs font-medium text-background transition-opacity hover:opacity-90"
+          className="btn-go px-4 py-2 text-xs"
         >
           {atEnd ? "Again" : playing ? "Pause" : "Watch it"}
         </button>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Reveal } from "@/components/Reveal";
+import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import { MAX_CLUBS_PER_PERSON, slugFromName } from "@/lib/club";
 
@@ -106,15 +107,14 @@ export function ClubsScreen({
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="clubs" />
 
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-6 pb-24 pt-8">
-        <Reveal className="flex flex-col gap-3">
-          <h1 className="text-3xl font-medium leading-tight tracking-tight">Clubs</h1>
-          <p className="max-w-lg text-sm leading-relaxed text-muted">
+      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-6 lg:pt-14">
+        <Reveal>
+          <PageHero eyebrow="Community" title="Clubs">
             A board for the people you actually cube with — your school, your
             university, your group chat. Ranked by the same verified solves as
             the global ladder, because a private board with friendlier numbers
             would not be worth looking at.
-          </p>
+          </PageHero>
         </Reveal>
 
         {error ? (
@@ -179,7 +179,7 @@ export function ClubsScreen({
                 <button
                   type="submit"
                   disabled={busy !== null}
-                  className="rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="btn-go px-6 py-3 text-sm disabled:opacity-50"
                 >
                   {busy === "join" ? "Joining…" : "Join"}
                 </button>

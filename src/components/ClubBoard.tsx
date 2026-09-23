@@ -30,7 +30,7 @@ export function ClubBoard({
   return (
     <section className="flex flex-col gap-5">
       <header className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-lg font-medium tracking-tight">Members</h2>
+        <h2 className="text-lg tracking-tight">Members</h2>
         <p className="text-xs text-muted-dim">
           {/* The event's name, not its id. `333` is what the database calls it
               and nobody else does. */}

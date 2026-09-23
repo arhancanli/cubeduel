@@ -3,11 +3,20 @@ import { HistorySync } from "@/components/HistorySync";
 import { SessionTracker } from "@/components/SessionTracker";
 import { SITE_URL } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Archivo, Figtree, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Display: Archivo, with its width axis, for headings, buttons and the clock —
+// a scoreboard voice. Body: Figtree, open and easy at length. Notation stays in
+// Geist Mono, where R and R' must never be mistaken for each other.
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
+  axes: ["wdth"],
+});
+
+const figtree = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
 });
 
@@ -55,7 +64,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0b",
+  themeColor: "#0e1320",
   // The timer is a full-screen surface; letting it zoom on double-tap would fire
   // mid-solve on mobile.
   maximumScale: 1,
@@ -68,7 +77,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // nothing about signing in ships JavaScript to somebody who never does.
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${archivo.variable} ${figtree.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

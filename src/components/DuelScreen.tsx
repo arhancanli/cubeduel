@@ -217,7 +217,7 @@ export function DuelScreen({
             <div className="flex flex-col items-center gap-2">
               <div
                 ref={displayRef}
-                className={`tnum text-6xl font-medium leading-none tracking-tighter transition-colors sm:text-7xl ${
+                className={`tnum font-display text-6xl font-bold leading-none tracking-tighter transition-colors sm:text-7xl ${
                   result?.outcome === "win"
                     ? "text-ready"
                     : result?.outcome === "loss"
@@ -265,7 +265,7 @@ export function DuelScreen({
               <button
                 type="button"
                 onClick={() => void session.startRound()}
-                className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                className="btn-go px-5 py-2.5 text-sm"
               >
                 Race again
               </button>
@@ -315,7 +315,7 @@ function OpponentPicker({
 
       <div className="flex w-full max-w-2xl flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-medium tracking-tight">Or race a bot</h1>
+        <h1 className="text-2xl tracking-tight">Or race a bot</h1>
         <p className="text-sm text-muted">
           Always available, and never a wait. Every bot races the cube you race,
           on a real solution to that exact scramble, at a pace fixed before you
@@ -354,7 +354,7 @@ function OpponentPicker({
       <button
         type="button"
         onClick={onStart}
-        className="self-start rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+        className="btn-go self-start px-6 py-2.5 text-sm"
       >
         Race {selected.name}
       </button>

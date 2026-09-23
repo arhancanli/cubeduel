@@ -5,38 +5,47 @@
  * and a bright field behind a huge number is fatiguing. Near-black rather than
  * pure black — #000 makes white text bloom on OLED.
  */
+/*
+ * Dark-first and deliberately so: a speedcuber stares at this screen for hours,
+ * and a bright field behind a huge number is fatiguing. The ground is a deep
+ * blue-black rather than neutral grey — the colour of a timer mat under a
+ * competition table — so the six sticker colours read as colours, not as neon
+ * on nothing.
+ */
 :root {
-  --background: #0a0a0b;
-  --surface: #141417;
-  --surface-hi: #1c1c21;
-  --border: #26262c;
-  --foreground: #f2f2f3;
-  --muted: #a3a3ad;
+  --background: #0e1320;
+  --surface: #161c2b;
+  --surface-hi: #1e2638;
+  --border: #2a344a;
+  --foreground: #eef1f6;
+  --muted: #a1aabb;
   /*
-   * Raised from #55555f, which measured 2.69:1 against the background — below the
-   * 4.5:1 floor for body text. This token carries every keycap in the learning
-   * legend and every caption, including the lines that separate measured fact from
-   * interpretation. Those are the sentences that most need to be readable.
+   * 5.3:1 against the ground. This token carries every keycap in the learning
+   * legend and every caption, including the lines that separate measured fact
+   * from interpretation, so it must clear the 4.5:1 floor for body text.
    */
-  --muted-dim: #85858f;
-  /* Bar fills: 5:1 against the track, so a chart drawn in it can actually be read. */
-  --bar: #6d6d78;
+  --muted-dim: #8a93a7;
+  /* Bar fills: readable against the track. */
+  --bar: #6f7a92;
 
   --ready: #34d399;
   --holding: #fbbf24;
   --danger: #f87171;
 
-  /* Depth.
+  /* The six stickers, standard Western scheme. See src/lib/modes.ts. */
+  --sticker-white: #f2f2ec;
+  --sticker-yellow: #ffd43b;
+  --sticker-red: #ef4b4f;
+  --sticker-orange: #ff8b2c;
+  --sticker-blue: #3e7bfa;
+  --sticker-green: #2bc46a;
 
-     This interface is deliberately flat, and mostly should stay that way — a
-     timer with drop shadows on it is a timer somebody stopped taking seriously.
-     But a cube is an object, and an object floating on a void reads as a
-     screenshot of an object. These are the two tools used to fix that, and
-     nothing else: one step of luminance, and light falling off around a thing.
+  /* The one primary action per screen: green, the face you are looking at. */
+  --go: #2bc46a;
+  --go-hover: #33d174;
+  --go-edge: #1c8a4a;
+  --on-go: #062312;
 
-     Both are tuned for a dark ground, where a black shadow does almost nothing
-     and separation has to come from the surface being *lighter* than what is
-     behind it. */
   --elevation-1: 0 1px 2px rgb(0 0 0 / 0.45);
   --elevation-2:
     0 8px 24px -8px rgb(0 0 0 / 0.7),
@@ -55,14 +64,22 @@
   --color-ready: var(--ready);
   --color-holding: var(--holding);
   --color-danger: var(--danger);
-  --font-sans: var(--font-geist-sans);
+  --color-go: var(--go);
+  --color-sticker-white: var(--sticker-white);
+  --color-sticker-yellow: var(--sticker-yellow);
+  --color-sticker-red: var(--sticker-red);
+  --color-sticker-orange: var(--sticker-orange);
+  --color-sticker-blue: var(--sticker-blue);
+  --color-sticker-green: var(--sticker-green);
+  --font-sans: var(--font-figtree);
+  --font-display: var(--font-archivo);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-figtree), system-ui, sans-serif;
   /* The spacebar must never scroll the page or select text mid-solve. */
   overscroll-behavior: none;
 }
@@ -148,5 +165,145 @@ body {
 
   .lift:hover {
     transform: translateY(-2px);
+  }
+}
+
+/* Headings speak in the display face: Archivo, a touch wide, set heavy — the
+   voice of a scoreboard. Body copy stays in Figtree, which is easier to read at
+   length. One rule here rather than a class on sixty headings. */
+@layer base {
+h1,
+h2,
+h3 {
+  font-family: var(--font-archivo), var(--font-figtree), system-ui, sans-serif;
+  font-stretch: 108%;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  font-weight: 800;
+}
+
+h2 {
+  font-weight: 750;
+}
+
+h3 {
+  font-weight: 650;
+}
+}
+
+.font-display {
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-stretch: 108%;
+}
+
+/* In the components layer so that utilities on the same element (padding,
+   width, `hidden`) still win — unlayered CSS would beat every Tailwind class. */
+@layer components {
+/* Buttons that feel like keys.
+
+   A 4px darker edge along the bottom, which the press removes. It is the one
+   piece of skeuomorphism on the site, and it is on the controls you press
+   rather than on content you read. */
+.btn-go,
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.75rem;
+  font-family: var(--font-archivo), system-ui, sans-serif;
+  font-stretch: 104%;
+  font-weight: 700;
+  transition:
+    transform 90ms ease-out,
+    box-shadow 90ms ease-out,
+    background-color 150ms ease;
+}
+
+.btn-go {
+  background: var(--go);
+  color: var(--on-go);
+  box-shadow: inset 0 -4px 0 var(--go-edge);
+}
+
+.btn-go:hover {
+  background: var(--go-hover);
+}
+
+.btn-secondary {
+  background: var(--surface-hi);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  box-shadow: inset 0 -3px 0 rgb(0 0 0 / 0.35);
+}
+
+.btn-secondary:hover {
+  background: color-mix(in oklab, var(--surface-hi) 80%, var(--foreground) 8%);
+}
+
+.btn-go:active:not(:disabled),
+.btn-secondary:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: inset 0 -1px 0 var(--go-edge);
+}
+
+.btn-secondary:active:not(:disabled) {
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.35);
+}
+
+.btn-go:disabled,
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid var(--sticker-blue);
+  outline-offset: 2px;
+}
+
+}
+
+/* The shell.
+
+   From `lg` the nav is a fixed sidebar and the page moves over for it. Below
+   `lg` it is a drawer, hidden until Menu opens it, and a tab bar sits along the
+   bottom — so the page keeps room beneath its last line for that bar. */
+body:has(.shell-rail) {
+  padding-bottom: calc(64px + env(safe-area-inset-bottom));
+}
+
+@media (min-width: 1024px) {
+  body:has(.shell-rail) {
+    padding-left: 248px;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 1023.98px) {
+  .shell-rail {
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform 220ms cubic-bezier(0.2, 0, 0, 1),
+      opacity 200ms ease,
+      visibility 0s linear 220ms;
+    box-shadow: var(--elevation-2);
+  }
+
+  .shell-rail[data-open="true"] {
+    transform: none;
+    visibility: visible;
+    transition:
+      transform 220ms cubic-bezier(0.2, 0, 0, 1),
+      opacity 200ms ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-rail,
+  .shell-rail[data-open="true"] {
+    transition: none;
   }
 }

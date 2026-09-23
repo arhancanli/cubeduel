@@ -119,12 +119,12 @@ async function send(message: Message): Promise<SendResult> {
 function shell(heading: string, body: string, action?: { label: string; url: string }): string {
   const button = action
     ? `<p style="margin:32px 0;">
-         <a href="${action.url}" style="background:#f2f2f3;color:#0a0a0b;border-radius:8px;padding:12px 24px;text-decoration:none;font-weight:500;display:inline-block;">${action.label}</a>
+         <a href="${action.url}" style="background:#2bc46a;color:#062312;border-radius:10px;padding:12px 24px;text-decoration:none;font-weight:700;display:inline-block;">${action.label}</a>
        </p>
        <p style="color:#8a8a95;font-size:13px;line-height:1.6;">Or paste this into your browser:<br><span style="color:#8a8a95;word-break:break-all;">${action.url}</span></p>`
     : "";
 
-  return `<div style="background:#0a0a0b;color:#f2f2f3;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;padding:40px 24px;">
+  return `<div style="background:#0e1320;color:#eef1f6;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;padding:40px 24px;">
   <div style="max-width:480px;margin:0 auto;">
     <p style="font-size:15px;font-weight:600;letter-spacing:-0.01em;margin:0 0 32px;">cubeduel</p>
     <h1 style="font-size:22px;font-weight:500;letter-spacing:-0.02em;margin:0 0 16px;">${heading}</h1>

@@ -6,7 +6,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CubeView } from "@/components/CubeView";
 import { DailyMemory, readDailyStats } from "@/components/DailyMemory";
 import { MovePad } from "@/components/MovePad";
+import { Glyph } from "@/components/Glyph";
 import { SiteHeader } from "@/components/SiteHeader";
+import { faceFor } from "@/lib/modes";
 import {
   buildDailyShare,
   formatCountdown,
@@ -272,7 +274,15 @@ export function DailyRound({
     return (
       <Shell dayNumber={dayNumber} dayKey={dayKey}>
         <div className="flex flex-col items-center gap-6 text-center">
-          <p className="max-w-sm text-sm leading-relaxed text-muted">
+          {/* The page's name, drawn large. Not a heading: the h1 above already
+              names the page for assistive tech, and a second would repeat it. */}
+          <div aria-hidden="true" className="flex flex-col items-center gap-4">
+            <Glyph pattern={faceFor("daily").glyph} sticker="white" size={44} />
+            <p className="font-display text-5xl font-extrabold tracking-tight sm:text-6xl">
+              Daily #{dayNumber}
+            </p>
+          </div>
+          <p className="max-w-md text-base leading-relaxed text-muted">
             One attempt. The scramble is the same for everyone today, and your time is
             final the moment the timer starts — leaving mid-solve counts as a DNF.
           </p>
@@ -284,7 +294,7 @@ export function DailyRound({
                   setMode("hand");
                   setStage("solving");
                 }}
-                className="rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                className="btn-go px-6 py-3 text-sm"
               >
                 Solve with my cube
               </button>
@@ -294,7 +304,7 @@ export function DailyRound({
                   setMode("keyboard");
                   setStage("solving");
                 }}
-                className="rounded-lg border border-border px-6 py-3 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+                className="btn-secondary px-6 py-3 text-sm"
               >
                 <span className="md:hidden">Solve here</span>
                 <span className="hidden md:inline">Solve on the keyboard</span>
@@ -364,7 +374,7 @@ export function DailyRound({
           />
           <div
             ref={displayRef as React.RefObject<HTMLDivElement>}
-            className={`tnum text-7xl font-medium tracking-tighter transition-colors duration-100 sm:text-8xl ${timeColor}`}
+            className={`tnum font-display text-7xl font-bold tracking-tighter transition-colors duration-100 sm:text-8xl ${timeColor}`}
           >
             0.00
           </div>
@@ -396,7 +406,7 @@ export function DailyRound({
     <Shell dayNumber={dayNumber} dayKey={dayKey}>
       <div className="flex flex-col items-center gap-8 text-center">
         <div className="flex flex-col items-center gap-2">
-          <span className="tnum text-6xl font-medium tracking-tighter sm:text-7xl">
+          <span className="tnum font-display text-6xl font-bold tracking-tighter sm:text-7xl">
             {effective === null ? "DNF" : formatMs(effective)}
           </span>
           <span className="text-xs uppercase tracking-widest text-muted-dim">
@@ -440,7 +450,7 @@ export function DailyRound({
         <button
           type="button"
           onClick={share}
-          className="rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          className="btn-go px-6 py-3 text-sm"
         >
           {copied ? "Copied" : "Share result"}
         </button>

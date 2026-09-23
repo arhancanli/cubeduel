@@ -32,7 +32,7 @@ export default function SolvePage() {
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-6 pb-24 pt-8">
         <Reveal className="flex flex-col gap-4">
-          <h1 className="text-3xl font-medium leading-tight tracking-tight">
+          <h1 className="text-3xl leading-tight tracking-tight">
             How to solve a Rubik&rsquo;s cube
           </h1>
           <p className="max-w-xl text-sm leading-relaxed text-muted">
@@ -86,7 +86,7 @@ export default function SolvePage() {
 
         {/* ---------------------------------------------------------------- */}
         <Reveal className="flex flex-col gap-4 border-t border-border pt-10">
-          <h2 className="text-lg font-medium tracking-tight">Once you can do it</h2>
+          <h2 className="text-lg tracking-tight">Once you can do it</h2>
           <p className="max-w-xl text-sm leading-relaxed text-muted">
             You are solving a cube. The next thing is not more algorithms — it is
             doing these ones without stopping to think, which is what turns three
@@ -105,7 +105,7 @@ export default function SolvePage() {
           <div className="flex flex-wrap gap-3 pt-1">
             <Link
               href="/play"
-              className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go px-5 py-2.5 text-sm"
             >
               Try it on a cube
             </Link>
@@ -151,7 +151,7 @@ function Step({ step }: { step: SolveStep }) {
         <div className="flex flex-col gap-2">
           <div className="flex items-baseline gap-3">
             <span className="font-mono text-sm text-muted-dim">{step.number}</span>
-            <h2 className="text-xl font-medium tracking-tight">{step.title}</h2>
+            <h2 className="text-xl tracking-tight">{step.title}</h2>
           </div>
           <p className="max-w-xl text-sm leading-relaxed text-muted">{step.goal}</p>
         </div>
@@ -172,7 +172,7 @@ function Step({ step }: { step: SolveStep }) {
           >
             {step.algorithms.map((a) => (
               <div key={a.name} className="panel flex flex-col gap-3 rounded-xl p-4">
-                <h3 className="text-sm font-medium">{a.name}</h3>
+                <h3 className="text-sm">{a.name}</h3>
                 {/* The algorithm is not printed twice. The move chips inside the
                     demo are the algorithm, and they also say where you are in
                     it — a second static copy above them was duplication. */}

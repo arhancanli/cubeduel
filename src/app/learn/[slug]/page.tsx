@@ -60,7 +60,7 @@ export default async function CasePage(props: PageProps<"/learn/[slug]">) {
           </Link>
 
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <h1 className="text-3xl font-medium tracking-tight">{study.label}</h1>
+            <h1 className="text-3xl tracking-tight">{study.label}</h1>
             {study.name && study.name !== study.label.split(" ")[1] ? (
               <span className="text-lg text-muted">{study.name}</span>
             ) : null}

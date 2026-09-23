@@ -36,7 +36,7 @@ export default async function LearnPage() {
 
       <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-14 px-6 pb-24 pt-8">
         <Reveal className="flex flex-col gap-3">
-          <h1 className="text-3xl font-medium leading-tight tracking-tight">
+          <h1 className="text-3xl leading-tight tracking-tight">
             The last layer
           </h1>
           <p className="max-w-xl text-sm leading-relaxed text-muted">
@@ -98,7 +98,7 @@ function Group({
     <Reveal className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
         <div className="flex items-baseline gap-3">
-          <h2 className="text-lg font-medium tracking-tight">{title}</h2>
+          <h2 className="text-lg tracking-tight">{title}</h2>
           <span className="font-mono text-xs tabular-nums text-muted-dim">{count}</span>
         </div>
         <p className="max-w-lg text-xs leading-relaxed text-muted-dim">{note}</p>

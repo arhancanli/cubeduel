@@ -25,10 +25,10 @@ export const alt = "cubeduel daily — one scramble, one attempt, the same cube 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const BACKGROUND = "#0a0a0b";
-const FOREGROUND = "#f2f2f3";
-const MUTED = "#a3a3ad";
-const DIM = "#85858f";
+const BACKGROUND = "#0e1320";
+const FOREGROUND = "#eef1f6";
+const MUTED = "#a1aabb";
+const DIM = "#8a93a7";
 
 export default function DailyOpengraphImage() {
   // Rendered per request, so the number is today's rather than the day of the

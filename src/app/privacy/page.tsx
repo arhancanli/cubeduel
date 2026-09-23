@@ -21,11 +21,11 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="play" />
+      <SiteHeader active="home" />
 
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 pb-24 pt-10">
         <header className="flex flex-col gap-3">
-          <h1 className="text-3xl font-medium tracking-tight">Privacy</h1>
+          <h1 className="text-3xl tracking-tight">Privacy</h1>
           <p className="text-sm leading-relaxed text-muted">
             Short, specific, and checkable. cubeduel is open source, so every
             claim here points at a file you can read rather than asking you to
@@ -133,7 +133,7 @@ export default function PrivacyPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-lg font-medium tracking-tight">{title}</h2>
+      <h2 className="text-lg tracking-tight">{title}</h2>
       <div className="flex flex-col gap-3 text-sm leading-relaxed text-muted [&_code]:rounded [&_code]:bg-surface-hi [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-xs">
         {children}
       </div>

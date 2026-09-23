@@ -67,7 +67,7 @@ export function ResetScreen({ token }: { token: string | null }) {
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-8 px-6 pb-24 pt-12">
         {!token ? (
           <Reveal className="flex flex-col gap-3">
-            <h1 className="text-2xl font-medium tracking-tight">
+            <h1 className="text-2xl tracking-tight">
               That link is incomplete
             </h1>
             <p className="text-sm leading-relaxed text-muted">
@@ -81,7 +81,7 @@ export function ResetScreen({ token }: { token: string | null }) {
           </Reveal>
         ) : done ? (
           <Reveal className="flex flex-col gap-4">
-            <h1 className="text-2xl font-medium tracking-tight">Password changed</h1>
+            <h1 className="text-2xl tracking-tight">Password changed</h1>
             <p className="text-sm leading-relaxed text-muted">
               Every device that was signed in has been signed out, including this
               one. Sign in with your new password.
@@ -89,7 +89,7 @@ export function ResetScreen({ token }: { token: string | null }) {
             <button
               type="button"
               onClick={() => router.push("/sign-in")}
-              className="self-start rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go self-start px-6 py-3 text-sm"
             >
               Sign in
             </button>
@@ -97,7 +97,7 @@ export function ResetScreen({ token }: { token: string | null }) {
         ) : (
           <>
             <Reveal className="flex flex-col gap-2">
-              <h1 className="text-3xl font-medium leading-tight tracking-tight">
+              <h1 className="text-3xl leading-tight tracking-tight">
                 Choose a new password
               </h1>
               <p className="text-sm leading-relaxed text-muted">
@@ -138,7 +138,7 @@ export function ResetScreen({ token }: { token: string | null }) {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="btn-go px-6 py-3 text-sm disabled:opacity-50"
                 >
                   {busy ? "Saving…" : "Set password"}
                 </button>

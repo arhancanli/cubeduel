@@ -143,7 +143,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
         <div className="flex flex-col items-center gap-2">
           <div
             ref={displayRef}
-            className={`tnum text-6xl font-medium leading-none tracking-tighter transition-colors sm:text-7xl ${
+            className={`tnum font-display text-6xl font-bold leading-none tracking-tighter transition-colors sm:text-7xl ${
               phase === "solved" ? "text-ready" : "text-foreground"
             }`}
           >
@@ -172,7 +172,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
           <button
             type="button"
             onClick={() => void session.startRound()}
-            className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            className="btn-go px-5 py-2.5 text-sm"
           >
             {phase === "solved" ? "Next scramble" : "New scramble"}
           </button>
@@ -191,7 +191,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
                   })
                   .catch(() => {});
               }}
-              className="rounded-lg border border-border px-5 py-2.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+              className="btn-secondary px-5 py-2.5 text-sm"
             >
               {copied ? "Link copied" : "Challenge a friend"}
             </button>
@@ -200,7 +200,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
             <button
               type="button"
               onClick={() => void session.connectCube()}
-              className="rounded-lg border border-border px-5 py-2.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+              className="btn-secondary px-5 py-2.5 text-sm"
             >
               Connect smart cube
             </button>

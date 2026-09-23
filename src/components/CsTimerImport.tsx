@@ -190,7 +190,7 @@ function Preview({
         <button
           type="button"
           onClick={() => onCommit(parsed)}
-          className="rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          className="btn-go px-4 py-2 text-sm"
         >
           Import {total.toLocaleString()} solve{total === 1 ? "" : "s"}
         </button>

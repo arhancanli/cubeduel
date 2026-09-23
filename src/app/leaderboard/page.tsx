@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
 import { ESTABLISHED_DEVIATION, WINDOW_SIZE, msForRating } from "@/lib/rating";
@@ -56,7 +57,7 @@ export default async function LeaderboardPage() {
     return (
       <Shell>
         <section className="w-full">
-          <h2 className="mb-3 text-lg font-medium tracking-tight">
+          <h2 className="mb-3 text-lg tracking-tight">
             The boards are not loading.
           </h2>
           <p className="max-w-xl text-sm leading-relaxed text-muted">
@@ -73,7 +74,7 @@ export default async function LeaderboardPage() {
     <Shell>
       <section className="w-full">
         <header className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg font-medium tracking-tight">Global · 3x3 keyboard</h2>
+          <h2 className="text-lg tracking-tight">Global · 3x3 keyboard</h2>
           <p className="text-xs text-muted-dim">
             Established ratings only (±{ESTABLISHED_DEVIATION} or better)
           </p>
@@ -127,7 +128,7 @@ export default async function LeaderboardPage() {
 
       <section className="w-full">
         <header className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg font-medium tracking-tight">Rush</h2>
+          <h2 className="text-lg tracking-tight">Rush</h2>
           <p className="text-xs text-muted-dim">Best run · every event</p>
         </header>
 
@@ -170,7 +171,7 @@ export default async function LeaderboardPage() {
 
       <section className="w-full">
         <header className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-lg font-medium tracking-tight">Today&apos;s daily</h2>
+          <h2 className="text-lg tracking-tight">Today&apos;s daily</h2>
           <p className="text-xs text-muted-dim">One attempt each · day {day}</p>
         </header>
 
@@ -226,10 +227,13 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="leaderboard" />
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-6 pb-20 pt-6">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-4 pb-20 pt-6 sm:px-6 lg:pt-14">
         {/* A visible heading, not a hidden one: this page is a document rather
             than a solving surface, and it opened on an h2 with nothing above it. */}
-        <h1 className="text-2xl font-medium tracking-tight">Leaderboard</h1>
+        <PageHero eyebrow="Compete" title="Leaderboard">
+          Every time on this page was replayed by the server against the scramble
+          it was issued for.
+        </PageHero>
         {children}
       </div>
     </main>
@@ -238,7 +242,7 @@ function Shell({ children }: { children: React.ReactNode }) {
 
 function Empty({ children }: { children: React.ReactNode }) {
   return (
-    <p className="rounded-lg border border-dashed border-border px-5 py-8 text-center text-sm text-muted">
+    <p className="rounded-2xl border border-dashed border-border px-5 py-8 text-center text-sm text-muted">
       {children}
     </p>
   );

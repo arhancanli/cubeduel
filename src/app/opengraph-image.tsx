@@ -23,11 +23,11 @@ export const contentType = "image/png";
 
 // Matches globals.css. Repeated rather than imported because this renders in a
 // separate image runtime that never loads the stylesheet.
-const BACKGROUND = "#0a0a0b";
-const FOREGROUND = "#f2f2f3";
-const MUTED = "#a3a3ad";
-const DIM = "#85858f";
-const BORDER = "#26262c";
+const BACKGROUND = "#0e1320";
+const FOREGROUND = "#eef1f6";
+const MUTED = "#a1aabb";
+const DIM = "#8a93a7";
+const BORDER = "#2a344a";
 
 export default function OpengraphImage() {
   const scale = [5, 15, 30].map((seconds) => ({

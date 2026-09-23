@@ -79,7 +79,7 @@ export default async function SolvePage(props: PageProps<"/s/[id]">) {
         {/* ---------------------------------------------------------------- */}
         <header className="flex flex-col gap-3">
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-            <h1 className="tnum font-mono text-4xl font-medium tracking-tight">
+            <h1 className="tnum font-mono text-4xl tracking-tight">
               {dnf ? "DNF" : formatMs(solve.durationMs)}
             </h1>
             {dnf ? (

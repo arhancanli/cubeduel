@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { RushScreen } from "@/components/RushScreen";
-import { SiteHeader } from "@/components/SiteHeader";
+import { ModeGate } from "@/components/ModeGate";
 import { EVENT_IDS, type EventId } from "@/lib/events";
 import { ensureProfile } from "@/lib/server/profiles";
 import { bestRun } from "@/lib/server/rush";
@@ -29,17 +28,9 @@ export default async function RushPage() {
   const profile = await ensureProfile();
   if (!profile) {
     return (
-      <Gate title="Sign in to run.">
+      <Gate title="Sign in to run." signIn="/rush">
         Rush builds its target from your own pace, which means it needs to know
         whose pace it is.
-        <span className="mt-5 block">
-          <Link
-            href="/timer"
-            className="rounded-lg border border-border px-4 py-2 text-xs text-muted transition-colors hover:border-muted-dim hover:text-foreground"
-          >
-            Practice instead
-          </Link>
-        </span>
       </Gate>
     );
   }
@@ -59,16 +50,18 @@ export default async function RushPage() {
   return <RushScreen bests={bests} />;
 }
 
-function Gate({ title, children }: { title: string; children: React.ReactNode }) {
+function Gate({
+  title,
+  children,
+  signIn,
+}: {
+  title: string;
+  children?: React.ReactNode;
+  signIn?: string;
+}) {
   return (
-    <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="rush" />
-      <div className="flex flex-1 items-center justify-center px-6 pb-24">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
-          <p className="mt-4 text-sm leading-relaxed text-muted">{children}</p>
-        </div>
-      </div>
-    </main>
+    <ModeGate face="rush" active="rush" title={title} signIn={signIn}>
+      {children}
+    </ModeGate>
   );
 }

@@ -125,7 +125,7 @@ export function ChallengeScreen({
 
       <div className="flex flex-1 flex-col items-center gap-6 px-6 pb-12">
         <div className={`text-center ${solving ? "opacity-0" : "opacity-100 transition-opacity"}`}>
-          <h1 className="text-lg font-medium tracking-tight">
+          <h1 className="text-lg tracking-tight">
             Challenge from{" "}
             <Link href={`/u/${opponentHandle}`} className="underline underline-offset-4">
               {opponentHandle}
@@ -149,7 +149,7 @@ export function ChallengeScreen({
                 setStarted(true);
                 void session.startRound();
               }}
-              className="rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go px-6 py-2.5 text-sm"
             >
               {alreadyStarted ? "Show the scramble" : "Open the scramble"}
             </button>
@@ -178,7 +178,7 @@ export function ChallengeScreen({
             <div className="flex flex-col items-center gap-2">
               <div
                 ref={displayRef}
-                className={`tnum text-6xl font-medium leading-none tracking-tighter transition-colors sm:text-7xl ${
+                className={`tnum font-display text-6xl font-bold leading-none tracking-tighter transition-colors sm:text-7xl ${
                   phase === "solved" ? "text-ready" : "text-foreground"
                 }`}
               >

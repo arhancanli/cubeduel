@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ChallengeScreen } from "@/components/ChallengeScreen";
-import { SiteHeader } from "@/components/SiteHeader";
+import { ModeGate } from "@/components/ModeGate";
 import { listChallenges } from "@/lib/server/challenges";
 import { ensureProfile } from "@/lib/server/profiles";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
@@ -25,7 +25,7 @@ export default async function ChallengePage({ params }: PageProps<"/challenge/[i
   const profile = await ensureProfile();
   if (!profile) {
     return (
-      <Gate title="Sign in to answer a challenge.">
+      <Gate title="Sign in to answer a challenge." signIn={`/challenge/${id}`}>
         A head-to-head result has to belong to two people.
       </Gate>
     );
@@ -73,18 +73,18 @@ export default async function ChallengePage({ params }: PageProps<"/challenge/[i
   );
 }
 
-function Gate({ title, children }: { title: string; children?: React.ReactNode }) {
+function Gate({
+  title,
+  children,
+  signIn,
+}: {
+  title: string;
+  children?: React.ReactNode;
+  signIn?: string;
+}) {
   return (
-    <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="duel" />
-      <div className="flex flex-1 items-center justify-center px-6 pb-24">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
-          {children ? (
-            <p className="mt-4 text-sm leading-relaxed text-muted">{children}</p>
-          ) : null}
-        </div>
-      </div>
-    </main>
+    <ModeGate face="duel" active="duel" title={title} signIn={signIn}>
+      {children}
+    </ModeGate>
   );
 }

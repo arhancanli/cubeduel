@@ -52,7 +52,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-10 px-6 pb-20 pt-6">
         <header className="flex flex-col gap-1">
-          <h1 className="text-2xl font-medium tracking-tight">
+          <h1 className="text-2xl tracking-tight">
             {profile.display_name}
           </h1>
           <p className="text-sm text-muted-dim">
@@ -142,7 +142,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
             Recent solves
           </h2>
           {stats.recent.length === 0 ? (
-            <p className="rounded-lg border border-dashed border-border px-5 py-8 text-center text-sm text-muted">
+            <p className="rounded-2xl border border-dashed border-border px-5 py-8 text-center text-sm text-muted">
               No solves recorded yet.
             </p>
           ) : (

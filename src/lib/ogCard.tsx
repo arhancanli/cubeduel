@@ -32,12 +32,12 @@ export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png";
 
 export const COLOURS = {
-  background: "#0a0a0b",
-  foreground: "#f2f2f3",
-  muted: "#a3a3ad",
-  dim: "#85858f",
-  border: "#26262c",
-  accent: "#7dd3a0",
+  background: "#0e1320",
+  foreground: "#eef1f6",
+  muted: "#a1aabb",
+  dim: "#8a93a7",
+  border: "#2a344a",
+  accent: "#2bc46a",
 };
 
 interface CardProps {

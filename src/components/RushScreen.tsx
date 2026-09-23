@@ -246,7 +246,7 @@ export function RushScreen({
             <div className="flex flex-col items-center gap-2">
               <div
                 ref={displayRef}
-                className={`tnum text-6xl font-medium leading-none tracking-tighter transition-colors sm:text-7xl ${
+                className={`tnum font-display text-6xl font-bold leading-none tracking-tighter transition-colors sm:text-7xl ${
                   last && phase === "solved"
                     ? last.cleared
                       ? "text-ready"
@@ -273,7 +273,7 @@ export function RushScreen({
                     type="button"
                     onClick={() => void session.startRound()}
                     autoFocus
-                    className="rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                    className="btn-go px-6 py-2.5 text-sm"
                   >
                     Next scramble
                   </button>
@@ -373,7 +373,7 @@ function Intro({
 }) {
   return (
     <div className="flex max-w-md flex-col items-center gap-5 pt-10 text-center">
-      <h1 className="text-3xl font-medium tracking-tight">Rush</h1>
+      <h1 className="text-3xl tracking-tight">Rush</h1>
       <p className="text-sm leading-relaxed text-muted">
         Solve under the target. Every time you beat it, it gets tighter. Three
         misses and the run is over.
@@ -413,7 +413,7 @@ function Intro({
       <button
         type="button"
         onClick={onStart}
-        className="rounded-lg bg-foreground px-7 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
+        className="btn-go px-7 py-3 text-sm"
       >
         Start a run
       </button>
@@ -448,7 +448,7 @@ function Summary({
           type="button"
           onClick={onAgain}
           autoFocus
-          className="rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          className="btn-go px-6 py-2.5 text-sm"
         >
           Run it again
         </button>

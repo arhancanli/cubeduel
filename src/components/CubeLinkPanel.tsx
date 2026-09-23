@@ -158,7 +158,7 @@ export function CubeLinkPanel() {
                 live ? "bg-ready" : state.status === "lost" ? "bg-danger" : "bg-muted-dim"
               }`}
             />
-            <h2 className="text-sm font-medium">
+            <h2 className="text-sm">
               {state.name ?? "No cube connected"}
               {demo ? <span className="ml-2 text-xs text-holding">simulated</span> : null}
             </h2>
@@ -179,7 +179,7 @@ export function CubeLinkPanel() {
             <button
               type="button"
               onClick={confirmSolved}
-              className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go px-5 py-2.5 text-sm"
             >
               My cube is solved
             </button>
@@ -198,7 +198,7 @@ export function CubeLinkPanel() {
               <button
                 type="button"
                 onClick={() => void connect()}
-                className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+                className="btn-go px-5 py-2.5 text-sm"
               >
                 {state.status === "lost" ? "Reconnect" : "Connect a cube"}
               </button>

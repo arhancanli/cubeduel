@@ -61,7 +61,7 @@ export default async function ClubPage(props: PageProps<"/c/[slug]">) {
     // club has no members" and "the database is unreachable" are opposite facts.
     return (
       <Shell>
-        <h1 className="text-2xl font-medium tracking-tight">{club.name}</h1>
+        <h1 className="text-2xl tracking-tight">{club.name}</h1>
         <p className="text-sm text-danger">
           The board could not be loaded. This is not the same as the club being
           empty — try again in a moment.
@@ -74,7 +74,7 @@ export default async function ClubPage(props: PageProps<"/c/[slug]">) {
     <Shell>
       <header className="flex flex-col gap-3">
         <p className="text-xs uppercase tracking-[0.18em] text-muted-dim">Club</p>
-        <h1 className="text-3xl font-medium leading-tight tracking-tight">{club.name}</h1>
+        <h1 className="text-3xl leading-tight tracking-tight">{club.name}</h1>
         {club.bio ? (
           <p className="max-w-lg text-sm leading-relaxed text-muted">{club.bio}</p>
         ) : null}
@@ -103,7 +103,7 @@ export default async function ClubPage(props: PageProps<"/c/[slug]">) {
           </p>
           <Link
             href="/clubs"
-            className="self-start rounded-lg bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            className="btn-go self-start px-5 py-2 text-sm"
           >
             Join a club
           </Link>

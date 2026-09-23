@@ -76,7 +76,7 @@ export function RaceStart({ signedIn }: { signedIn: boolean }) {
         disabled={busy}
         onClick={() => void create()}
         data-testid="race-create"
-        className="rounded-lg bg-foreground px-7 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="btn-go px-7 py-3 text-sm disabled:opacity-50"
       >
         {busy ? "Creating…" : "Create a race"}
       </button>

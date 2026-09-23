@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { RankedScreen, type RankedStanding } from "@/components/RankedScreen";
-import { SiteHeader } from "@/components/SiteHeader";
+import { ModeGate } from "@/components/ModeGate";
 import { EVENT_IDS, type EventId } from "@/lib/events";
 import { UNRATED, isEstablished } from "@/lib/rating";
 import { ensureProfile } from "@/lib/server/profiles";
@@ -46,18 +45,10 @@ export default async function RankedPage() {
 
   if (!profile) {
     return (
-      <Gate title="Sign in to play ranked.">
+      <Gate title="Sign in to play ranked." signIn="/ranked">
         A rating has to belong to someone. Practice mode needs no account and is
         the same cube — the only difference is that nothing there is recorded
         against you.
-        <span className="mt-5 block">
-          <Link
-            href="/play"
-            className="rounded-lg border border-border px-4 py-2 text-xs text-muted transition-colors hover:border-muted-dim hover:text-foreground"
-          >
-            Practice instead
-          </Link>
-        </span>
       </Gate>
     );
   }
@@ -93,19 +84,15 @@ export default async function RankedPage() {
 function Gate({
   title,
   children,
+  signIn,
 }: {
   title: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  signIn?: string;
 }) {
   return (
-    <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="ranked" />
-      <div className="flex flex-1 items-center justify-center px-6 pb-24">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
-          <p className="mt-4 text-sm leading-relaxed text-muted">{children}</p>
-        </div>
-      </div>
-    </main>
+    <ModeGate face="ranked" active="ranked" title={title} signIn={signIn}>
+      {children}
+    </ModeGate>
   );
 }

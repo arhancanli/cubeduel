@@ -25,7 +25,7 @@ export default function CubePage() {
 
       <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-10 px-6 pb-24 pt-8">
         <header className="flex flex-col gap-3">
-          <h1 className="text-3xl font-medium leading-tight tracking-tight">Your cube</h1>
+          <h1 className="text-3xl leading-tight tracking-tight">Your cube</h1>
           <p className="max-w-xl text-sm leading-relaxed text-muted">
             Connect a Bluetooth speedcube and turn it. The cube here turns with
             it — and once it does, the timer, the drills and every case in{" "}

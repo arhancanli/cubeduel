@@ -3,6 +3,58 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.6.0 — 2026-09-23
+
+The release where it stops looking like a document and starts looking like a
+place to play.
+
+### Six modes, six faces
+
+- **Every competitive mode owns one sticker colour**, and the assignment is the
+  standard Western colour scheme laid out as a cube net: Daily on top in white,
+  Race on the left in orange, Solve in front in green, Ranked on the right in red,
+  Duel at the back in blue, Rush underneath in yellow. The home page draws that
+  net, and each mode keeps its colour everywhere else — the sidebar, its tile, its
+  own page — so a colour always means a place.
+- **The icons are 3×3 sticker pictograms** in the mode's colour. Daily is a whole
+  solved face; Rush is a shape that narrows.
+
+### A real shell
+
+- **A sidebar on wide screens**, with the same Compete and Practice groups as
+  before, a green "Solve now" button at the top and your account at the bottom.
+- **On a phone, a tab bar and a drawer.** The old header scrolled sideways and a
+  phone showed five of fourteen destinations, so Timer, Learn, Train and Progress
+  could not be reached from the nav at all. The drawer is the same `<nav>` as the
+  sidebar, so a screen reader hears the same structure at any width.
+- **Everything still disappears while you solve**: sidebar, tab bar and all.
+
+### Type, colour and controls
+
+- **Archivo for headings, buttons and the clock** — a wide, heavy scoreboard
+  face — with Figtree for reading and Geist Mono kept for notation.
+- **A deep blue-black ground** in place of neutral grey, so the sticker colours
+  read as colours.
+- **Buttons that feel like keys**: the primary action is green with a darker
+  bottom edge that the press removes. There is one of them per screen.
+
+### Pages
+
+- **The front page** leads with the claim and the cube net, then what is live
+  today: the daily's number and time left, how many open challenges are waiting
+  (the board's own count, signed out), and the way into a race. Somebody who has
+  solved here before sees their solve count, best single and last ao5 instead of
+  the pitch.
+- **Signing in to a mode is a door, not a dead end.** Ranked, Rush, Duel and
+  challenges used to show one grey sentence on an empty page. They now show the
+  mode, what it is, a button that signs you in and brings you back, and the
+  account-free alternative beside it.
+- **Leaderboard, Race, Clubs and the Daily** open with a proper title.
+- **Share cards, emails and the tab icon** use the new colours and mark.
+
+The design system — tokens, type ramp, buttons, mode faces and the home screens —
+is in Figma alongside the code.
+
 ## 1.5.0 — 2026-09-22
 
 The release where you no longer need to know somebody to play somebody.

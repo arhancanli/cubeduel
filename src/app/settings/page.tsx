@@ -158,7 +158,7 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
   return (
     <Shell>
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-medium tracking-tight">Settings</h1>
+        <h1 className="text-2xl tracking-tight">Settings</h1>
         <p className="text-sm text-muted">
           Your public page is{" "}
           <Link
@@ -194,7 +194,7 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
 
         <button
           type="submit"
-          className="self-start rounded-lg bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          className="btn-go self-start px-5 py-2 text-sm"
         >
           Save
         </button>
@@ -202,7 +202,7 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-col gap-1">
-          <h2 className="text-lg font-medium tracking-tight">Your cube</h2>
+          <h2 className="text-lg tracking-tight">Your cube</h2>
           <p className="max-w-lg text-sm leading-relaxed text-muted">
             Applies everywhere a cube is drawn — the timer, the daily, duels and
             the trainer.

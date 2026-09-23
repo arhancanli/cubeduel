@@ -157,7 +157,7 @@ export function ClaimScreen() {
               <p className="text-xs uppercase tracking-[0.18em] text-muted-dim">
                 Your session so far
               </p>
-              <h1 className="text-balance text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
+              <h1 className="text-balance text-3xl leading-tight tracking-tight sm:text-4xl">
                 Keep this.
               </h1>
               <p className="max-w-lg text-balance text-sm leading-relaxed text-muted">
@@ -207,7 +207,7 @@ export function ClaimScreen() {
             {summary.shape.length > 0 ? (
               <div className="flex flex-col gap-3">
                 <div className="flex items-baseline justify-between gap-2">
-                  <h2 className="text-sm font-medium tracking-tight">
+                  <h2 className="text-sm tracking-tight">
                     The shape of your solve
                   </h2>
                   <p className="text-xs text-muted-dim">
@@ -259,7 +259,7 @@ export function ClaimScreen() {
           </Reveal>
         ) : (
           <Reveal className="flex flex-col gap-3">
-            <h1 className="text-3xl font-medium leading-tight tracking-tight sm:text-4xl">
+            <h1 className="text-3xl leading-tight tracking-tight sm:text-4xl">
               Make an account
             </h1>
             <p className="max-w-lg text-balance text-sm leading-relaxed text-muted">
@@ -326,7 +326,7 @@ export function ClaimScreen() {
               <button
                 type="submit"
                 disabled={busy}
-                className="rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+                className="btn-go px-6 py-3 text-sm disabled:opacity-50"
               >
                 {busy
                   ? "Just a moment…"
@@ -381,7 +381,7 @@ function PasskeyStep({
   return (
     <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface px-6 py-6">
       <div className="flex flex-col gap-2">
-        <h2 className="text-lg font-medium tracking-tight">
+        <h2 className="text-lg tracking-tight">
           Your solves are safe. Now lock the account.
         </h2>
         <p className="max-w-md text-sm leading-relaxed text-muted">
@@ -402,7 +402,7 @@ function PasskeyStep({
           type="button"
           onClick={onAdd}
           disabled={busy}
-          className="rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+          className="btn-go px-6 py-3 text-sm disabled:opacity-50"
         >
           {busy ? "Waiting for your device…" : "Add a passkey"}
         </button>

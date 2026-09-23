@@ -279,7 +279,7 @@ function Watch({ study, moves }: { study: LearnCase; moves: string[] }) {
             <button
               type="button"
               onClick={() => (atEnd ? restart() : setPlaying((p) => !p))}
-              className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go px-5 py-2.5 text-sm"
             >
               {atEnd ? "Again" : playing ? "Pause" : "Play"}
             </button>

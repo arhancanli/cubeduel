@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { DuelScreen } from "@/components/DuelScreen";
-import { SiteHeader } from "@/components/SiteHeader";
+import { ModeGate } from "@/components/ModeGate";
 import { listChallenges, listOpenChallenges } from "@/lib/server/challenges";
 import { duelRecord } from "@/lib/server/duels";
 import { MissingTableError } from "@/lib/server/schema";
@@ -32,17 +31,9 @@ export default async function DuelPage() {
   const profile = await ensureProfile();
   if (!profile) {
     return (
-      <Gate title="Sign in to duel.">
+      <Gate title="Sign in to duel." signIn="/duel">
         A result has to belong to someone. Practice mode needs no account and is
         the same cube.
-        <span className="mt-5 block">
-          <Link
-            href="/play"
-            className="rounded-lg border border-border px-4 py-2 text-xs text-muted transition-colors hover:border-muted-dim hover:text-foreground"
-          >
-            Practice instead
-          </Link>
-        </span>
       </Gate>
     );
   }
@@ -83,16 +74,18 @@ export default async function DuelPage() {
   );
 }
 
-function Gate({ title, children }: { title: string; children: React.ReactNode }) {
+function Gate({
+  title,
+  children,
+  signIn,
+}: {
+  title: string;
+  children?: React.ReactNode;
+  signIn?: string;
+}) {
   return (
-    <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="duel" />
-      <div className="flex flex-1 items-center justify-center px-6 pb-24">
-        <div className="max-w-md text-center">
-          <h1 className="text-2xl font-medium tracking-tight">{title}</h1>
-          <p className="mt-4 text-sm leading-relaxed text-muted">{children}</p>
-        </div>
-      </div>
-    </main>
+    <ModeGate face="duel" active="duel" title={title} signIn={signIn}>
+      {children}
+    </ModeGate>
   );
 }

@@ -7,9 +7,12 @@ import { SolverDemo } from "@/components/SolverDemo";
 import { Reveal } from "@/components/Reveal";
 import { ScrollSolve } from "@/components/ScrollSolve";
 import { SiteHeader } from "@/components/SiteHeader";
-import { formatMs } from "@/lib/format";
 import { ratingForMs } from "@/lib/rating";
-import { loadHistory } from "@/lib/solveHistory";
+import { CubeNet } from "@/components/CubeNet";
+import { TodayStrip } from "@/components/TodayStrip";
+import { formatAverage, formatMs } from "@/lib/format";
+import { ao5, bestSingle } from "@/lib/stats";
+import { loadHistory, type StoredSolve } from "@/lib/solveHistory";
 
 /**
  * The front door.
@@ -26,73 +29,81 @@ import { loadHistory } from "@/lib/solveHistory";
  * local history the page leads with "Continue" and the pitch moves out of the way.
  */
 
-export function LandingScreen() {
-  const [returningSolves, setReturningSolves] = useState<number | null>(null);
+export function LandingScreen({ dailyStart }: { dailyStart: string }) {
+  const [history, setHistory] = useState<StoredSolve[] | null>(null);
 
   useEffect(() => {
-    setReturningSolves(loadHistory().length);
+    setHistory(loadHistory());
   }, []);
 
-  const returning = (returningSolves ?? 0) > 0;
+  const returning = (history?.length ?? 0) > 0;
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="play" />
+      <SiteHeader active="home" />
 
-      {/* Hero */}
-      <section className="flex flex-col items-center gap-10 px-6 pb-24 pt-12 text-center sm:pt-20">
-        <Reveal className="flex max-w-2xl flex-col items-center gap-6">
-          <h1 className="text-balance text-4xl font-medium leading-[1.1] tracking-tight sm:text-6xl">
-            A rating that actually means something.
-          </h1>
-          <p className="max-w-xl text-balance text-base leading-relaxed text-muted sm:text-lg">
-            Speedcubing with a real ladder. The server hands you a scramble nobody
-            has seen, replays your solve to prove it happened, and only then does
-            it count. Plus the analysis that tells you which part of your solve to
-            fix.
+      {/* Hero: the claim on the left, the six modes on the right as a cube net. */}
+      <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 pb-14 pt-6 sm:px-8 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,34rem)] lg:gap-14 lg:pt-20">
+        <Reveal className="flex flex-col gap-6">
+          <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-sticker-green">
+            {returning ? "Welcome back" : "Speedcubing, on the record"}
           </p>
-        </Reveal>
+          <h1 className="text-balance text-[2.6rem] leading-[1.02] sm:text-6xl xl:text-7xl">
+            Every solve here is proven.
+          </h1>
+          <p className="max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
+            The server hands you a scramble nobody has seen, replays every turn,
+            and only then does the time count. Then it shows you which part of
+            your solve is slow.
+          </p>
 
-        <Reveal delayMs={120} className="flex flex-col items-center gap-3">
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/timer"
-              className="rounded-lg bg-foreground px-7 py-3.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
-            >
+          <div className="flex flex-wrap items-center gap-3">
+            <Link href="/timer" className="btn-go px-7 py-3.5 text-base">
               {returning ? "Continue solving" : "Start solving"}
             </Link>
-            <Link
-              href="/ranked"
-              className="rounded-lg border border-border px-7 py-3.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
-            >
+            <Link href="/ranked" className="btn-secondary px-6 py-3.5 text-base">
               Play ranked
             </Link>
           </div>
-          <p className="text-xs text-muted-dim">
-            {returning
-              ? `${returningSolves} solves saved on this device.`
-              : "Solving needs no account. Free, and it works offline."}
-          </p>
 
-          {/* The other half of the audience, and until now the half with no door
-              at all: every call to action on this page assumed you could already
-              solve a cube. One quiet line rather than a third button, because the
-              claim this page makes is the ladder and two competing buttons argue
-              with each other. */}
+          {returning && history ? (
+            <ReturningStats history={history} />
+          ) : (
+            <p className="text-sm text-muted-dim">Solving needs no account. Free, and it works offline.</p>
+          )}
+
+          {/* The other half of the audience: every call to action above assumes
+              you can already solve a cube. One quiet line rather than a third
+              button, because two competing buttons already argue. */}
           <Link
             href="/solve"
-            className="text-xs text-muted underline decoration-border underline-offset-4 transition-colors hover:decoration-current"
+            className="self-start text-sm text-muted underline decoration-border underline-offset-4 transition-colors hover:text-foreground hover:decoration-current"
           >
             Can&rsquo;t solve one yet? Start here.
           </Link>
         </Reveal>
 
-        {/* A cube that solves itself, rather than one sitting there scrambled.
-            The scramble is WCA random-state, the solution comes from the solver
-            in this repository, and the two numbers underneath were measured
-            when it was generated. It is the one claim on this page a visitor
-            can check. */}
-        <Reveal delayMs={220} className="w-full">
+        <Reveal delayMs={140}>
+          <CubeNet />
+        </Reveal>
+      </section>
+
+      <section className="mx-auto w-full max-w-6xl px-4 pb-20 sm:px-8">
+        <TodayStrip dailyStart={dailyStart} />
+      </section>
+
+      {/* A cube that solves itself. The scramble is WCA random-state, the
+          solution comes from the solver in this repository, and the two numbers
+          underneath were measured when it was generated. It is the one claim on
+          this page a visitor can check. */}
+      <section className="border-t border-border">
+        <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 px-6 pt-24 text-center">
+          <Reveal className="flex flex-col items-center gap-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-dim">The engine</p>
+            <h2 className="text-balance text-3xl sm:text-4xl">It solves any cube in about 19 moves.</h2>
+          </Reveal>
+        </div>
+        <Reveal delayMs={120} className="w-full px-6 pb-8">
           <SolverDemo />
         </Reveal>
       </section>
@@ -107,7 +118,7 @@ export function LandingScreen() {
             <p className="text-[10px] uppercase tracking-widest text-muted-dim">
               Ranked
             </p>
-            <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
+            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
               One number, and you can always read it in seconds.
             </h2>
             <p className="max-w-xl text-base leading-relaxed text-muted">
@@ -138,7 +149,7 @@ export function LandingScreen() {
               },
             ].map((card, i) => (
               <Reveal key={card.title} delayMs={i * 90} className="flex flex-col gap-2">
-                <h3 className="text-sm font-medium">{card.title}</h3>
+                <h3 className="text-sm">{card.title}</h3>
                 <p className="text-sm leading-relaxed text-muted">{card.body}</p>
               </Reveal>
             ))}
@@ -159,7 +170,7 @@ export function LandingScreen() {
       <section className="border-t border-border">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-16 px-6 py-28">
           <Reveal className="flex flex-col gap-4">
-            <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
+            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
               A stopwatch tells you that you took 22 seconds.
             </h2>
             <p className="text-base leading-relaxed text-muted">
@@ -186,7 +197,7 @@ export function LandingScreen() {
               },
             ].map((card, i) => (
               <Reveal key={card.title} delayMs={i * 90} className="flex flex-col gap-2">
-                <h3 className="text-sm font-medium">{card.title}</h3>
+                <h3 className="text-sm">{card.title}</h3>
                 <p className="text-sm leading-relaxed text-muted">{card.body}</p>
               </Reveal>
             ))}
@@ -201,7 +212,7 @@ export function LandingScreen() {
             <p className="text-[10px] uppercase tracking-widest text-muted-dim">
               Under pressure
             </p>
-            <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
+            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
               A target that keeps tightening.
             </h2>
             <p className="max-w-xl text-balance text-base leading-relaxed text-muted">
@@ -221,7 +232,7 @@ export function LandingScreen() {
           <Reveal delayMs={120}>
             <Link
               href="/rush"
-              className="rounded-lg border border-border px-7 py-3.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+              className="btn-secondary px-7 py-3.5 text-sm"
             >
               Start a run
             </Link>
@@ -234,7 +245,7 @@ export function LandingScreen() {
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 px-6 py-28 text-center">
           <Reveal className="flex flex-col items-center gap-4">
             <p className="text-[10px] uppercase tracking-widest text-muted-dim">Every day</p>
-            <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
+            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
               One scramble. One attempt.
             </h2>
             <p className="max-w-xl text-balance text-base leading-relaxed text-muted">
@@ -245,7 +256,7 @@ export function LandingScreen() {
           <Reveal delayMs={120}>
             <Link
               href="/daily"
-              className="rounded-lg border border-border px-7 py-3.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+              className="btn-secondary px-7 py-3.5 text-sm"
             >
               Try today&apos;s
             </Link>
@@ -260,7 +271,7 @@ export function LandingScreen() {
             <p className="text-[10px] uppercase tracking-widest text-muted-dim">
               From the beginning
             </p>
-            <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
+            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
               You do not have to be able to solve one yet.
             </h2>
             <p className="max-w-xl text-base leading-relaxed text-muted">
@@ -297,7 +308,7 @@ export function LandingScreen() {
       <section className="border-t border-border">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-28">
           <Reveal className="flex flex-col gap-4">
-            <h2 className="text-balance text-3xl font-medium tracking-tight sm:text-4xl">
+            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
               No cube in your hand?
             </h2>
             <p className="max-w-xl text-base leading-relaxed text-muted">
@@ -319,12 +330,12 @@ export function LandingScreen() {
       <footer className="border-t border-border">
         <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 px-6 py-24 text-center">
           <Reveal className="flex flex-col items-center gap-5">
-            <h2 className="text-balance text-2xl font-medium tracking-tight sm:text-3xl">
+            <h2 className="text-balance text-2xl tracking-tight sm:text-3xl">
               Start with one solve.
             </h2>
             <Link
               href="/timer"
-              className="rounded-lg bg-foreground px-7 py-3.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go px-7 py-3.5 text-sm"
             >
               {returning ? "Continue solving" : "Start solving"}
             </Link>
@@ -404,5 +415,29 @@ function RatingScale() {
         </div>
       ))}
     </div>
+  );
+}
+
+/**
+ * What somebody who has solved here already wants to see first: where they are.
+ * Read from this device's history, so it works signed out and offline.
+ */
+function ReturningStats({ history }: { history: StoredSolve[] }) {
+  const timed = history.map((solve) => ({ ms: solve.durationMs, penalty: solve.penalty }));
+  const best = bestSingle(timed);
+  const stats = [
+    { label: "Solves", value: history.length.toLocaleString("en") },
+    { label: "Best single", value: best === null ? "—" : formatMs(best, { truncate: false }) },
+    { label: "Last ao5", value: formatAverage(ao5(timed)) },
+  ];
+  return (
+    <dl className="grid max-w-md grid-cols-3 gap-2">
+      {stats.map((stat) => (
+        <div key={stat.label} className="rounded-xl border border-border bg-surface px-3.5 py-3">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{stat.label}</dt>
+          <dd className="tnum mt-1 font-display text-xl font-bold">{stat.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

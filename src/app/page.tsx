@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { LandingScreen } from "@/components/LandingScreen";
+import dailies from "@/data/dailies.json";
 
 export const metadata: Metadata = {
   // Absolute, not templated: this is the root and appending "· cubeduel" to a
@@ -13,5 +14,6 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <LandingScreen />;
+  // Only the start date crosses to the client — the scramble list stays here.
+  return <LandingScreen dailyStart={dailies.start} />;
 }

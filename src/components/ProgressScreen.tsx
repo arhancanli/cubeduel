@@ -61,7 +61,7 @@ export function ProgressScreen() {
             <p className="text-sm text-muted">No solves recorded yet.</p>
             <Link
               href="/play"
-              className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go px-5 py-2.5 text-sm"
             >
               Start solving
             </Link>

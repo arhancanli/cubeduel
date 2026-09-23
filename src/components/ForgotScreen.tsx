@@ -65,7 +65,7 @@ export function ForgotScreen() {
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-8 px-6 pb-24 pt-12">
         {sent ? (
           <Reveal className="flex flex-col gap-4">
-            <h1 className="text-2xl font-medium tracking-tight">Check your inbox</h1>
+            <h1 className="text-2xl tracking-tight">Check your inbox</h1>
             <p className="text-sm leading-relaxed text-muted">
               If that address has an account, a link is on its way. It works once
               and expires in thirty minutes.
@@ -84,7 +84,7 @@ export function ForgotScreen() {
         ) : (
           <>
             <Reveal className="flex flex-col gap-2">
-              <h1 className="text-3xl font-medium leading-tight tracking-tight">
+              <h1 className="text-3xl leading-tight tracking-tight">
                 Forgot your password?
               </h1>
               <p className="text-sm leading-relaxed text-muted">
@@ -125,7 +125,7 @@ export function ForgotScreen() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="btn-go px-6 py-3 text-sm disabled:opacity-50"
                 >
                   {busy ? "Sending…" : "Email me a link"}
                 </button>

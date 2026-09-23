@@ -41,7 +41,7 @@ export default async function VerifyPage(props: PageProps<"/verify">) {
       <SiteHeader active="progress" />
 
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-6 px-6 pb-24 pt-12">
-        <h1 className="text-2xl font-medium tracking-tight">
+        <h1 className="text-2xl tracking-tight">
           {confirmed ? "Address confirmed" : "That link did not work"}
         </h1>
 
@@ -53,7 +53,7 @@ export default async function VerifyPage(props: PageProps<"/verify">) {
             </p>
             <Link
               href="/progress"
-              className="self-start rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go self-start px-6 py-3 text-sm"
             >
               Back to your solves
             </Link>

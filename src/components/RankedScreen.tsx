@@ -267,7 +267,7 @@ export function RankedScreen({
         <div className="flex flex-col items-center gap-2">
           <div
             ref={displayRef}
-            className={`tnum text-6xl font-medium leading-none tracking-tighter transition-colors sm:text-7xl ${
+            className={`tnum font-display text-6xl font-bold leading-none tracking-tighter transition-colors sm:text-7xl ${
               phase === "solved" ? "text-ready" : "text-foreground"
             }`}
           >
@@ -311,7 +311,7 @@ export function RankedScreen({
             type="button"
             onClick={() => void session.startRound()}
             disabled={submitting}
-            className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="btn-go px-5 py-2.5 text-sm disabled:opacity-40"
           >
             {!started
               ? "Start a ranked attempt"

@@ -202,7 +202,7 @@ function Drill({
       <div className="flex flex-col items-center gap-2">
         <div
           ref={displayRef}
-          className={`tnum text-6xl font-medium leading-none tracking-tighter transition-colors sm:text-7xl ${
+          className={`tnum font-display text-6xl font-bold leading-none tracking-tighter transition-colors sm:text-7xl ${
             done ? "text-ready" : "text-foreground"
           }`}
         >
@@ -228,7 +228,7 @@ function Drill({
           type="button"
           onClick={onNext}
           autoFocus
-          className="rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          className="btn-go px-6 py-2.5 text-sm"
         >
           Next case
         </button>
@@ -303,7 +303,7 @@ function CardHistory({
 function EmptyDeck() {
   return (
     <div className="max-w-md pt-20 text-center">
-      <h1 className="text-xl font-medium tracking-tight">Nothing to drill yet.</h1>
+      <h1 className="text-xl tracking-tight">Nothing to drill yet.</h1>
       <p className="mt-4 text-sm leading-relaxed text-muted">
         The deck is built from cases your own solves actually produced, so there
         is nothing here until some solves have been analysed. That is deliberate:
@@ -312,7 +312,7 @@ function EmptyDeck() {
       </p>
       <Link
         href="/play"
-        className="mt-6 inline-block rounded-lg border border-border px-5 py-2.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+        className="btn-secondary mt-6 inline-block px-5 py-2.5 text-sm"
       >
         Solve a few first
       </Link>

@@ -182,7 +182,7 @@ export function ChallengePanel({
   return (
     <section className="w-full max-w-2xl">
       <div className="mb-3 flex items-baseline justify-between">
-        <h2 className="text-sm font-medium tracking-tight">Challenge a player</h2>
+        <h2 className="text-sm tracking-tight">Challenge a player</h2>
         {waiting.length > 0 ? (
           <span className="text-xs text-ready">
             {waiting.length} waiting on you
@@ -206,7 +206,7 @@ export function ChallengePanel({
         <button
           type="submit"
           disabled={sending || handle.trim().length === 0}
-          className="rounded-lg bg-foreground px-4 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-40"
+          className="btn-go px-4 py-2 text-sm disabled:opacity-40"
         >
           {sending ? "Sending…" : "Challenge"}
         </button>
@@ -263,7 +263,7 @@ export function ChallengePanel({
                     type="button"
                     onClick={() => take(c.id)}
                     disabled={taking !== null}
-                    className="rounded-lg bg-foreground px-3 py-1.5 text-xs font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-40"
+                    className="btn-go px-3 py-1.5 text-xs disabled:opacity-40"
                   >
                     {taking === c.id ? "Taking…" : "Take it"}
                   </button>

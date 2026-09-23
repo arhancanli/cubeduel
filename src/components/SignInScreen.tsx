@@ -111,7 +111,7 @@ export function SignInScreen() {
 
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-8 px-6 pb-24 pt-12">
         <Reveal className="flex flex-col gap-2">
-          <h1 className="text-3xl font-medium leading-tight tracking-tight">
+          <h1 className="text-3xl leading-tight tracking-tight">
             Sign in
           </h1>
           <p className="text-sm leading-relaxed text-muted">
@@ -135,7 +135,7 @@ export function SignInScreen() {
               type="button"
               onClick={usePasskey}
               disabled={busy !== null}
-              className="rounded-lg bg-foreground px-6 py-3 text-sm font-medium text-background transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="btn-go px-6 py-3 text-sm disabled:opacity-50"
             >
               {busy === "passkey" ? "Waiting for your device…" : "Sign in with a passkey"}
             </button>

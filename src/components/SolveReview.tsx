@@ -118,7 +118,7 @@ export function SolveReviewPanel({
         {culprit && drillHref ? (
           <Link
             href={drillHref}
-            className="rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+            className="btn-go px-5 py-2.5 text-sm"
           >
             Drill {culprit.phase}
           </Link>
@@ -140,7 +140,7 @@ function Again({ onAgain, secondary = false }: { onAgain: () => void; secondary?
       className={
         secondary
           ? "rounded-lg border border-border px-5 py-2.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
-          : "rounded-lg bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+          : "btn-go px-5 py-2.5 text-sm"
       }
     >
       Again

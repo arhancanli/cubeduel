@@ -21,7 +21,7 @@ export default function PlayerNotFound() {
 
       <div className="flex flex-1 items-center justify-center px-6 pb-24">
         <div className="max-w-md text-center">
-          <h1 className="text-2xl font-medium tracking-tight">No player by that name.</h1>
+          <h1 className="text-2xl tracking-tight">No player by that name.</h1>
           <p className="mt-4 text-sm leading-relaxed text-muted">
             Either the handle is mistyped, or it has been changed since the link
             was shared — a handle is the profile&apos;s address, so renaming
@@ -31,7 +31,7 @@ export default function PlayerNotFound() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/leaderboard"
-              className="rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go px-6 py-2.5 text-sm"
             >
               See the leaderboard
             </Link>

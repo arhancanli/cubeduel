@@ -16,11 +16,11 @@ export const metadata: Metadata = { title: "Not found" };
 export default function NotFound() {
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="play" />
+      <SiteHeader active="home" />
 
       <div className="flex flex-1 items-center justify-center px-6 pb-24">
         <div className="max-w-md text-center">
-          <h1 className="text-2xl font-medium tracking-tight">
+          <h1 className="text-2xl tracking-tight">
             There is nothing at this address.
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-muted">
@@ -30,13 +30,13 @@ export default function NotFound() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/timer"
-              className="rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
+              className="btn-go px-6 py-2.5 text-sm"
             >
               Start solving
             </Link>
             <Link
               href="/daily"
-              className="rounded-lg border border-border px-6 py-2.5 text-sm text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+              className="btn-secondary px-6 py-2.5 text-sm"
             >
               Today&apos;s daily
             </Link>

@@ -268,7 +268,7 @@ export function TimerScreen() {
         <div className="relative flex flex-col items-center">
           <div
             ref={displayRef as React.RefObject<HTMLDivElement>}
-            className={`tnum text-7xl font-medium leading-none tracking-tighter transition-colors duration-100 sm:text-8xl md:text-9xl ${timeColor}`}
+            className={`tnum font-display text-7xl font-bold leading-none tracking-tighter transition-colors duration-100 sm:text-8xl md:text-9xl ${timeColor}`}
           >
             0.00
           </div>

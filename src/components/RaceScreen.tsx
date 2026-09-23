@@ -253,7 +253,7 @@ export function RaceScreen({
   if (missing) {
     return (
       <Shell>
-        <h1 className="text-2xl font-medium tracking-tight">No such race</h1>
+        <h1 className="text-2xl tracking-tight">No such race</h1>
         <p className="mt-3 text-sm text-muted">
           The link may be mistyped, or the race has gone. <Link href="/race" className="underline underline-offset-4">Start a new one</Link>.
         </p>
@@ -273,7 +273,7 @@ export function RaceScreen({
   return (
     <Shell>
       <div className={`flex flex-col items-center gap-1 text-center ${solving ? "opacity-40" : ""}`}>
-        <h1 className="text-lg font-medium tracking-tight">
+        <h1 className="text-lg tracking-tight">
           {eventName} race · <span className="font-mono">{view.code}</span>
         </h1>
         <p className="text-xs text-muted-dim">
@@ -331,7 +331,7 @@ export function RaceScreen({
                 type="button"
                 disabled={busy}
                 onClick={() => void act(JOIN, {})}
-                className="rounded-lg bg-foreground px-6 py-2.5 text-sm font-medium text-background disabled:opacity-50"
+                className="btn-go px-6 py-2.5 text-sm disabled:opacity-50"
               >
                 Take the seat
               </button>
@@ -355,8 +355,8 @@ export function RaceScreen({
               disabled={busy}
               onClick={() => void act(READY, { ready: !me?.ready })}
               data-testid="race-ready"
-              className={`rounded-lg px-6 py-2.5 text-sm font-medium disabled:opacity-50 ${
-                me?.ready ? "border border-border text-muted" : "bg-foreground text-background"
+              className={`px-6 py-2.5 text-sm disabled:opacity-50 ${
+                me?.ready ? "rounded-lg border border-border font-medium text-muted" : "btn-go"
               }`}
             >
               {me?.ready ? "Not ready" : "Ready"}
@@ -378,7 +378,7 @@ export function RaceScreen({
 
       {view.phase === "countdown" ? (
         <div className="flex flex-col items-center gap-2" aria-live="assertive">
-          <div className="tnum text-7xl font-medium" data-testid="race-countdown">
+          <div className="tnum font-display text-7xl font-bold" data-testid="race-countdown">
             {Math.ceil(countdownLeft / 1000)}
           </div>
           <p className="text-xs text-muted-dim">The scramble appears for both of you at zero.</p>
@@ -406,7 +406,7 @@ export function RaceScreen({
           <div className="flex flex-col items-center gap-2">
             <div
               ref={displayRef}
-              className={`tnum text-6xl font-medium leading-none tracking-tighter sm:text-7xl ${
+              className={`tnum font-display text-6xl font-bold leading-none tracking-tighter sm:text-7xl ${
                 sessionPhase === "solved" ? "text-ready" : "text-foreground"
               }`}
             >
@@ -550,7 +550,7 @@ function Result({
           type="button"
           disabled={busy}
           onClick={onRematch}
-          className="rounded-lg bg-foreground px-5 py-2 text-sm font-medium text-background disabled:opacity-50"
+          className="btn-go px-5 py-2 text-sm disabled:opacity-50"
         >
           {view.rematchCode ? "Join the rematch" : "Rematch"}
         </button>
