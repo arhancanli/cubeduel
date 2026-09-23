@@ -51,6 +51,27 @@ export default async function LearnPage() {
           </PageHero>
         </Reveal>
 
+        <Reveal className="grid gap-3 sm:grid-cols-2">
+          <Link
+            href="/learn/f2l"
+            className="group flex flex-col gap-1 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-muted-dim/60"
+          >
+            <span className="font-semibold">
+              All 41 F2L cases <span aria-hidden="true" className="inline-block transition-transform group-hover:translate-x-0.5">→</span>
+            </span>
+            <span className="text-sm text-muted">The first two layers: pairing a corner with an edge, every case.</span>
+          </Link>
+          <Link
+            href="/notation"
+            className="group flex flex-col gap-1 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-muted-dim/60"
+          >
+            <span className="font-semibold">
+              What the letters mean <span aria-hidden="true" className="inline-block transition-transform group-hover:translate-x-0.5">→</span>
+            </span>
+            <span className="text-sm text-muted">R, U&apos;, F2, M, x — every move, on a cube you can watch.</span>
+          </Link>
+        </Reveal>
+
         {SHAPE_ORDER.map((shape) => {
           const group = oll.filter((c) => c.shape === shape);
           if (group.length === 0) return null;

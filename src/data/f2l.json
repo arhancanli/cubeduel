@@ -1,0 +1,289 @@
+[
+  {
+    "number": 1,
+    "group": "Both on top",
+    "alg": "F' U F",
+    "moves": 3,
+    "key": "c0.1/e1.1"
+  },
+  {
+    "number": 2,
+    "group": "Both on top",
+    "alg": "F' U' F",
+    "moves": 3,
+    "key": "c0.2/e2.1"
+  },
+  {
+    "number": 3,
+    "group": "Both on top",
+    "alg": "R U R'",
+    "moves": 3,
+    "key": "c0.1/e3.0"
+  },
+  {
+    "number": 4,
+    "group": "Both on top",
+    "alg": "R U' R'",
+    "moves": 3,
+    "key": "c0.2/e0.0"
+  },
+  {
+    "number": 5,
+    "group": "Both on top",
+    "alg": "F' U' F R U R'",
+    "moves": 6,
+    "key": "c0.0/e2.0"
+  },
+  {
+    "number": 6,
+    "group": "Both on top",
+    "alg": "R U R' F' U' F",
+    "moves": 6,
+    "key": "c0.0/e3.1"
+  },
+  {
+    "number": 7,
+    "group": "Both on top",
+    "alg": "F' U F U' F' U' F",
+    "moves": 7,
+    "key": "c0.2/e1.1"
+  },
+  {
+    "number": 8,
+    "group": "Both on top",
+    "alg": "F' U F U2 R U R'",
+    "moves": 7,
+    "key": "c0.2/e1.0"
+  },
+  {
+    "number": 9,
+    "group": "Both on top",
+    "alg": "F' U' F U F' U2 F",
+    "moves": 7,
+    "key": "c0.1/e2.1"
+  },
+  {
+    "number": 10,
+    "group": "Both on top",
+    "alg": "F' U2 F U F' U' F",
+    "moves": 7,
+    "key": "c0.0/e1.1"
+  },
+  {
+    "number": 11,
+    "group": "Both on top",
+    "alg": "F' U2 F U F' U2 F",
+    "moves": 7,
+    "key": "c0.1/e3.1"
+  },
+  {
+    "number": 12,
+    "group": "Both on top",
+    "alg": "F' U2 F U' F' U F",
+    "moves": 7,
+    "key": "c0.0/e2.1"
+  },
+  {
+    "number": 13,
+    "group": "Both on top",
+    "alg": "F' U2 F U' R U R'",
+    "moves": 7,
+    "key": "c0.1/e1.0"
+  },
+  {
+    "number": 14,
+    "group": "Both on top",
+    "alg": "R U R' U R U R'",
+    "moves": 7,
+    "key": "c0.1/e2.0"
+  },
+  {
+    "number": 15,
+    "group": "Both on top",
+    "alg": "R U R' U' R U2 R'",
+    "moves": 7,
+    "key": "c0.2/e3.0"
+  },
+  {
+    "number": 16,
+    "group": "Both on top",
+    "alg": "R U R' U2 F' U' F",
+    "moves": 7,
+    "key": "c0.2/e3.1"
+  },
+  {
+    "number": 17,
+    "group": "Both on top",
+    "alg": "R U' R' U R U R'",
+    "moves": 7,
+    "key": "c0.1/e0.0"
+  },
+  {
+    "number": 18,
+    "group": "Both on top",
+    "alg": "R U' R' U2 F' U' F",
+    "moves": 7,
+    "key": "c0.1/e0.1"
+  },
+  {
+    "number": 19,
+    "group": "Both on top",
+    "alg": "R U2 R' U F' U' F",
+    "moves": 7,
+    "key": "c0.2/e0.1"
+  },
+  {
+    "number": 20,
+    "group": "Both on top",
+    "alg": "R U2 R' U R U' R'",
+    "moves": 7,
+    "key": "c0.0/e3.0"
+  },
+  {
+    "number": 21,
+    "group": "Both on top",
+    "alg": "R U2 R' U' R U R'",
+    "moves": 7,
+    "key": "c0.0/e0.0"
+  },
+  {
+    "number": 22,
+    "group": "Both on top",
+    "alg": "R U2 R' U' R U2 R'",
+    "moves": 7,
+    "key": "c0.2/e2.0"
+  },
+  {
+    "number": 23,
+    "group": "Both on top",
+    "alg": "R U R' F' U F R U R'",
+    "moves": 9,
+    "key": "c0.0/e1.0"
+  },
+  {
+    "number": 24,
+    "group": "Both on top",
+    "alg": "R U R' F' U2 F R U R'",
+    "moves": 9,
+    "key": "c0.0/e0.1"
+  },
+  {
+    "number": 25,
+    "group": "Corner on top, edge in slot",
+    "alg": "F' U F R U2 R'",
+    "moves": 6,
+    "key": "c0.0/e8.1"
+  },
+  {
+    "number": 26,
+    "group": "Corner on top, edge in slot",
+    "alg": "F' U F U R U R'",
+    "moves": 7,
+    "key": "c0.1/e8.1"
+  },
+  {
+    "number": 27,
+    "group": "Corner on top, edge in slot",
+    "alg": "R U R' U F' U' F",
+    "moves": 7,
+    "key": "c0.2/e8.1"
+  },
+  {
+    "number": 28,
+    "group": "Corner on top, edge in slot",
+    "alg": "R U R' U2 R U R'",
+    "moves": 7,
+    "key": "c0.1/e8.0"
+  },
+  {
+    "number": 29,
+    "group": "Corner on top, edge in slot",
+    "alg": "R U' R' U' R U2 R'",
+    "moves": 7,
+    "key": "c0.2/e8.0"
+  },
+  {
+    "number": 30,
+    "group": "Corner on top, edge in slot",
+    "alg": "R U R' F' U F U2 R U R'",
+    "moves": 10,
+    "key": "c0.0/e8.0"
+  },
+  {
+    "number": 31,
+    "group": "Edge on top, corner in slot",
+    "alg": "F' U F R U R'",
+    "moves": 6,
+    "key": "c4.2/e0.0"
+  },
+  {
+    "number": 32,
+    "group": "Edge on top, corner in slot",
+    "alg": "F' U2 F R U2 R'",
+    "moves": 6,
+    "key": "c4.1/e0.0"
+  },
+  {
+    "number": 33,
+    "group": "Edge on top, corner in slot",
+    "alg": "R U' R' F' U' F",
+    "moves": 6,
+    "key": "c4.1/e0.1"
+  },
+  {
+    "number": 34,
+    "group": "Edge on top, corner in slot",
+    "alg": "R U2 R' F' U2 F",
+    "moves": 6,
+    "key": "c4.2/e0.1"
+  },
+  {
+    "number": 35,
+    "group": "Edge on top, corner in slot",
+    "alg": "F' U F U R U' R'",
+    "moves": 7,
+    "key": "c4.0/e0.0"
+  },
+  {
+    "number": 36,
+    "group": "Edge on top, corner in slot",
+    "alg": "R U R' U' F' U' F",
+    "moves": 7,
+    "key": "c4.0/e0.1"
+  },
+  {
+    "number": 37,
+    "group": "Both in slot",
+    "alg": "F' U F R U' R' U2 R U R'",
+    "moves": 10,
+    "key": "c4.1/e8.1"
+  },
+  {
+    "number": 38,
+    "group": "Both in slot",
+    "alg": "R U' R' U2 R U R' F' U' F",
+    "moves": 10,
+    "key": "c4.2/e8.1"
+  },
+  {
+    "number": 39,
+    "group": "Both in slot",
+    "alg": "F' U F U' R U2 R' U' R U2 R'",
+    "moves": 11,
+    "key": "c4.0/e8.1"
+  },
+  {
+    "number": 40,
+    "group": "Both in slot",
+    "alg": "R U R' U' R U2 R' U' R U R'",
+    "moves": 11,
+    "key": "c4.1/e8.0"
+  },
+  {
+    "number": 41,
+    "group": "Both in slot",
+    "alg": "R U R' U2 R U' R' U R U R'",
+    "moves": 11,
+    "key": "c4.2/e8.0"
+  }
+]

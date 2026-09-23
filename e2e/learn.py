@@ -43,7 +43,9 @@ with sync_playwright() as p:
     page.goto(BASE + "/learn", wait_until="networkidle", timeout=60000)
     page.wait_for_timeout(3500)
 
-    cards = page.locator("a[href^='/learn/']")
+    # OLL and PLL cases only: the page also links to the F2L cases, which live
+    # on their own page and are counted by e2e/lessons.py.
+    cards = page.locator("a[href^='/learn/oll-'], a[href^='/learn/pll-']")
     check("all 78 cases are listed", cards.count() == 78, f"{cards.count()} cards")
 
     body = page.inner_text("body")

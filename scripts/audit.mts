@@ -484,6 +484,7 @@ console.log("Every route that solves carries the solver's tables");
     "/duel": "imports server/duels for duelRecord only",
     "/api/home": "imports server/duels for duelRecord only",
     "/solver": "imports the cube model to fill the net from a scramble; the solve itself is /api/solve",
+    "/learn/f2l": "imports the cube model to group the F2L cases; nothing is solved at request time",
   };
 
   const missing = [...needed].filter(

@@ -29,6 +29,8 @@ export const INDEXABLE: IndexableRoute[] = [
   // answers it with the site's own engine.
   { path: "/solver", changeFrequency: "monthly", priority: 0.95 },
   { path: "/learn", changeFrequency: "monthly", priority: 0.9 },
+  { path: "/learn/f2l", changeFrequency: "monthly", priority: 0.85 },
+  { path: "/notation", changeFrequency: "yearly", priority: 0.8 },
 
   { path: "/play", changeFrequency: "monthly", priority: 0.9 },
   { path: "/daily", changeFrequency: "daily", priority: 0.9 },

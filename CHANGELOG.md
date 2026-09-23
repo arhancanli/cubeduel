@@ -3,6 +3,31 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.13.0 — 2026-09-24
+
+### All 41 F2L cases, found rather than copied
+
+- **`/learn/f2l`**: every first-two-layers case for the front-right slot,
+  grouped by where the corner and edge start — both on top (24), corner on top
+  with the edge in the slot (6), the reverse (6), both in the slot (5) — each
+  with an algorithm and a cube, held cross-down, to step through.
+- **The algorithms were searched for, not typed in.** A script tries sequences
+  of the moves cubers actually use — top-face turns and the six triggers
+  R U R', R U' R', R U2 R', F' U F, F' U' F, F' U2 F — shortest first, and
+  keeps the first that solves each case. Averages 7 moves; none over 11.
+- **The count is proved, not assumed.** The pair's corner and edge can sit in
+  150 placements; turning the top face makes 41 cases plus solved. The tests
+  check all 41 are present and distinct, that each picture has the cross and
+  the other pairs intact, that each algorithm finishes the first two layers,
+  and that the group sizes are the ones the arithmetic gives.
+
+### Notation
+
+- **`/notation`**: every move — the six faces, prime and double turns, wide
+  turns, the middle slices and whole-cube rotations — as a button. Pressing one
+  starts the cube solved and plays that move, with a sentence on what it does.
+- F2L and notation are linked from Algorithms, and in the sitemap.
+
 ## 1.12.0 — 2026-09-24
 
 ### Ranked and Rush, rebuilt as game screens
