@@ -149,6 +149,14 @@ with sync_playwright() as p:
             "() => { const el = document.querySelector('[data-testid=inspection-countdown]');"
             " return el ? parseFloat(el.innerText) : null; }"
         )
+        # The countdown mounts when the attempt arms, a beat after the scramble
+        # text lands; reading at the same instant flaked on a loaded machine.
+        # Waiting for the element (not for a number) keeps the check honest: a
+        # countdown that never appears still fails here, after five seconds.
+        try:
+            page.wait_for_selector("[data-testid=inspection-countdown]", timeout=5000)
+        except Exception:
+            pass
         first = page.evaluate(read)
         check("an inspection countdown is on screen", first is not None,
               f"{first}s" if first is not None else "no countdown element")

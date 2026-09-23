@@ -9,10 +9,12 @@ import { ScrollSolve } from "@/components/ScrollSolve";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ratingForMs } from "@/lib/rating";
 import { CubeNet } from "@/components/CubeNet";
+import { HomeDashboard } from "@/components/HomeDashboard";
 import { TodayStrip } from "@/components/TodayStrip";
 import { formatAverage, formatMs } from "@/lib/format";
 import { ao5, bestSingle } from "@/lib/stats";
 import { loadHistory, type StoredSolve } from "@/lib/solveHistory";
+import { useSession } from "@/lib/useSession";
 
 /**
  * The front door.
@@ -37,6 +39,18 @@ export function LandingScreen({ dailyStart }: { dailyStart: string }) {
   }, []);
 
   const returning = (history?.length ?? 0) > 0;
+  const { loaded, session } = useSession();
+
+  // A player gets their home, not the pitch. Decided after the session loads, so
+  // the static page a visitor (or a crawler) receives is always the pitch.
+  if (loaded && session.signedIn) {
+    return (
+      <main className="flex min-h-dvh flex-col">
+        <SiteHeader active="home" />
+        <HomeDashboard handle={session.handle} dailyStart={dailyStart} />
+      </main>
+    );
+  }
 
   return (
     <main className="flex min-h-dvh flex-col">

@@ -32,7 +32,7 @@ export default function SolvePage() {
 
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-6 pb-24 pt-8">
         <Reveal className="flex flex-col gap-4">
-          <h1 className="text-3xl leading-tight tracking-tight">
+          <h1 className="text-balance text-4xl leading-[1.05] sm:text-5xl">
             How to solve a Rubik&rsquo;s cube
           </h1>
           <p className="max-w-xl text-sm leading-relaxed text-muted">

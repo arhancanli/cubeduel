@@ -32,7 +32,7 @@ with sync_playwright() as p:
     print("\n== a goal can be set with no solves ==")
     page.goto(BASE + "/progress", wait_until="domcontentloaded"); page.wait_for_timeout(2500)
     body = page.inner_text("body")
-    check("the empty state offers solving", "No solves recorded yet" in body)
+    check("the empty state offers solving", "starts filling in" in body and "Solve on the keyboard" in body)
 
     print("\n== record some solves ==")
     for i in range(3):

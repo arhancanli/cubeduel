@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { LastLayerDiagram } from "@/components/LastLayerDiagram";
+import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Reveal } from "@/components/Reveal";
 import { learnCases, SHAPE_ORDER, type LearnCase } from "@/lib/learn";
@@ -34,21 +35,20 @@ export default async function LearnPage() {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="learn" />
 
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-14 px-6 pb-24 pt-8">
-        <Reveal className="flex flex-col gap-3">
-          <h1 className="text-3xl leading-tight tracking-tight">
-            The last layer
-          </h1>
-          <p className="max-w-xl text-sm leading-relaxed text-muted">
-            All 57 OLL and 21 PLL cases. Every algorithm here is checked against
-            the puzzle itself — the case is built by running the algorithm
-            backwards from solved, so the picture, the moves and the name cannot
-            drift apart.
-          </p>
-          <p className="max-w-xl text-xs leading-relaxed text-muted-dim">
-            Grouped by the shape on top, because that is what you actually see in
-            the half second before you decide what to do.
-          </p>
+      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-14 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
+        <Reveal>
+          <PageHero eyebrow="Learn" title="The last layer">
+            <p>
+              All 57 OLL and 21 PLL cases. Every algorithm here is checked against
+              the puzzle itself — the case is built by running the algorithm
+              backwards from solved, so the picture, the moves and the name cannot
+              drift apart.
+            </p>
+            <p className="mt-2 text-sm text-muted-dim">
+              Grouped by the shape on top, because that is what you actually see in
+              the half second before you decide what to do.
+            </p>
+          </PageHero>
         </Reveal>
 
         {SHAPE_ORDER.map((shape) => {

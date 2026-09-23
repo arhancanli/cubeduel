@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { Reveal } from "@/components/Reveal";
+import { AuthShell } from "@/components/AuthShell";
 import { SiteHeader } from "@/components/SiteHeader";
 import { nextFromLocation } from "@/lib/nextPath";
 import { track } from "@/lib/analytics";
@@ -109,7 +110,7 @@ export function SignInScreen() {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="progress" />
 
-      <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-8 px-6 pb-24 pt-12">
+      <AuthShell>
         <Reveal className="flex flex-col gap-2">
           <h1 className="text-3xl leading-tight tracking-tight">
             Sign in
@@ -205,7 +206,7 @@ export function SignInScreen() {
             Make an account
           </Link>
         </Reveal>
-      </div>
+      </AuthShell>
     </main>
   );
 }

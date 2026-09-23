@@ -57,6 +57,7 @@ export type MomentKind =
   | "cross-clean"
   | "pause"
   | "undo"
+  | "cancel"
   | "long-way"
   | "rotations"
   | "two-look"
@@ -76,6 +77,15 @@ export interface Moment {
   alg?: string;
   /** Where to practise it. */
   href?: string;
+  /**
+   * What the moment is about, for rolling many reviews up into habits: the
+   * phase a pause came before or inside, or the case taken in two looks.
+   */
+  subject?: string;
+  /** Pauses only: whether it came before the phase's first turn. */
+  opensPhase?: boolean;
+  /** Cross only: turns over the shortest cross. */
+  extraTurns?: number;
 }
 
 export interface MoveReview {
@@ -177,6 +187,8 @@ export function reviewMoves(input: ReviewInput): MoveReview {
       atMs: turns[i - 1].atMs,
       costMs: gap - typical,
       title: opensPhase ? `${seconds(gap)} before ${phase}` : `${seconds(gap)} pause in ${phase}`,
+      subject: phase,
+      opensPhase,
       detail: opensPhase
         ? `Looking for what to do next. Your ordinary gap between turns is ${seconds(typical)}; the rest of this is recognition you could do while finishing ${phaseBefore(splits, phase) ?? "the previous step"}.`
         : `The hands stopped mid-${phase}. Usually a lost piece or a changed plan — watch what the cube looked like here.`,
@@ -205,7 +217,10 @@ export function reviewMoves(input: ReviewInput): MoveReview {
       // the first finishes removes both — "cancelling into" it.
       const seam = from !== to;
       moments.push({
-        kind: "undo",
+        // A different kind, not a different wording: across many solves a
+        // misread and a seam between algorithms are different habits with
+        // different fixes, and counting them together gave the wrong advice.
+        kind: seam ? "cancel" : "undo",
         tone: "cost",
         phase: from,
         atMs: a.atMs,
@@ -278,6 +293,7 @@ export function reviewMoves(input: ReviewInput): MoveReview {
         atMs: 0,
         costMs: extra * perTurn,
         title: `Cross in ${yours} — the shortest was ${input.cross.moves}`,
+        extraTurns: extra,
         detail: `On the same face, from the same scramble, held the way the scramble was written. Planning the whole cross in inspection is what gets a cross this short.`,
         alg: input.cross.solution,
       });
@@ -288,6 +304,7 @@ export function reviewMoves(input: ReviewInput): MoveReview {
         phase: "Cross",
         atMs: 0,
         costMs: 0,
+        extraTurns: Math.max(0, extra),
         title:
           extra <= 0
             ? `Cross in ${yours} — as short as it gets`
@@ -317,6 +334,7 @@ export function reviewMoves(input: ReviewInput): MoveReview {
         title: `${ref.stage} took ${yours} turns — ${caseName} is ${ref.moveCount} in one look`,
         detail: `That is what a two-step ${ref.stage} looks like. This case is worth learning on its own.`,
         href: `/learn/${ref.slug}`,
+        subject: caseName,
       });
     }
   }

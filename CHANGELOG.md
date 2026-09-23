@@ -3,6 +3,71 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.8.0 — 2026-09-23
+
+Insights: the habits that cost you the most, from your own turns.
+
+### From one solve to a habit
+
+A single review says where one solve lost time. Whether that was an accident
+or a habit only shows across solves, so `/review` now opens with **Insights**:
+your last 25 solves that kept their turns, each read back the same way its own
+review reads it, rolled up into habits.
+
+- **Ranked by time per solve**, averaged over every solve read — including the
+  ones where the habit did not show up. That is what fixing it would actually
+  give back, and it puts a small habit you have every time and a large one you
+  have once a month on one scale.
+- **"Fix this first"** is the top one, with the evidence and its sample stated
+  ("a long pause before F2L 3 in 7 of 10 solves"), what to do about it, and
+  **Watch the worst one** — the solve where it cost the most, opened at its own
+  review.
+- **Where you stop**: pauses are grouped by where they happen, so the habit is
+  named as a place — before the third pair, in OLL — not as "pauses".
+- **The cross**: how many turns over the shortest cross on the same face, on
+  average, over the solves where it could be judged.
+- **Two-look cases**, listed by how often they come up, with the commonest one
+  linked to learn.
+- **Nothing is claimed from fewer than five solves**, and a habit that is both
+  rare and cheap is left out rather than padded into the list.
+- The Progress page links to it.
+
+### A home for players
+
+- **Signed in, the front page is yours.** The pitch is for visitors; a player
+  now lands on their standing — the ranked rating read back as an average, or
+  how many verified solves are left to a first one — with challenges waiting,
+  today's daily, the duel record and the Rush best beside it, recent solves with
+  a review link on each, and the cube net to play. One request to a new
+  `/api/home`, where a part that fails comes back empty instead of taking the
+  page down with it. Visitors and crawlers still get the static pitch.
+
+### Every page, finished
+
+- **Profiles** open with a monogram and the name large, and the stats are
+  tiles.
+- **The leaderboard**: a monogram for each player, the top three in sticker
+  colours — yellow, white and orange, the cube's gold, silver and bronze — and
+  ratings in the display face.
+- **Sign in, make an account, forgot and reset** share one frame: what an
+  account gets you on the left, the form in a card on the right.
+- **Progress with nothing in it** says what will fill it and how to start,
+  instead of one grey line.
+- **Learn, How to solve, Your cube and Privacy** open at the same scale as
+  every other page.
+- **Sign-in gates** keep the mode's name on its own and its one-line
+  description under the title; on a phone the daily's date no longer squeezes
+  the account button onto two lines.
+
+### Fixed
+
+- **A seam between two algorithms was called a misread.** When OLL ends on R'
+  and PLL starts on R, the two turns cancel — but nothing was misread; the next
+  case just was not recognised in time to leave both out. The review now calls
+  these a seam, and Insights counts them as their own habit with their own
+  advice. Found when Insights reported "You undo turns — usually a misread
+  piece" in six solves out of six, where the browser suite had planted one.
+
 ## 1.7.0 — 2026-09-23
 
 Solve review: every solve read back one turn at a time.

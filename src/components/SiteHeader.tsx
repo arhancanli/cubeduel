@@ -125,7 +125,9 @@ export function SiteHeader({
           a pinned bar would take 56px from a clock that needs every one. */}
       <header className={`flex items-center gap-3 px-4 py-3 lg:hidden ${chrome}`}>
         <Brand />
-        {trailing ? <span className="truncate text-xs text-muted-dim">{trailing}</span> : null}
+        {/* Not on a phone: there is no room beside the account and menu
+            buttons, and the pages that pass it say the same thing larger. */}
+        {trailing ? <span className="hidden truncate text-xs text-muted-dim sm:inline">{trailing}</span> : null}
         <span className="flex-1" />
         <AuthControl compact />
         <button

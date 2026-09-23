@@ -25,7 +25,7 @@ export default function PrivacyPage() {
 
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 pb-24 pt-10">
         <header className="flex flex-col gap-3">
-          <h1 className="text-3xl tracking-tight">Privacy</h1>
+          <h1 className="text-4xl leading-[1.05] sm:text-5xl">Privacy</h1>
           <p className="text-sm leading-relaxed text-muted">
             Short, specific, and checkable. cubeduel is open source, so every
             claim here points at a file you can read rather than asking you to

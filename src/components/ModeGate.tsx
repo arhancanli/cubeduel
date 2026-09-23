@@ -39,11 +39,15 @@ export function ModeGate({
           />
           <div className="flex items-center gap-3">
             <Glyph pattern={mode.glyph} sticker={mode.sticker} size={36} />
-            <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">
-              {mode.label} · {mode.blurb}
+            <span
+              className="text-[11px] font-semibold uppercase tracking-[0.16em]"
+              style={{ color: stickerVar(mode.sticker) }}
+            >
+              {mode.label}
             </span>
           </div>
           <h1 className="mt-6 text-balance text-3xl leading-tight sm:text-4xl">{title}</h1>
+          <p className="mt-2 text-sm font-semibold text-foreground/80">{mode.blurb}</p>
           {children ? <p className="mt-4 text-base leading-relaxed text-muted">{children}</p> : null}
           {signIn ? (
             <div className="mt-8 flex flex-wrap gap-3">

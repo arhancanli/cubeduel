@@ -45,7 +45,7 @@ with sync_playwright() as p:
     page.goto(BASE + "/progress", wait_until="networkidle")
     page.wait_for_timeout(800)
     section = page.locator("[data-testid=cstimer-import]")
-    check("the import is on the empty page", section.count() == 1 and "No solves recorded yet" in page.inner_text("body"))
+    check("the import is on the empty page", section.count() == 1 and "starts filling in" in page.inner_text("body"))
 
     print("\n== the preview comes before anything is written ==")
     page.set_input_files("input[type=file]", FIXTURE)
@@ -62,7 +62,7 @@ with sync_playwright() as p:
     status = section.inner_text()
     check("the confirmation survives the page filling in", "Added 3 solves from csTimer" in status, status[:120])
     body = page.inner_text("body")
-    check("the page is no longer empty", "No solves recorded yet" not in body)
+    check("the page is no longer empty", "starts filling in" not in body)
     imported = page.locator("[data-testid=imported-count]")
     check("it says how many came from csTimer", imported.count() == 1 and "3 of these came from csTimer" in imported.inner_text())
 

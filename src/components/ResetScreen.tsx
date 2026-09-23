@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { Reveal } from "@/components/Reveal";
+import { AuthShell } from "@/components/AuthShell";
 import { SiteHeader } from "@/components/SiteHeader";
 // From `passwordPolicy`, never from `password`. That module imports
 // `node:crypto` and `node:util`; pulling a single constant from it into a
@@ -64,7 +65,7 @@ export function ResetScreen({ token }: { token: string | null }) {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="progress" />
 
-      <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-8 px-6 pb-24 pt-12">
+      <AuthShell>
         {!token ? (
           <Reveal className="flex flex-col gap-3">
             <h1 className="text-2xl tracking-tight">
@@ -146,7 +147,7 @@ export function ResetScreen({ token }: { token: string | null }) {
             </Reveal>
           </>
         )}
-      </div>
+      </AuthShell>
     </main>
   );
 }

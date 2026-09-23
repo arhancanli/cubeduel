@@ -57,19 +57,29 @@ export function ProgressScreen() {
     <Shell>
       <div className="flex w-full max-w-2xl flex-col gap-10">
         {solves.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 text-center">
-            <p className="text-sm text-muted">No solves recorded yet.</p>
-            <Link
-              href="/play"
-              className="btn-go px-5 py-2.5 text-sm"
-            >
-              Start solving
-            </Link>
-          </div>
+          <EmptyProgress />
         ) : (
           <>
             <GoalPanel solves={solves} />
             <Recommendation diagnosis={diagnosis} />
+            {/* The tables below say which phase is slow; the review says why,
+                from the turns. One line, because it is a different page. */}
+            {solves.some((solve) => solve.moves) ? (
+              <Link
+                href="/review"
+                className="group flex items-center justify-between gap-4 rounded-2xl border border-border bg-surface px-5 py-4 transition-colors hover:border-muted-dim/60"
+              >
+                <span className="flex flex-col gap-0.5">
+                  <span className="text-[15px] font-semibold">Insights from your turns</span>
+                  <span className="text-sm text-muted">
+                    The habits costing you the most, and each solve read back move by move.
+                  </span>
+                </span>
+                <span aria-hidden="true" className="text-lg transition-transform group-hover:translate-x-0.5">
+                  →
+                </span>
+              </Link>
+            ) : null}
             {aggregates.length > 0 ? <PhaseTable aggregates={aggregates} /> : null}
             {aggregates.length > 0 ? <LookTurnTable rows={looking} /> : null}
             <CaseCoach solves={solves} />
@@ -310,5 +320,47 @@ function Shell({ children }: { children: React.ReactNode }) {
       <h1 className="sr-only">Your progress</h1>
       <div className="flex flex-1 justify-center px-6 py-8">{children}</div>
     </main>
+  );
+}
+
+/**
+ * The first visit. Not "nothing here" but what will be here, and the one step
+ * that starts it — because what fills this page is the reason to come back.
+ */
+function EmptyProgress() {
+  const coming = [
+    ["Where the time goes", "Cross, each pair, OLL and PLL — timed on every solve, averaged across them."],
+    ["Looking or turning", "Whether a slow phase is slow eyes or slow hands. They need different practice."],
+    ["The cases to drill", "The OLL and PLL cases costing you the most, ranked by time you would get back."],
+    ["Your habits", "Where you stop, how long your cross runs, which cases take you two looks."],
+  ];
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sticker-green">Progress</p>
+        <p className="font-display text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">
+          Solve once, and this page starts filling in.
+        </p>
+        <p className="max-w-xl text-base leading-relaxed text-muted">
+          Everything here is worked out from your own solves, on this device. No account needed.
+        </p>
+        <div className="flex flex-wrap gap-3 pt-1">
+          <Link href="/play" className="btn-go px-6 py-3 text-[15px]">
+            Solve on the keyboard
+          </Link>
+          <Link href="/timer" className="btn-secondary px-5 py-3 text-[15px]">
+            Time a real cube
+          </Link>
+        </div>
+      </div>
+      <ul className="grid gap-3 sm:grid-cols-2">
+        {coming.map(([title, body]) => (
+          <li key={title} className="rounded-2xl border border-border bg-surface p-5">
+            <p className="text-[15px] font-semibold">{title}</p>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted">{body}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

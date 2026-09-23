@@ -482,6 +482,7 @@ console.log("Every route that solves carries the solver's tables");
   const NOT_SOLVING: Record<string, string> = {
     "/api/duel/finish": "imports server/duels for finishDuel; only startDuel solves",
     "/duel": "imports server/duels for duelRecord only",
+    "/api/home": "imports server/duels for duelRecord only",
   };
 
   const missing = [...needed].filter(

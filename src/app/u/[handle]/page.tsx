@@ -50,9 +50,18 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="leaderboard" />
 
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-10 px-6 pb-20 pt-6">
-        <header className="flex flex-col gap-1">
-          <h1 className="text-2xl tracking-tight">
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-10 px-4 pb-20 pt-6 sm:px-8 lg:pt-12">
+        <header className="flex items-center gap-5">
+          {/* A monogram rather than an uploaded picture: there are no uploads,
+              and a grey silhouette says "missing" where a letter says "you". */}
+          <span
+            aria-hidden="true"
+            className="grid size-20 shrink-0 place-items-center rounded-2xl border border-border bg-surface-hi font-display text-4xl font-extrabold uppercase sm:size-24 sm:text-5xl"
+          >
+            {(profile.display_name || profile.handle).slice(0, 1)}
+          </span>
+          <div className="flex min-w-0 flex-col gap-1">
+          <h1 className="truncate text-4xl leading-tight sm:text-5xl">
             {profile.display_name}
           </h1>
           <p className="text-sm text-muted-dim">
@@ -67,9 +76,10 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
           {profile.bio ? (
             <p className="mt-2 max-w-prose text-sm text-muted">{profile.bio}</p>
           ) : null}
+          </div>
         </header>
 
-        <section className="flex flex-wrap gap-x-10 gap-y-6">
+        <section className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Stat
             label="rating"
             value={stats.rating === null ? "—" : String(Math.round(stats.rating))}
@@ -200,12 +210,12 @@ function Stat({
   note: string;
 }) {
   return (
-    <div className="flex flex-col gap-1">
-      <span className="text-[10px] uppercase tracking-widest text-muted-dim">
+    <div className="flex flex-col gap-1 rounded-2xl border border-border bg-surface p-4 sm:p-5">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
         {label}
       </span>
-      <span className="tnum text-2xl font-medium">{value}</span>
-      <span className="text-[11px] text-muted-dim">{note}</span>
+      <span className="tnum font-display text-3xl font-bold">{value}</span>
+      <span className="text-xs text-muted-dim">{note}</span>
     </div>
   );
 }

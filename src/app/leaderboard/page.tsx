@@ -89,26 +89,30 @@ export default async function LeaderboardPage() {
             </Link>
           </Empty>
         ) : (
-          <ol className="divide-y divide-border overflow-hidden rounded-lg border border-border">
+          <ol className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
             {board.map((entry) => (
               <li
                 key={entry.handle}
-                className="flex items-center gap-4 bg-surface px-4 py-3"
+                className="flex items-center gap-4 bg-surface px-4 py-3 transition-colors hover:bg-surface-hi"
               >
-                <span className="tnum w-8 shrink-0 text-sm text-muted-dim">
-                  {entry.rank}
+                <RankBadge rank={entry.rank} />
+                <span
+                  aria-hidden="true"
+                  className="grid size-9 shrink-0 place-items-center rounded-lg bg-surface-hi font-display text-sm font-bold uppercase"
+                >
+                  {(entry.displayName || entry.handle).slice(0, 1)}
                 </span>
                 <Link
                   href={`/u/${entry.handle}`}
                   className="min-w-0 flex-1 truncate text-sm transition-colors hover:text-foreground"
                 >
-                  <span className="font-medium">{entry.displayName}</span>
+                  <span className="font-semibold">{entry.displayName}</span>
                   <span className="ml-2 text-muted-dim">@{entry.handle}</span>
                 </Link>
                 <span className="hidden text-xs text-muted-dim sm:inline">
                   {formatMs(msForRating(entry.rating), { truncate: false })} pace
                 </span>
-                <span className="tnum w-16 shrink-0 text-right text-sm font-medium">
+                <span className="tnum w-16 shrink-0 text-right font-display text-lg font-bold">
                   {Math.round(entry.rating)}
                 </span>
                 <span className="tnum hidden w-12 shrink-0 text-right text-xs text-muted-dim sm:inline">
@@ -245,5 +249,29 @@ function Empty({ children }: { children: React.ReactNode }) {
     <p className="rounded-2xl border border-dashed border-border px-5 py-8 text-center text-sm text-muted">
       {children}
     </p>
+  );
+}
+
+/**
+ * The top three wear sticker colours — yellow, white, orange, the nearest the
+ * cube has to gold, silver and bronze — and everyone else a plain number.
+ */
+function RankBadge({ rank }: { rank: number }) {
+  const podium: Record<number, string> = {
+    1: "var(--sticker-yellow)",
+    2: "var(--sticker-white)",
+    3: "var(--sticker-orange)",
+  };
+  const colour = podium[rank];
+  if (!colour) {
+    return <span className="tnum w-8 shrink-0 text-center text-sm text-muted-dim">{rank}</span>;
+  }
+  return (
+    <span
+      className="tnum grid size-8 shrink-0 place-items-center rounded-lg font-display text-sm font-extrabold text-background"
+      style={{ background: colour }}
+    >
+      {rank}
+    </span>
   );
 }

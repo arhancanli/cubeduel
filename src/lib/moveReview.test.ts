@@ -271,7 +271,9 @@ test("an undo across a phase boundary is named as two algorithms cancelling", ()
   const input = plainSolve();
   // OLL ends on R'; start PLL on R instead of the U2.
   input.moves = input.moves.map((m) => (m.atMs === 8200 ? { ...m, move: "R" } : m));
-  const seam = reviewMoves(input).moments.find((m) => m.kind === "undo");
+  const moments = reviewMoves(input).moments;
+  assert.ok(!moments.some((m) => m.kind === "undo"), "a seam is not a misread");
+  const seam = moments.find((m) => m.kind === "cancel");
   assert.ok(seam);
   assert.match(seam.title, /OLL and PLL cancel/);
   assert.match(seam.detail, /cancelling into/);

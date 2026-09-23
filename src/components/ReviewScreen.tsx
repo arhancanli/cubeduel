@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+import { InsightsPanel, type InsightSolve } from "@/components/InsightsPanel";
 import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SolveStudy } from "@/components/SolveStudy";
@@ -37,7 +38,7 @@ export function ReviewScreen() {
     | { kind: "loading" }
     | { kind: "one"; item: Reviewable }
     | { kind: "missing" }
-    | { kind: "list"; items: Reviewable[]; total: number }
+    | { kind: "list"; items: Reviewable[]; total: number; insight: InsightSolve[] }
   >({ kind: "loading" });
 
   // Read reactively: moving from the list to a solve changes only the query,
@@ -58,7 +59,13 @@ export function ReviewScreen() {
         .filter((r): r is Reviewable => r !== null)
         .reverse()
         .slice(0, 30);
-      setState({ kind: "list", items, total: history.length });
+      const insight = items.map(({ solve, moves }) => ({
+        href: `/review?id=${encodeURIComponent(solve.id)}`,
+        scramble: solve.scramble,
+        moves,
+        durationMs: solve.durationMs,
+      }));
+      setState({ kind: "list", items, total: history.length, insight });
     };
     // Read after mount: the history lives in this browser, not on the server.
     const timer = window.setTimeout(read, 0);
@@ -93,8 +100,9 @@ export function ReviewScreen() {
         ) : (
           <>
             <PageHero eyebrow="Improve" title="Solve review">
-              Pick a solve and it is read back one turn at a time: the shortest cross you could have
-              built, where you stopped, the turns you undid, and the cases worth learning next.
+              Every solve read back one turn at a time — the shortest cross you could have built,
+              where you stopped, the turns you undid — and, across your recent solves, the habits
+              that cost you the most.
             </PageHero>
             {state.kind === "missing" ? (
               <p className="rounded-2xl border border-border bg-surface px-5 py-5 text-sm text-muted">
@@ -102,7 +110,15 @@ export function ReviewScreen() {
                 read back.
               </p>
             ) : null}
-            {state.kind === "list" ? <SolveList items={state.items} total={state.total} /> : null}
+            {state.kind === "list" && state.items.length > 0 ? (
+              <InsightsPanel solves={state.insight} />
+            ) : null}
+            {state.kind === "list" ? (
+              <section className="flex flex-col gap-3">
+                {state.items.length > 0 ? <h2 className="text-xl">Every solve you can review</h2> : null}
+                <SolveList items={state.items} total={state.total} />
+              </section>
+            ) : null}
           </>
         )}
       </div>

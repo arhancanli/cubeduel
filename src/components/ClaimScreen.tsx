@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Reveal } from "@/components/Reveal";
+import { AuthShell } from "@/components/AuthShell";
 import { SiteHeader } from "@/components/SiteHeader";
 import {
   MIN_SOLVES_TO_PROJECT,
@@ -150,7 +151,7 @@ export function ClaimScreen() {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="progress" />
 
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-6 pb-24 pt-8">
+      <AuthShell>
         {summary?.worthClaiming ? (
           <Reveal className="flex flex-col gap-8">
             <div className="flex flex-col gap-3">
@@ -353,7 +354,7 @@ export function ClaimScreen() {
             </form>
           )}
         </Reveal>
-      </div>
+      </AuthShell>
     </main>
   );
 }

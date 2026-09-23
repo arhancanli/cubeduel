@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { Reveal } from "@/components/Reveal";
+import { AuthShell } from "@/components/AuthShell";
 import { SiteHeader } from "@/components/SiteHeader";
 
 /**
@@ -62,7 +63,7 @@ export function ForgotScreen() {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="progress" />
 
-      <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-8 px-6 pb-24 pt-12">
+      <AuthShell>
         {sent ? (
           <Reveal className="flex flex-col gap-4">
             <h1 className="text-2xl tracking-tight">Check your inbox</h1>
@@ -133,7 +134,7 @@ export function ForgotScreen() {
             </Reveal>
           </>
         )}
-      </div>
+      </AuthShell>
     </main>
   );
 }

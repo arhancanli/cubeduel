@@ -119,6 +119,47 @@ with sync_playwright() as p:
         check("choosing a moment plays the replay",
               page.get_by_role("button", name="Pause", exact=True).count() == 1)
 
+        print("\n== five more solves, the same habit each time ==")
+        # Insights needs five solves before it says anything. Each is solved for
+        # real, through /play, with the same stop before the third pair and no
+        # undo: across six solves that stop is a habit and the undo is not.
+        for _ in range(5):
+            page.goto(f"{BASE}/play?scramble={quote(SCRAMBLE)}", wait_until="networkidle")
+            page.wait_for_selector("twisty-player", timeout=30000)
+            page.wait_for_timeout(2500)
+            for i, step in enumerate(STEPS):
+                if i == 3:
+                    page.wait_for_timeout(2200)
+                for move in step.split():
+                    press(page, move)
+            page.wait_for_timeout(1500)
+            check("each solve finishes", page.get_by_role("link", name="Review this solve").count() == 1)
+
+        print("\n== insights ==")
+        page.goto(BASE + "/review", wait_until="networkidle")
+        page.wait_for_selector("[data-testid=habit-first]", timeout=60000)
+        first = page.locator("[data-testid=habit-first]").inner_text()
+        check("the habit to fix first is the stop before the third pair",
+              "before F2L 3" in first, first.replace("\n", " ")[:200])
+        check("it states the sample", "6 of 6 solves" in first, first.replace("\n", " ")[:200])
+        heading = page.locator("#insights-heading").inner_text()
+        check("it says how many solves it read", "6 solves" in heading, heading)
+        panel = page.locator("[data-testid=insights]").inner_text()
+        check("the one-off undo is not promoted to a habit", "You undo turns" not in panel)
+        # The solve's OLL ends on R' and its PLL starts on R — in all six. That is
+        # a seam between algorithms, and it must be named as one, not as a misread.
+        check("the seam between OLL and PLL is its own habit",
+              "undo each other at the seams" in panel and "misread" not in panel)
+
+        worst = page.locator("[data-testid=habit-first]").get_by_role("link", name="Watch the worst one")
+        check("the habit links to the solve where it cost most", worst.count() == 1)
+        if worst.count() == 1:
+            worst.click()
+            page.wait_for_url("**/review?id=*", timeout=15000)
+            page.wait_for_selector("[data-testid=review-moments]", timeout=30000)
+            check("and that solve's review shows the same stop",
+                  any("before F2L 3" in m for m in page.locator("[data-testid=review-moments] > li").all_inner_texts()))
+
         print("\n== the list ==")
         page.goto(BASE + "/review", wait_until="networkidle")
         page.wait_for_timeout(1500)
