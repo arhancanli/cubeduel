@@ -7,6 +7,7 @@ import { CubeView } from "@/components/CubeView";
 import { KeyMapHint } from "@/components/KeyMapHint";
 import { MovePad } from "@/components/MovePad";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SolveSwitch } from "@/components/SolveSwitch";
 import { SolveBreakdown } from "@/components/SolveBreakdown";
 import { formatMs } from "@/lib/format";
 import { countMoves, encodeMoveStream, type SolveRecording } from "@/lib/moveStream";
@@ -119,130 +120,155 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
           chrome-free — a visible heading beside the clock would be noise. */}
       <h1 className="sr-only">Keyboard cubing</h1>
 
-      <div className="flex flex-1 flex-col items-center gap-6 px-6 pb-10">
-        <div
-          className={`flex w-full flex-col items-center gap-6 transition-opacity duration-200 ${
-            solving ? "opacity-30" : "opacity-100"
-          }`}
-        >
-          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-3 gap-y-1.5 font-mono text-base leading-snug sm:text-lg">
-            {scramble.split(" ").map((move, i) => (
-              <span key={`${move}-${i}`}>{move}</span>
-            ))}
-          </div>
-        </div>
+      <div className="mx-auto grid w-full max-w-7xl flex-1 items-start gap-6 px-4 pb-10 pt-3 sm:px-8 lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-8 lg:pt-8">
+        <div className="flex min-w-0 flex-col items-center gap-5 md:gap-6">
+          <SolveSwitch
+            active="keyboard"
+            className={`transition-opacity duration-200 ${solving ? "opacity-30" : "opacity-100"}`}
+          />
 
-        <CubeView
-          scramble={scramble}
-          /*
-           * cubing.js's own click/drag-to-turn input is deliberately NOT enabled.
-           * It throws "internal parsing error" on load here, and I could not drive
-           * it through synthetic pointer events to confirm it works at all — so it
-           * would have been an unverifiable feature that also poisons the console.
-           * The MovePad below is the touch path, and it is tested.
-           */
-          interactive
-          onPlayerReady={session.onPlayerReady}
-          className="h-[26vh] max-h-64 min-h-36 w-full max-w-lg"
-        />
-
-        <div className="flex flex-col items-center gap-2">
-          <div
-            ref={displayRef}
-            className={`tnum font-display text-6xl font-bold leading-none tracking-tighter transition-colors sm:text-7xl ${
-              phase === "solved" ? "text-ready" : "text-foreground"
+          <section
+            className={`w-full rounded-2xl border border-border bg-surface px-4 py-4 transition-opacity duration-200 sm:px-6 ${
+              solving ? "opacity-30" : "opacity-100"
             }`}
           >
-            0.00
-          </div>
-          <p className="text-xs text-muted-dim">
-            {phase === "armed" &&
-              "Turn the cube to start the clock — buttons below on a phone, or the keyboard."}
-            {phase === "running" && `${moveCount} moves`}
-            {phase === "solved" && "Solved"}
-            {phase === "idle" && "Loading…"}
-          </p>
-        </div>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">
+                Scramble · already applied
+              </span>
+              <span className="text-[11px] text-muted-dim">The cube below is scrambled for you</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-base leading-snug sm:text-lg">
+              {scramble.split(" ").map((move, i) => (
+                <span key={`${move}-${i}`}>{move}</span>
+              ))}
+            </div>
+          </section>
 
-        {recording ? (
-          <SolveReport
-            recording={recording}
-            optimal={optimal}
-            optimalCross={optimalCross}
-            crossEndMs={splits?.find((s) => s.phase === "Cross")?.endMs ?? null}
+          <CubeView
+            scramble={scramble}
+            /*
+             * cubing.js's own click/drag-to-turn input is deliberately NOT enabled.
+             * It throws "internal parsing error" on load here, and I could not drive
+             * it through synthetic pointer events to confirm it works at all — so it
+             * would have been an unverifiable feature that also poisons the console.
+             * The MovePad below is the touch path, and it is tested.
+             */
+            interactive
+            backView="none"
+            onPlayerReady={session.onPlayerReady}
+            className="h-[30vh] max-h-80 min-h-44 w-full max-w-md"
           />
-        ) : null}
-        {splits && splits.length > 0 ? <SolveBreakdown splits={splits} /> : null}
 
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          {/* After a solve the review is the first button, not the next
-              scramble: a recommendation that has to win a click against
-              "again" at the moment of highest emotion only gets read if it
-              is the obvious one. */}
-          {phase === "solved" && reviewId ? (
-            <Link href={`/review?id=${encodeURIComponent(reviewId)}`} className="btn-go px-5 py-2.5 text-sm">
-              Review this solve
-            </Link>
+          <div className="flex flex-col items-center gap-2">
+            <div
+              ref={displayRef}
+              className={`tnum font-display text-6xl font-bold leading-none tracking-tighter transition-colors sm:text-7xl ${
+                phase === "solved" ? "text-ready" : "text-foreground"
+              }`}
+            >
+              0.00
+            </div>
+            <p className="text-sm text-muted">
+              {phase === "armed" &&
+                "Make your first turn to start the clock. It stops by itself when the cube is solved."}
+              {phase === "running" && `${moveCount} moves`}
+              {phase === "solved" && "Solved"}
+              {phase === "idle" && "Loading…"}
+            </p>
+          </div>
+
+          {/* Touch first on small screens; the keyboard legend is useless there. */}
+          <MovePad onMove={session.pushMove} className="md:hidden" />
+
+          {recording ? (
+            <SolveReport
+              recording={recording}
+              optimal={optimal}
+              optimalCross={optimalCross}
+              crossEndMs={splits?.find((s) => s.phase === "Cross")?.endMs ?? null}
+            />
           ) : null}
-          <button
-            type="button"
-            onClick={() => void session.startRound()}
-            className={`${phase === "solved" && reviewId ? "btn-secondary" : "btn-go"} px-5 py-2.5 text-sm`}
-          >
-            {phase === "solved" ? "Next scramble" : "New scramble"}
-          </button>
-          {phase === "solved" ? (
+          {splits && splits.length > 0 ? <SolveBreakdown splits={splits} /> : null}
+
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            {/* After a solve the review is the first button, not the next
+                scramble: a recommendation that has to win a click against
+                "again" at the moment of highest emotion only gets read if it
+                is the obvious one. */}
+            {phase === "solved" && reviewId ? (
+              <Link href={`/review?id=${encodeURIComponent(reviewId)}`} className="btn-go px-5 py-2.5 text-sm">
+                Review this solve
+              </Link>
+            ) : null}
             <button
               type="button"
-              onClick={() => {
-                const url = `${window.location.origin}/play?scramble=${encodeURIComponent(
-                  session.scrambleRef.current,
-                )}`;
-                void navigator.clipboard
-                  .writeText(url)
-                  .then(() => {
-                    setCopied(true);
-                    setTimeout(() => setCopied(false), 2000);
-                  })
-                  .catch(() => {});
-              }}
-              className="btn-secondary px-5 py-2.5 text-sm"
+              onClick={() => void session.startRound()}
+              className={`${phase === "solved" && reviewId ? "btn-secondary" : "btn-go"} px-5 py-2.5 text-sm`}
             >
-              {copied ? "Link copied" : "Challenge a friend"}
+              {phase === "solved" ? "Next scramble" : "New scramble"}
             </button>
+            {phase === "solved" ? (
+              <button
+                type="button"
+                onClick={() => {
+                  const url = `${window.location.origin}/play?scramble=${encodeURIComponent(
+                    session.scrambleRef.current,
+                  )}`;
+                  void navigator.clipboard
+                    .writeText(url)
+                    .then(() => {
+                      setCopied(true);
+                      setTimeout(() => setCopied(false), 2000);
+                    })
+                    .catch(() => {});
+                }}
+                className="btn-secondary px-5 py-2.5 text-sm"
+              >
+                {copied ? "Link copied" : "Challenge a friend"}
+              </button>
+            ) : null}
+            {support?.supported ? (
+              <button
+                type="button"
+                onClick={() => void session.connectCube()}
+                className="btn-secondary px-5 py-2.5 text-sm"
+              >
+                Connect smart cube
+              </button>
+            ) : null}
+          </div>
+
+          <p className="text-center text-xs text-muted-dim">
+            {sourceName ? `Input: ${sourceName}` : "Connecting input…"}
+            {support && !support.supported && support.reason ? (
+              <span className="mt-1 block max-w-md text-muted-dim">{support.reason}</span>
+            ) : null}
+          </p>
+
+          {connectError ? (
+            <p className="max-w-md text-center text-xs text-danger">{connectError}</p>
           ) : null}
-          {support?.supported ? (
-            <button
-              type="button"
-              onClick={() => void session.connectCube()}
-              className="btn-secondary px-5 py-2.5 text-sm"
-            >
-              Connect smart cube
-            </button>
-          ) : null}
+
         </div>
 
-        <p className="text-center text-xs text-muted-dim">
-          {sourceName ? `Input: ${sourceName}` : "Connecting input…"}
-          {support && !support.supported && support.reason ? (
-            <span className="mt-1 block max-w-md text-muted-dim">{support.reason}</span>
-          ) : null}
-        </p>
-
-        {connectError ? (
-          <p className="max-w-md text-center text-xs text-danger">{connectError}</p>
-        ) : null}
-
-        {/* Touch first on small screens; the keyboard legend is useless there. */}
-        <MovePad onMove={session.pushMove} className="md:hidden" />
-
-        <div
-          className={`mt-2 hidden transition-opacity duration-200 md:block ${
-            solving ? "opacity-20" : "opacity-100"
+        {/* The controls, beside the cube rather than under it. Always visible:
+            a beginner needs the mapping on every move for their first sessions,
+            and the key just pressed lights up so it is learned by use. */}
+        <aside
+          aria-label="Keyboard controls"
+          className={`hidden flex-col gap-3 rounded-2xl border border-border bg-surface p-5 transition-opacity duration-200 md:flex lg:sticky lg:top-6 ${
+            solving ? "opacity-40" : "opacity-100"
           }`}
         >
-          <KeyMapHint activeCode={activeKey} />
-        </div>
+          <div className="flex flex-col gap-1">
+            <h2 className="text-base">Keyboard controls</h2>
+            <p className="text-xs leading-relaxed text-muted-dim">
+              Each key turns one layer. The one you just pressed lights up.
+            </p>
+          </div>
+          <KeyMapHint activeCode={activeKey} compact />
+        </aside>
       </div>
     </main>
   );
@@ -345,7 +371,7 @@ function SolveReport({
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
       <span className="tnum text-lg font-medium text-muted">{value}</span>
     </div>
   );

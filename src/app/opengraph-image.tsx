@@ -53,11 +53,11 @@ export default function OpengraphImage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
           <div style={{ fontSize: 30, color: DIM, letterSpacing: 2 }}>cubeduel</div>
           <div style={{ fontSize: 76, lineHeight: 1.05, letterSpacing: -2, maxWidth: 900 }}>
-            A rating that actually means something.
+            The speedcubing site that shows you why you’re slow.
           </div>
           <div style={{ fontSize: 30, color: MUTED, lineHeight: 1.4, maxWidth: 880 }}>
-            The server issues a scramble nobody has seen, replays your solve to
-            prove it happened, and only then does it count.
+            Every solve reviewed move by move. Live races, a verified ladder.
+            Free, open source, no account needed.
           </div>
         </div>
 

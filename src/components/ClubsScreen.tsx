@@ -125,7 +125,7 @@ export function ClubsScreen({
 
         {clubs.length > 0 ? (
           <Reveal className="flex flex-col gap-3">
-            <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+            <h2 className="text-lg">
               Your clubs
             </h2>
             <ul className="flex list-none flex-col gap-px overflow-hidden rounded-xl border border-border bg-border p-0">
@@ -160,7 +160,7 @@ export function ClubsScreen({
           <>
             {/* Joining first: almost everybody arriving here was handed a code. */}
             <Reveal className="flex flex-col gap-3">
-              <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+              <h2 className="text-lg">
                 Join with a code
               </h2>
               <form onSubmit={join} className="flex flex-wrap items-start gap-3">
@@ -190,7 +190,7 @@ export function ClubsScreen({
             </Reveal>
 
             <Reveal className="flex flex-col gap-3">
-              <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+              <h2 className="text-lg">
                 Or start one
               </h2>
               <form onSubmit={create} className="flex flex-col gap-4">

@@ -85,7 +85,7 @@ export function DailyMemory({
 function Figure({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
-      <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
       <span className="tnum text-lg font-medium text-muted">{value}</span>
     </div>
   );

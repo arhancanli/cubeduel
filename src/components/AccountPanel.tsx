@@ -127,7 +127,7 @@ export function AccountPanel({
   return (
     <div className="flex flex-col gap-10">
       <section className="flex flex-col gap-3">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Account</h2>
+        <h2 className="text-lg">Account</h2>
         <p className="font-mono text-sm">{email}</p>
         {emailVerified ? (
           <p className="text-xs text-muted-dim">
@@ -149,7 +149,7 @@ export function AccountPanel({
 
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Passkeys</h2>
+          <h2 className="text-lg">Passkeys</h2>
           {canAdd ? (
             <button
               type="button"
@@ -209,7 +209,7 @@ export function AccountPanel({
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+        <h2 className="text-lg">
           Where you are signed in
         </h2>
 

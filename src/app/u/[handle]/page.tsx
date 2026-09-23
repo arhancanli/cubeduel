@@ -140,7 +140,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
 
         {stats.history.length > 1 ? (
           <section>
-            <h2 className="mb-3 text-[10px] uppercase tracking-widest text-muted-dim">
+            <h2 className="mb-3 text-lg">
               Rating over time
             </h2>
             <RatingHistory points={stats.history} />
@@ -148,7 +148,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
         ) : null}
 
         <section>
-          <h2 className="mb-3 text-[10px] uppercase tracking-widest text-muted-dim">
+          <h2 className="mb-3 text-lg">
             Recent solves
           </h2>
           {stats.recent.length === 0 ? (

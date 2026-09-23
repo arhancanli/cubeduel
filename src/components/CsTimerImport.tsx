@@ -81,7 +81,7 @@ export function CsTimerImport({ onImported }: { onImported?: () => void }) {
 
   return (
     <section className="flex flex-col gap-3" data-testid="cstimer-import">
-      <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Bring your csTimer history</h2>
+      <h2 className="text-xl">Bring your csTimer history</h2>
 
       {/* One input for every state, so a second file — another device's
           export, a newer one — can be brought in without reloading the page. */}

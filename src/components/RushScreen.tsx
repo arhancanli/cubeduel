@@ -326,19 +326,19 @@ function Scoreboard({
       }`}
     >
       <div>
-        <div className="text-[10px] uppercase tracking-widest text-muted-dim">Score</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">Score</div>
         <div className="tnum text-3xl font-medium leading-none">{state?.score ?? 0}</div>
       </div>
 
       <div className="text-center">
-        <div className="text-[10px] uppercase tracking-widest text-muted-dim">Beat this</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">Beat this</div>
         <div className="tnum text-3xl font-medium leading-none text-ready">
           {target !== null ? formatMs(target, { truncate: false }) : "—"}
         </div>
       </div>
 
       <div className="text-right">
-        <div className="text-[10px] uppercase tracking-widest text-muted-dim">Lives</div>
+        <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">Lives</div>
         <div className="flex items-center justify-end gap-1 pt-1.5">
           {Array.from({ length: RUSH_LIVES }, (_, i) => (
             <span
@@ -433,7 +433,7 @@ function Summary({
   const isBest = state !== null && best !== null && state.score >= best.score;
   return (
     <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-xl border border-border px-6 py-7 text-center">
-      <p className="text-[10px] uppercase tracking-widest text-muted-dim">Run over</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">Run over</p>
       <p className="tnum text-5xl font-medium leading-none">{state?.score ?? 0}</p>
       <p className="text-sm text-muted">
         {state?.score === 1 ? "solve cleared" : "solves cleared"}

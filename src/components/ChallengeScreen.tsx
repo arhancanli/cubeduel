@@ -262,11 +262,11 @@ function Verdict({
       {result.settled && own && theirs ? (
         <div className="grid w-full grid-cols-2 gap-4 text-sm">
           <div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-dim">You</div>
+            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">You</div>
             <div className="tnum mt-1 text-lg">{describe(own)}</div>
           </div>
           <div>
-            <div className="text-[10px] uppercase tracking-widest text-muted-dim">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
               {opponentHandle}
             </div>
             <div className="tnum mt-1 text-lg">{describe(theirs)}</div>

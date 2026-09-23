@@ -120,7 +120,7 @@ with sync_playwright() as p:
     )
     # Two different activities: one puts something on the record, the other does
     # not. A screen reader should hear that structure, not eight links in a row.
-    check("the nav is grouped", groups == ["Compete", "Practice"], str(groups))
+    check("the nav is grouped", groups == ["Solve", "Compete", "Improve", "Community"], str(groups))
 
     labelled = page.evaluate(
         """() => {
@@ -132,13 +132,20 @@ with sync_playwright() as p:
             return out;
         }"""
     )
-    check("ranked, rush, duels and the daily are the competitive half",
-          set(labelled.get("Compete", [])) == {"Ranked", "Race", "Rush", "Duel", "Daily", "Leaderboard", "Clubs"},
+    # The three ways to solve, named by what is in your hands — the old nav
+    # called the keyboard "Play" and nobody could tell.
+    check("the three ways to solve sit together",
+          labelled.get("Solve") == ["Timer", "Keyboard", "Smart cube"], str(labelled.get("Solve")))
+    check("ranked, races, duels, the daily and rush are the competitive half",
+          set(labelled.get("Compete", [])) == {"Ranked", "Race", "Duel", "Daily", "Rush"},
           str(labelled.get("Compete")))
-    check("the practice half is everything not on the record",
-          set(labelled.get("Practice", []))
-          == {"Play", "Timer", "How to solve", "Learn", "Train", "Progress", "Review", "Your cube"},
-          str(labelled.get("Practice")))
+    check("everything that looks back at your solves is under Improve",
+          set(labelled.get("Improve", []))
+          == {"Review", "Progress", "Train", "Algorithms", "Beginner guide"},
+          str(labelled.get("Improve")))
+    check("other people are under Community",
+          set(labelled.get("Community", [])) == {"Leaderboard", "Clubs"},
+          str(labelled.get("Community")))
 
     print("\n== the landing page demonstrates the solver ==")
     players = page.locator("twisty-player").count()

@@ -11,13 +11,17 @@ import { KEY_GROUPS } from "@/lib/keyMap";
  * The key that was just pressed lights up, so the mapping is learned by use rather
  * than memorised up front.
  */
-export function KeyMapHint({ activeCode }: { activeCode: string | null }) {
+export function KeyMapHint({ activeCode, compact = false }: { activeCode: string | null; compact?: boolean }) {
   return (
-    <div className="grid w-full max-w-4xl grid-cols-2 gap-x-8 gap-y-5 md:grid-cols-4">
+    <div
+      className={`grid w-full gap-x-6 gap-y-5 ${
+        compact ? "grid-cols-1" : "max-w-4xl grid-cols-2 md:grid-cols-4"
+      }`}
+    >
       {KEY_GROUPS.map((group) => (
         <div key={group.title} className="flex flex-col gap-2">
           <div>
-            <h3 className="text-[10px] uppercase tracking-widest text-muted-dim">
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
               {group.title}
             </h3>
             <p className="mt-1 text-xs leading-snug text-muted-dim">{group.hint}</p>

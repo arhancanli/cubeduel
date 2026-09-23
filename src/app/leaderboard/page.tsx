@@ -205,7 +205,7 @@ export default async function LeaderboardPage() {
                 </Link>
                 {entry.verified ? null : (
                   <span
-                    className="text-[10px] uppercase tracking-widest text-muted-dim"
+                    className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim"
                     title="Timed by hand, with no move stream to check against"
                   >
                     unverified

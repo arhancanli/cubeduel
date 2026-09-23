@@ -38,7 +38,7 @@ with sync_playwright() as p:
     page.goto(BASE + "/", wait_until="networkidle")
     page.wait_for_timeout(1500)
     body = page.inner_text("body")
-    check("a visitor gets the pitch", "Every solve here is proven" in body)
+    check("a visitor gets the pitch", "shows you why you" in body)
     check("and no dashboard", page.locator("[data-testid=home-rating]").count() == 0)
 
     print("\n== signed in ==")
@@ -51,7 +51,7 @@ with sync_playwright() as p:
     body = page.inner_text("body")
     # Lower-cased: the eyebrow is styled uppercase, and innerText returns it so.
     check("a player gets their home", "welcome back" in body.lower())
-    check("not the pitch", "Every solve here is proven" not in body)
+    check("not the pitch", "shows you why you" not in body)
     rating = page.locator("[data-testid=home-rating]").inner_text()
     check("a new account reads as unrated, from the server",
           "Unrated" in rating and "Five verified solves" in rating, rating.replace("\n", " "))

@@ -40,9 +40,9 @@ interface Props {
   /** Whether the cube can be rotated by dragging. */
   interactive?: boolean;
   /**
-   * Renders a second cube showing the three hidden faces. Verifying a scramble
-   * needs all six, and a matched pair reads as deliberate where a small corner
-   * inset reads as a stray fragment.
+   * Whether to also draw the three hidden faces. Off by default: to anybody new,
+   * two cubes side by side read as two puzzles, and a small corner inset reads
+   * as a stray fragment. The replay turns it on, where it earns its place.
    */
   backView?: "side-by-side" | "top-right" | "none";
   /**
@@ -89,7 +89,7 @@ export type CubePlayer = HTMLElement & {
 export function CubeView({
   scramble,
   interactive = true,
-  backView = "side-by-side",
+  backView = "none",
   visualization = "3D",
   movePressInput = false,
   onPlayerReady,

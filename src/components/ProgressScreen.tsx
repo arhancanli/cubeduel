@@ -6,7 +6,9 @@ import { useEffect, useState } from "react";
 import { CaseCoach } from "@/components/CaseCoach";
 import { CsTimerImport } from "@/components/CsTimerImport";
 import { GoalPanel } from "@/components/GoalPanel";
+import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
+import { StreakCard } from "@/components/StreakCard";
 import { formatMs } from "@/lib/format";
 import {
   aggregatePhases,
@@ -54,14 +56,21 @@ export function ProgressScreen() {
   // the full one; if the importer lived in two different trees it would be
   // unmounted at exactly that moment, taking its "Added 2,000 solves" with it.
   return (
-    <Shell>
-      <div className="flex w-full max-w-2xl flex-col gap-10">
+    <Shell titled={solves.length > 0}>
+      <div className="flex w-full flex-col gap-4">
         {solves.length === 0 ? (
           <EmptyProgress />
         ) : (
           <>
-            <GoalPanel solves={solves} />
-            <Recommendation diagnosis={diagnosis} />
+            {/* Your numbers first: they are what somebody opening this page
+                came to see, and they used to be at the very bottom. */}
+            <Card>
+              <Overview solves={solves} trend={trend} />
+            </Card>
+            <StreakCard />
+            <Card>
+              <Recommendation diagnosis={diagnosis} />
+            </Card>
             {/* The tables below say which phase is slow; the review says why,
                 from the turns. One line, because it is a different page. */}
             {solves.some((solve) => solve.moves) ? (
@@ -80,15 +89,29 @@ export function ProgressScreen() {
                 </span>
               </Link>
             ) : null}
-            {aggregates.length > 0 ? <PhaseTable aggregates={aggregates} /> : null}
-            {aggregates.length > 0 ? <LookTurnTable rows={looking} /> : null}
-            <CaseCoach solves={solves} />
-            <Overview solves={solves} trend={trend} />
+            {aggregates.length > 0 ? (
+              <Card>
+                <PhaseTable aggregates={aggregates} />
+              </Card>
+            ) : null}
+            {aggregates.length > 0 ? (
+              <Card>
+                <LookTurnTable rows={looking} />
+              </Card>
+            ) : null}
+            <Card>
+              <CaseCoach solves={solves} />
+            </Card>
+            <Card>
+              <GoalPanel solves={solves} />
+            </Card>
           </>
         )}
         {/* Somebody arriving with years of csTimer history should not start
             from zero — it is the single biggest cost of switching. */}
-        <CsTimerImport onImported={reload} />
+        <Card>
+          <CsTimerImport onImported={reload} />
+        </Card>
       </div>
     </Shell>
   );
@@ -98,7 +121,7 @@ function Recommendation({ diagnosis }: { diagnosis: Diagnosis }) {
   if (diagnosis.kind === "insufficient") {
     return (
       <section className="flex flex-col gap-2">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Work on</h2>
+        <h2 className="text-xl">Work on</h2>
         <p className="text-lg text-muted">Not enough solves yet</p>
         <p className="text-sm leading-relaxed text-muted-dim">
           {diagnosis.fact} {diagnosis.interpretation}
@@ -109,7 +132,7 @@ function Recommendation({ diagnosis }: { diagnosis: Diagnosis }) {
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Work on</h2>
+      <h2 className="text-xl">Work on</h2>
       <p className="text-3xl font-medium tracking-tight">{diagnosis.phase}</p>
 
       {/* Arithmetic first, plainly stated. */}
@@ -122,7 +145,7 @@ function Recommendation({ diagnosis }: { diagnosis: Diagnosis }) {
 
       {/* Then the judgement, marked as one. */}
       <div className="border-l-2 border-border pl-3">
-        <p className="text-[10px] uppercase tracking-widest text-muted-dim">Interpretation</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">Interpretation</p>
         <p className="mt-1 text-sm leading-relaxed text-muted-dim">{diagnosis.interpretation}</p>
       </div>
     </section>
@@ -134,9 +157,9 @@ function PhaseTable({ aggregates }: { aggregates: PhaseAggregate[] }) {
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">By phase</h2>
+      <h2 className="text-xl">By phase</h2>
 
-      <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-muted-dim">
+      <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
         <span className="w-12 shrink-0">Phase</span>
         <span className="flex-1" />
         <span className="tnum w-14 shrink-0 text-right">Mean</span>
@@ -189,7 +212,7 @@ function LookTurnTable({ rows }: { rows: LookTurn[] }) {
   if (rows.length === 0) {
     return (
       <section className="flex flex-col gap-2">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Looking and turning</h2>
+        <h2 className="text-xl">Looking and turning</h2>
         <p className="text-xs leading-relaxed text-muted-dim">
           Needs five solves on /play or the daily that recorded their turns. Solves from before
           this was measured, and stopwatch times, can&apos;t tell looking from turning.
@@ -202,9 +225,9 @@ function LookTurnTable({ rows }: { rows: LookTurn[] }) {
 
   return (
     <section className="flex flex-col gap-3" data-testid="look-turn">
-      <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Looking and turning</h2>
+      <h2 className="text-xl">Looking and turning</h2>
 
-      <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-muted-dim">
+      <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
         <span className="w-12 shrink-0">Phase</span>
         <span className="flex-1" />
         <span className="tnum w-14 shrink-0 text-right">Look</span>
@@ -260,7 +283,7 @@ function Overview({ solves, trend }: { solves: StoredSolve[]; trend: Trend }) {
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Overall</h2>
+      <h2 className="text-xl">Overall</h2>
       <div className="flex flex-wrap gap-x-10 gap-y-4">
         <Stat label="solves" value={String(solves.length)} />
         <Stat label="best" value={best === null ? "—" : formatMs(best)} />
@@ -305,22 +328,34 @@ function trendExplanation(trend: Trend): string {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
-      <span className="tnum text-lg font-medium text-muted">{value}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
+      <span className="tnum font-display text-3xl font-bold">{value}</span>
     </div>
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ children, titled = true }: { children: React.ReactNode; titled?: boolean }) {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="progress" />
-      {/* The page title, for assistive tech. This screen is deliberately
-          chrome-free — a visible heading beside the clock would be noise. */}
-      <h1 className="sr-only">Your progress</h1>
-      <div className="flex flex-1 justify-center px-6 py-8">{children}</div>
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
+        {titled ? (
+          <PageHero eyebrow="Improve" title="Your progress">
+            Where your time goes, what to work on, and whether it is working — from your
+            own solves on this device.
+          </PageHero>
+        ) : (
+          <h1 className="sr-only">Your progress</h1>
+        )}
+        {children}
+      </div>
     </main>
   );
+}
+
+/** One section of the page, as its own card. */
+function Card({ children }: { children: React.ReactNode }) {
+  return <div className="rounded-2xl border border-border bg-surface p-5 sm:p-6">{children}</div>;
 }
 
 /**

@@ -1,10 +1,12 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
 import type { PhaseSplit } from "@/lib/cfop";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SolveSwitch } from "@/components/SolveSwitch";
 import { SolveReviewPanel } from "@/components/SolveReview";
 import { formatAverage, formatMs, formatSolve } from "@/lib/format";
 import { nextScramble, warmScrambles } from "@/lib/scramble";
@@ -228,184 +230,216 @@ export function TimerScreen() {
       style={{ touchAction: "manipulation" }}
       {...touchHandlers}
     >
-      <SiteHeader active="timer" fade={chromeHidden} trailing="3×3" />
+      <SiteHeader active="timer" fade={chromeHidden} />
       {/* The page title, for assistive tech. This screen is deliberately
           chrome-free — a visible heading beside the clock would be noise. */}
       <h1 className="sr-only">Speedcubing timer</h1>
 
       {/*
-        Scramble, clock and stats form one centred stack instead of three things
-        pinned to separate edges. The eye travels scramble -> clock in a single
-        short move, and the screen reads as one object rather than a dashboard.
+        Two columns on a wide screen, like every serious timer: the solve on the
+        left — how you solve, the scramble, the cube, the clock — and your session
+        on the right. On a phone the session drops below. Everything but the clock
+        fades while a solve is running.
       */}
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-4 md:gap-8">
-        <section className={`w-full text-center ${chromeClass}`}>
-          {scrambleError ? (
-            <p className="text-sm text-danger">
-              Couldn&apos;t generate a scramble. Reload to try again.
-            </p>
-          ) : (
-            /*
-              An even gap per move, not letter-spacing across the whole string.
-              Scrambles are read in chunks; stretched tracking destroys the chunking
-              and is the single most common flaw in existing timers.
-            */
-            <div className="mx-auto flex min-h-14 max-w-5xl flex-wrap items-center justify-center gap-x-3 gap-y-1.5 font-mono text-lg leading-snug sm:text-xl md:text-2xl">
-              {scramble
-                ? scramble.split(" ").map((move, i) => <span key={`${move}-${i}`}>{move}</span>)
-                : null}
+      <div className="mx-auto grid w-full max-w-7xl flex-1 items-start gap-6 px-4 pb-10 pt-3 sm:px-8 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-8 lg:pt-8">
+        <div className="flex min-w-0 flex-col items-center gap-5 md:gap-6">
+          <SolveSwitch active="timer" className={chromeClass} />
+
+          <section className={`w-full rounded-2xl border border-border bg-surface px-4 py-4 sm:px-6 ${chromeClass}`}>
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">
+                Scramble · 3×3
+              </span>
+              <span className="text-[11px] text-muted-dim">Hold it with white on top, green in front</span>
             </div>
-          )}
-        </section>
+            {scrambleError ? (
+              <p className="text-sm text-danger">
+                Couldn&apos;t generate a scramble. Reload to try again.
+              </p>
+            ) : (
+              /*
+                An even gap per move, not letter-spacing across the whole string.
+                Scrambles are read in chunks; stretched tracking destroys the chunking
+                and is the single most common flaw in existing timers.
+              */
+              <div className="flex min-h-10 flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-lg leading-snug sm:text-xl md:text-2xl">
+                {scramble
+                  ? scramble.split(" ").map((move, i) => <span key={`${move}-${i}`}>{move}</span>)
+                  : null}
+              </div>
+            )}
+          </section>
 
-        {/* Sized in vh so it yields to the clock on short laptop screens rather
-            than pushing the stats off the bottom. */}
-        <CubeView
-          scramble={scramble}
-          className={`h-[24vh] max-h-64 min-h-36 w-full max-w-lg ${chromeClass}`}
-        />
+          {/* One cube. Two side by side — front and back — read as two
+              puzzles to anybody new. Sized in vh so it yields to the clock on
+              short laptop screens. */}
+          <CubeView
+            scramble={scramble}
+            backView="none"
+            className={`h-[26vh] max-h-72 min-h-40 w-full max-w-md ${chromeClass}`}
+          />
 
-        <div className="relative flex flex-col items-center">
-          <div
-            ref={displayRef as React.RefObject<HTMLDivElement>}
-            className={`tnum font-display text-7xl font-bold leading-none tracking-tighter transition-colors duration-100 sm:text-8xl md:text-9xl ${timeColor}`}
-          >
-            0.00
+          <div className="relative flex flex-col items-center">
+            <div
+              ref={displayRef as React.RefObject<HTMLDivElement>}
+              className={`tnum font-display text-7xl font-bold leading-none tracking-tighter transition-colors duration-100 sm:text-8xl md:text-9xl ${timeColor}`}
+            >
+              0.00
+            </div>
+            <span
+              className={`pointer-events-none absolute -top-1 right-0 translate-x-[calc(100%+0.75rem)] text-[10px] font-semibold uppercase tracking-widest text-ready transition-opacity duration-200 ${
+                isPersonalBest && !chromeHidden ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              PB
+            </span>
           </div>
-          <span
-            className={`pointer-events-none absolute -top-1 right-0 translate-x-[calc(100%+0.75rem)] text-[10px] font-semibold uppercase tracking-widest text-ready transition-opacity duration-200 ${
-              isPersonalBest && !chromeHidden ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            PB
-          </span>
-        </div>
 
-        {/*
-          The one thing that stays on screen during a solve. Everything else fades
-          because nothing should compete with the clock — but in split mode you have
-          to know which phase your next tap ends, or the taps are meaningless.
-        */}
-        {splitMode ? (
-          <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest">
-            {SPLIT_LABELS.map((label, i) => {
-              const done = phase === "running" && i < splitIndex;
-              const current = phase === "running" && i === splitIndex;
-              return (
-                <span
-                  key={label}
-                  className={
-                    current
-                      ? "text-ready"
-                      : done
-                        ? "text-muted-dim line-through"
-                        : "text-muted-dim"
-                  }
-                >
-                  {label}
-                </span>
-              );
-            })}
-          </div>
-        ) : null}
+          <p className={`text-center text-sm text-muted ${chromeClass}`}>
+            {phase === "holding"
+              ? "Keep holding…"
+              : phase === "ready"
+                ? "Release to start"
+                : "Hold space — or press and hold anywhere — until the clock turns green, then let go."}
+          </p>
 
-        {review ? (
-          <div className={chromeClass}>
-            <SolveReviewPanel
-              review={review}
-              /* No /drill route yet: the case coach on /progress is the nearest real
-                 destination, and it links straight into practising the case. */
-              drillHref="/progress"
-              onAgain={nextRound}
-            />
-          </div>
-        ) : null}
-
-        <div className={`flex items-center gap-8 text-center ${chromeClass}`}>
-          <Stat label="ao5" value={formatAverage(ao5(solves))} />
-          <Stat label="ao12" value={formatAverage(ao12(solves))} />
-          <Stat label="best" value={best === null ? "—" : formatMs(best)} />
-          <Stat label="solves" value={String(solves.length)} />
-        </div>
-
-        <div className={`flex h-9 items-center gap-2 ${chromeClass}`}>
-          {lastSolve ? (
-            <>
-              <PenaltyButton
-                label="+2"
-                active={lastSolve.penalty === "PLUS2"}
-                onClick={() => setPenalty("PLUS2")}
-              />
-              <PenaltyButton
-                label="DNF"
-                active={lastSolve.penalty === "DNF"}
-                onClick={() => setPenalty("DNF")}
-              />
-              <PenaltyButton label="delete" active={false} onClick={deleteLast} />
-            </>
+          {/*
+            The one thing that stays on screen during a solve. Everything else fades
+            because nothing should compete with the clock — but in split mode you have
+            to know which phase your next tap ends, or the taps are meaningless.
+          */}
+          {splitMode ? (
+            <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest">
+              {SPLIT_LABELS.map((label, i) => {
+                const done = phase === "running" && i < splitIndex;
+                const current = phase === "running" && i === splitIndex;
+                return (
+                  <span
+                    key={label}
+                    className={
+                      current
+                        ? "text-ready"
+                        : done
+                          ? "text-muted-dim line-through"
+                          : "text-muted-dim"
+                    }
+                  >
+                    {label}
+                  </span>
+                );
+              })}
+            </div>
           ) : null}
+
+          {review ? (
+            <div className={chromeClass}>
+              <SolveReviewPanel
+                review={review}
+                /* No /drill route yet: the case coach on /progress is the nearest real
+                   destination, and it links straight into practising the case. */
+                drillHref="/progress"
+                onAgain={nextRound}
+              />
+            </div>
+          ) : null}
+
+          <div className={`flex min-h-9 flex-wrap items-center justify-center gap-2 ${chromeClass}`}>
+            {lastSolve ? (
+              <>
+                <PenaltyButton
+                  label="+2"
+                  active={lastSolve.penalty === "PLUS2"}
+                  onClick={() => setPenalty("PLUS2")}
+                />
+                <PenaltyButton
+                  label="DNF"
+                  active={lastSolve.penalty === "DNF"}
+                  onClick={() => setPenalty("DNF")}
+                />
+                <PenaltyButton label="delete" active={false} onClick={deleteLast} />
+              </>
+            ) : null}
+            {/*
+              A stopwatch cannot see turns, so phase analysis is otherwise locked to
+              people with a smart cube or a keyboard. Four taps is coarser data and it
+              works with the cube already in your hands.
+            */}
+            <button
+              type="button"
+              onClick={(event) => {
+                event.currentTarget.blur();
+                toggleSplitMode();
+              }}
+              title="Tap space at the end of the cross, F2L and OLL, so the site can tell you which part of your solve is slow."
+              className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                splitMode
+                  ? "border-ready/40 bg-ready/10 text-ready"
+                  : "border-border text-muted hover:border-muted-dim hover:text-foreground"
+              }`}
+            >
+              {splitMode ? "Phase splits on — space ends each phase" : "Record phase splits"}
+            </button>
+          </div>
         </div>
 
-        {/*
-          A stopwatch cannot see turns, so phase analysis is otherwise locked to
-          people with a smart cube or a keyboard. Four taps is coarser data and it
-          works with the cube already in your hands — which is the difference between
-          the analysis being available to everyone and to almost nobody.
-        */}
-        <button
-          type="button"
-          onClick={(event) => {
-            event.currentTarget.blur();
-            toggleSplitMode();
-          }}
-          className={`rounded-md border px-3 py-1.5 text-xs transition-colors ${chromeClass} ${
-            splitMode
-              ? "border-ready/40 bg-ready/10 text-ready"
-              : "border-border text-muted-dim hover:border-muted-dim hover:text-muted"
-          }`}
-        >
-          {splitMode ? "Splits on — space ends each phase" : "Record phase splits"}
-        </button>
+        {/* The session. */}
+        <aside className={`flex flex-col gap-4 lg:sticky lg:top-6 ${chromeClass}`} aria-label="This session">
+          <div className="grid grid-cols-2 gap-2">
+            <Stat label="ao5" value={formatAverage(ao5(solves))} />
+            <Stat label="ao12" value={formatAverage(ao12(solves))} />
+            <Stat label="best" value={best === null ? "—" : formatMs(best)} />
+            <Stat label="solves" value={String(solves.length)} />
+          </div>
+
+          <section className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface">
+            <h2 className="border-b border-border px-4 py-3 text-sm">Recent solves</h2>
+            {recent.length === 0 ? (
+              <p className="px-4 py-5 text-sm leading-relaxed text-muted-dim">
+                Your times appear here. Everything stays on this device unless you sign in.
+              </p>
+            ) : (
+              <ol data-testid="recent-solves" className="flex max-h-[22rem] flex-col divide-y divide-border overflow-y-auto">
+                {recent.map((solve, i) => {
+                  const eff = effectiveMs(solve);
+                  const isBest = eff !== null && eff === best;
+                  return (
+                    <li key={solve.id} className="flex items-center gap-3 px-4 py-2" data-testid="recent-solve">
+                      <span className="tnum w-6 shrink-0 text-xs text-muted-dim">{solves.length - i}</span>
+                      <span
+                        data-testid="recent-time"
+                        title={solve.scramble}
+                        className={`tnum flex-1 font-display text-base font-bold ${
+                          solve.penalty === "DNF" ? "text-danger" : isBest ? "text-ready" : "text-foreground"
+                        }`}
+                      >
+                        {formatSolve(solve)}
+                      </span>
+                      {isBest ? (
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-ready">best</span>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+            <Link
+              href="/progress"
+              className="border-t border-border px-4 py-3 text-sm font-semibold text-muted transition-colors hover:text-foreground"
+            >
+              Where your time goes →
+            </Link>
+          </section>
+        </aside>
       </div>
-
-      <footer className={`px-6 pb-6 ${chromeClass}`}>
-        <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-x-2 gap-y-2">
-          {recent.length === 0 ? (
-            <p className="text-xs text-muted-dim">
-              Hold space — or press and hold anywhere — until it turns green, then release.
-            </p>
-          ) : (
-            recent.map((solve) => {
-              const eff = effectiveMs(solve);
-              const isBest = eff !== null && eff === best;
-              return (
-                <span
-                  key={solve.id}
-                  title={solve.scramble}
-                  className={`tnum rounded-md px-2 py-1 text-xs transition-colors ${
-                    solve.penalty === "DNF"
-                      ? "text-danger"
-                      : isBest
-                        ? "bg-surface-hi text-foreground"
-                        : "text-muted"
-                  }`}
-                >
-                  {formatSolve(solve)}
-                </span>
-              );
-            })
-          )}
-        </div>
-      </footer>
     </main>
   );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col items-center gap-1.5">
-      <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
-      <span className="tnum text-lg font-medium text-muted">{value}</span>
+    <div className="flex flex-col gap-1 rounded-xl border border-border bg-surface px-4 py-3">
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
+      <span className="tnum font-display text-2xl font-bold">{value}</span>
     </div>
   );
 }

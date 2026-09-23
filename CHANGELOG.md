@@ -3,6 +3,51 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.10.0 — 2026-09-23
+
+The release that makes it make sense the first time.
+
+### A menu you can read
+
+- **Four groups named for what you came to do**: Solve, Compete, Improve,
+  Community. The old menu had fourteen entries whose names overlapped —
+  "Solve now", "Play" and "Timer" were three doors to solving, and nothing said
+  that "Play" meant the keyboard.
+- **The three ways to solve are named by what is in your hands**: Timer (your
+  real cube), Keyboard, Smart cube. Improve holds everything that looks back at
+  your solves: Review, Progress, Train, Algorithms and the Beginner guide.
+
+### Solving screens built like a real timer
+
+- **A switch at the top** between Timer, Keyboard and Smart cube, each with one
+  line saying what it means.
+- **The scramble in a card**, saying how to hold the cube (timer) or that it is
+  already applied (keyboard).
+- **One cube.** Two side by side — front and back — read as two puzzles.
+- **Your session beside the solve**: ao5, ao12, best and count as tiles, and
+  recent solves as a list with your best marked.
+- **Keyboard controls in their own panel** beside the cube, still always on
+  screen, instead of a wall of keys under it.
+- **Train says what it is** and shows the case by name, with its progress as
+  labelled chips instead of "0/6 cases seen · 0 mastered · rep 1".
+
+### A front page that says what this is
+
+- **"The speedcubing site that shows you why you're slow."** The old headline
+  meant something to us and nothing to a cuber arriving from a link.
+- **Eight essays and a five-screen scroll animation became a tour**: solve
+  review and Insights shown with real screenshots, three modes, and a grid of
+  everything else. The page is less than half as long.
+- Titles, the description and the link preview say the same thing.
+
+### Progress, reorganised
+
+- **A title, then your numbers**, then your streak and what to work on — the
+  summary used to be at the very bottom. Every section is its own card with a
+  real heading.
+- **Section headings and labels across the site** are larger and bolder; the
+  10px grey capitals are gone.
+
 ## 1.9.0 — 2026-09-23
 
 ### A solving streak

@@ -136,7 +136,7 @@ export default async function SolvePage(props: PageProps<"/s/[id]">) {
 
         {/* ---------------------------------------------------------------- */}
         <section className="flex flex-col gap-3">
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Scramble</h2>
+          <h2 className="text-lg">Scramble</h2>
           <p className="break-words rounded-lg border border-border bg-surface px-4 py-3 font-mono text-sm leading-relaxed">
             {solve.scramble}
           </p>
@@ -145,7 +145,7 @@ export default async function SolvePage(props: PageProps<"/s/[id]">) {
         {/* ---------------------------------------------------------------- */}
         {solve.splits.length > 0 ? (
           <section className="flex flex-col gap-3">
-            <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+            <h2 className="text-lg">
               Where the time went
             </h2>
             <SolveBreakdown splits={solve.splits} />
@@ -155,7 +155,7 @@ export default async function SolvePage(props: PageProps<"/s/[id]">) {
         {/* ---------------------------------------------------------------- */}
         {review.kind === "reviewed" ? (
           <section className="flex flex-col gap-3">
-            <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+            <h2 className="text-lg">
               Against their own average
             </h2>
 
@@ -206,7 +206,7 @@ function Tag({ children }: { children: React.ReactNode }) {
 function Case({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
       <span className="font-mono text-sm">{value}</span>
     </div>
   );

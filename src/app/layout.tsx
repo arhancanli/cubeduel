@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   // do not resolve relative URLs.
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "cubeduel — a rating that actually means something",
+    default: "cubeduel — the speedcubing site that shows you why you’re slow",
     // Every page states what it is, then where it is.
     template: "%s · cubeduel",
   },
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "cubeduel",
-    title: "cubeduel — a rating that actually means something",
+    title: "cubeduel — the speedcubing site that shows you why you’re slow",
     description:
       "Server-verified speedcubing. Every solve is replayed against the scramble it was issued for.",
     url: SITE_URL,
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   twitter: {
     // The large card, because the whole growth mechanic is a pasted link.
     card: "summary_large_image",
-    title: "cubeduel — a rating that actually means something",
+    title: "cubeduel — the speedcubing site that shows you why you’re slow",
     description:
       "Server-verified speedcubing, phase analysis, a case trainer and duels.",
   },

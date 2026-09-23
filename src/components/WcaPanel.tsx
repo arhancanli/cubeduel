@@ -62,7 +62,7 @@ export function WcaPanel({ configured, link, comparisons, outcome }: WcaPanelPro
   return (
     <section className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+        <h2 className="text-lg">
           World Cube Association
         </h2>
         <p className="max-w-lg text-xs leading-relaxed text-muted-dim">
@@ -150,7 +150,7 @@ export function WcaPanel({ configured, link, comparisons, outcome }: WcaPanelPro
                         <span className={comparison.wcaMs === null ? "text-muted-dim" : ""}>
                           {comparison.wcaMs === null ? "—" : formatMs(comparison.wcaMs)}
                         </span>
-                        <span className="text-[10px] uppercase tracking-widest text-muted-dim">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
                           competition
                         </span>
                       </span>
@@ -161,7 +161,7 @@ export function WcaPanel({ configured, link, comparisons, outcome }: WcaPanelPro
                             ? "—"
                             : formatMs(comparison.cubeduelMs)}
                         </span>
-                        <span className="text-[10px] uppercase tracking-widest text-muted-dim">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
                           here
                         </span>
                       </span>

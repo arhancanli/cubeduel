@@ -1,20 +1,21 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { SolverDemo } from "@/components/SolverDemo";
 import { Reveal } from "@/components/Reveal";
-import { ScrollSolve } from "@/components/ScrollSolve";
 import { SiteHeader } from "@/components/SiteHeader";
 import { StreakCard } from "@/components/StreakCard";
-import { ratingForMs } from "@/lib/rating";
 import { CubeNet } from "@/components/CubeNet";
+import { Glyph } from "@/components/Glyph";
 import { HomeDashboard } from "@/components/HomeDashboard";
 import { TodayStrip } from "@/components/TodayStrip";
 import { formatAverage, formatMs } from "@/lib/format";
 import { ao5, bestSingle } from "@/lib/stats";
 import { loadHistory, type StoredSolve } from "@/lib/solveHistory";
+import { faceFor, stickerVar, type FaceKey } from "@/lib/modes";
 import { useSession } from "@/lib/useSession";
 
 /**
@@ -61,23 +62,23 @@ export function LandingScreen({ dailyStart }: { dailyStart: string }) {
       <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 pb-14 pt-6 sm:px-8 sm:pt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,34rem)] lg:gap-14 lg:pt-20">
         <Reveal className="flex flex-col gap-6">
           <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-sticker-green">
-            {returning ? "Welcome back" : "Speedcubing, on the record"}
+            {returning ? "Welcome back" : "Free · open source · no account needed"}
           </p>
-          <h1 className="text-balance text-[2.6rem] leading-[1.02] sm:text-6xl xl:text-7xl">
-            Every solve here is proven.
+          <h1 className="text-balance text-[2.5rem] leading-[1.03] sm:text-5xl xl:text-6xl">
+            The speedcubing site that shows you why you&rsquo;re slow.
           </h1>
           <p className="max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
-            The server hands you a scramble nobody has seen, replays every turn,
-            and only then does the time count. Then it shows you which part of
-            your solve is slow.
+            Time your solves, race friends live, climb a ladder where every time is
+            verified — and get every solve reviewed move by move: your cross against
+            the shortest possible, where you stopped, which cases to learn next.
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
             <Link href="/timer" className="btn-go px-7 py-3.5 text-base">
               {returning ? "Continue solving" : "Start solving"}
             </Link>
-            <Link href="/ranked" className="btn-secondary px-6 py-3.5 text-base">
-              Play ranked
+            <Link href="/race" className="btn-secondary px-6 py-3.5 text-base">
+              Race a friend
             </Link>
           </div>
 
@@ -126,222 +127,73 @@ export function LandingScreen({ dailyStart }: { dailyStart: string }) {
         </Reveal>
       </section>
 
-      {/* The product, running, driven by scroll. */}
-      <ScrollSolve />
-
-      {/* The ladder */}
+      {/* What it does, shown rather than argued. The first version explained
+          itself in eight essays and a scroll animation five screens long; this
+          is four things, each with the product itself as the picture. */}
       <section className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-12 px-6 py-28">
-          <Reveal className="flex flex-col gap-4">
-            <p className="text-[10px] uppercase tracking-widest text-muted-dim">
-              Ranked
-            </p>
-            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
-              One number, and you can always read it in seconds.
-            </h2>
-            <p className="max-w-xl text-base leading-relaxed text-muted">
-              Chess needs Elo because it has no absolute scale — you only ever
-              learn that one player beat another. Cubing has seconds. So the
-              rating is fixed to two landmarks the sport already uses, and every
-              rating converts straight back into the average that earned it.
-            </p>
-          </Reveal>
-
-          <Reveal delayMs={100}>
-            <RatingScale />
-          </Reveal>
-
-          <div className="grid gap-10 sm:grid-cols-3">
-            {[
-              {
-                title: "The server picks the puzzle",
-                body: "Every ranked scramble is generated when you ask for it, so there is nothing to cherry-pick and nothing to solve in advance.",
-              },
-              {
-                title: "Every solve is replayed",
-                body: "Your moves are applied to that exact scramble on the server. If the cube does not end solved, the result does not exist.",
-              },
-              {
-                title: "Failure costs certainty",
-                body: "Abandon a bad solve and your rating cannot rise — a failed average widens your margin instead of inventing a time for you.",
-              },
-            ].map((card, i) => (
-              <Reveal key={card.title} delayMs={i * 90} className="flex flex-col gap-2">
-                <h3 className="text-sm">{card.title}</h3>
-                <p className="text-sm leading-relaxed text-muted">{card.body}</p>
-              </Reveal>
-            ))}
-          </div>
-
-          <Reveal delayMs={120}>
-            <Link
-              href="/leaderboard"
-              className="text-sm text-foreground underline-offset-4 hover:underline"
-            >
-              See the leaderboard →
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* What the splits are for */}
-      <section className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-16 px-6 py-28">
-          <Reveal className="flex flex-col gap-4">
-            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
-              A stopwatch tells you that you took 22 seconds.
-            </h2>
-            <p className="text-base leading-relaxed text-muted">
-              It does not tell you that F2L pair three costs you 2.1 seconds every single
-              solve, or that your OLL time swings between one and four seconds depending on
-              which case you get. Those are different problems with different fixes, and the
-              total hides both.
-            </p>
-          </Reveal>
-
-          <div className="grid gap-10 sm:grid-cols-3">
-            {[
-              {
-                title: "Looking, or turning",
-                body: "Every stage is split in two: the time before your first turn, and the time spent turning. Slow to see and slow to do are different problems — and your slow solves say which one is yours.",
-              },
-              {
-                title: "The case, not the stage",
-                body: "It works out which OLL and PLL you actually faced, then ranks them by how much time you would get back — how often it comes up, times how slow it is.",
-              },
-              {
-                title: "Honest about itself",
-                body: "Nothing is claimed below a stated sample size, and a change inside normal variation is reported as no change instead of as progress.",
-              },
-            ].map((card, i) => (
-              <Reveal key={card.title} delayMs={i * 90} className="flex flex-col gap-2">
-                <h3 className="text-sm">{card.title}</h3>
-                <p className="text-sm leading-relaxed text-muted">{card.body}</p>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Rush — the mode nothing else in cubing has. */}
-      <section className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 px-6 py-28 text-center">
-          <Reveal className="flex flex-col items-center gap-4">
-            <p className="text-[10px] uppercase tracking-widest text-muted-dim">
-              Under pressure
-            </p>
-            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
-              A target that keeps tightening.
-            </h2>
-            <p className="max-w-xl text-balance text-base leading-relaxed text-muted">
-              Every timer tells you your average afterwards. None of them ever put
-              you in the position of needing <em>this</em> solve to be fast — which
-              is what a competition round actually is. In Rush the number is on
-              screen before you turn a face, and it shrinks every time you beat it.
-              Three misses ends the run.
-            </p>
-            <p className="max-w-xl text-balance text-sm leading-relaxed text-muted-dim">
-              The target comes from your own pace, so it is the same difficulty
-              whether you average eight seconds or forty. A fixed number would be a
-              lazy solve for one and unreachable for the other; this finds the edge
-              of what you can do today, which is the only place anybody improves.
-            </p>
-          </Reveal>
-          <Reveal delayMs={120}>
-            <Link
-              href="/rush"
-              className="btn-secondary px-7 py-3.5 text-sm"
-            >
-              Start a run
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* The daily */}
-      <section className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-8 px-6 py-28 text-center">
-          <Reveal className="flex flex-col items-center gap-4">
-            <p className="text-[10px] uppercase tracking-widest text-muted-dim">Every day</p>
-            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
-              One scramble. One attempt.
-            </h2>
-            <p className="max-w-xl text-balance text-base leading-relaxed text-muted">
-              The same cube for everyone, resetting at midnight UTC. Your time is final the
-              moment the clock starts — so the result you share is the one you actually got.
-            </p>
-          </Reveal>
-          <Reveal delayMs={120}>
-            <Link
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-20 px-4 py-24 sm:px-8">
+          <Feature
+            eyebrow="Solve review"
+            title="Every solve, read back turn by turn."
+            body="Your cross against the shortest one on the same face, with the route written out. Where you stopped, and for how long. Turns you undid. Cases you did in two looks, with the algorithm to learn. Choose any moment and the replay plays it."
+            image={{ src: "/tour/review.webp", width: 1192, height: 1100, alt: "A solve review: the replay cube beside three moments — a three-move cross credited as optimal, a turn undone, and a two-second pause before the third pair." }}
+            href="/play"
+            action="Solve one and review it"
+          />
+          <Feature
+            eyebrow="Insights"
+            title="The habit costing you the most."
+            body="Across your last 25 solves, habits are ranked by how much time each one costs you — so you know what to practise tomorrow. It won't claim anything from fewer than five solves."
+            image={{ src: "/tour/insights.webp", width: 1192, height: 725, alt: "Insights across six solves: fix this first — you stop before F2L 3, about two seconds a solve." }}
+            href="/review"
+            action="See your insights"
+            flip
+          />
+          <div className="grid gap-4 md:grid-cols-3">
+            <ModeCard
+              face="race"
+              title="Race a friend, live"
+              body="Send a link. A shared countdown, then the same scramble on both screens — and you watch each other get through the cross, the pairs and the last layer."
+              href="/race"
+            />
+            <ModeCard
+              face="ranked"
+              title="A rating that means something"
+              body="The server issues the scramble and replays your moves. If the cube doesn't end solved, the time doesn't exist. Your rating reads back as an average."
+              href="/ranked"
+            />
+            <ModeCard
+              face="daily"
+              title="One scramble a day"
+              body="The same cube for everyone, one attempt, and a streak for the days in a row you solve."
               href="/daily"
-              className="btn-secondary px-7 py-3.5 text-sm"
-            >
-              Try today&apos;s
-            </Link>
-          </Reveal>
+            />
+          </div>
         </div>
       </section>
 
-      {/* Learning to solve at all */}
       <section className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-28">
-          <Reveal className="flex flex-col gap-4">
-            <p className="text-[10px] uppercase tracking-widest text-muted-dim">
-              From the beginning
-            </p>
-            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
-              You do not have to be able to solve one yet.
-            </h2>
-            <p className="max-w-xl text-base leading-relaxed text-muted">
-              Seven steps, one layer at a time, with every algorithm running on a
-              cube you can turn and step through move by move. Most people get
-              there in an afternoon.
-            </p>
-            <p className="max-w-xl text-base leading-relaxed text-muted-dim">
-              Each step also says what it will <em>not</em> disturb — and those
-              promises are checked against the puzzle rather than written down,
-              because &ldquo;this will not wreck your first two layers&rdquo; is the
-              sentence a beginner has to be able to trust, and the one most guides
-              get wrong.
-            </p>
-            <div className="flex flex-wrap gap-5 pt-1">
-              <Link
-                href="/solve"
-                className="text-sm text-foreground underline-offset-4 hover:underline"
-              >
-                How to solve a cube →
-              </Link>
-              <Link
-                href="/learn"
-                className="text-sm text-muted underline-offset-4 hover:text-foreground hover:underline"
-              >
-                All 57 OLL and 21 PLL cases →
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* No cube? */}
-      <section className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-28">
-          <Reveal className="flex flex-col gap-4">
-            <h2 className="text-balance text-3xl tracking-tight sm:text-4xl">
-              No cube in your hand?
-            </h2>
-            <p className="max-w-xl text-base leading-relaxed text-muted">
-              Solve one with your keyboard. The clock starts on your first turn and stops
-              the instant the cube is actually solved — no spacebar, no reaction delay at
-              either end. It is the most accurate timing in the app, and it is what ranked
-              runs on.
-            </p>
-            <Link
-              href="/play"
-              className="text-sm text-foreground underline-offset-4 hover:underline"
-            >
-              Try keyboard cubing →
-            </Link>
-          </Reveal>
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-24 sm:px-8">
+          <div className="flex flex-col gap-3">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-dim">Everything else</p>
+            <h2 className="text-balance text-3xl sm:text-4xl">Whatever stage you&rsquo;re at.</h2>
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {EVERYTHING.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className="group flex h-full flex-col gap-1.5 rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-muted-dim/60"
+                >
+                  <span className="font-semibold">
+                    {item.title}{" "}
+                    <span aria-hidden="true" className="inline-block text-muted-dim transition-transform group-hover:translate-x-0.5">→</span>
+                  </span>
+                  <span className="text-sm leading-relaxed text-muted">{item.body}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -397,44 +249,6 @@ export function LandingScreen({ dailyStart }: { dailyStart: string }) {
   );
 }
 
-/**
- * The rating scale, drawn from the real function rather than typed out.
- *
- * This is the clearest possible statement of the design claim above it: the
- * numbers here are computed by `ratingForMs`, so the marketing page cannot drift
- * away from the ladder. If someone moves an anchor, this section moves with it.
- */
-function RatingScale() {
-  const rows = [5, 10, 15, 20, 30, 60].map((seconds) => ({
-    seconds,
-    rating: Math.round(ratingForMs(seconds * 1000)),
-    label: formatMs(seconds * 1000, { truncate: false }),
-  }));
-
-  const max = rows[0].rating;
-
-  return (
-    <div className="overflow-hidden rounded-lg border border-border">
-      {rows.map((row) => (
-        <div
-          key={row.seconds}
-          className="flex items-center gap-4 border-b border-border bg-surface px-4 py-2.5 last:border-b-0"
-        >
-          <span className="tnum w-16 shrink-0 text-sm font-medium">{row.rating}</span>
-          <span className="relative h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-surface-hi">
-            <span
-              className="absolute inset-y-0 left-0 rounded-full bg-bar"
-              style={{ width: `${(row.rating / max) * 100}%` }}
-            />
-          </span>
-          <span className="tnum w-20 shrink-0 text-right text-xs text-muted-dim">
-            {row.label} average
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 /**
  * What somebody who has solved here already wants to see first: where they are.
@@ -457,5 +271,73 @@ function ReturningStats({ history }: { history: StoredSolve[] }) {
         </div>
       ))}
     </dl>
+  );
+}
+
+const EVERYTHING = [
+  { href: "/solve", title: "Learn to solve", body: "Seven steps from never having solved one, each algorithm on a cube you can turn." },
+  { href: "/learn", title: "All 78 algorithms", body: "Every OLL and PLL case, grouped by what you see on top, each checked against the puzzle." },
+  { href: "/train", title: "Drill your cases", body: "The cases you're slow on come back sooner, until each one is mastered." },
+  { href: "/rush", title: "Rush", body: "Beat a target built from your own pace. It tightens every time you do. Three misses ends it." },
+  { href: "/clubs", title: "Clubs", body: "A board for your school or your friends, ranked by the same verified solves." },
+  { href: "/progress", title: "Bring your csTimer history", body: "Import your export and your progress starts from where you are, not from zero." },
+];
+
+function Feature({
+  eyebrow,
+  title,
+  body,
+  image,
+  href,
+  action,
+  flip = false,
+}: {
+  eyebrow: string;
+  title: string;
+  body: string;
+  image: { src: string; width: number; height: number; alt: string };
+  href: string;
+  action: string;
+  flip?: boolean;
+}) {
+  return (
+    <div className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14">
+      <Reveal className={`flex flex-col gap-4 ${flip ? "lg:order-2" : ""}`}>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-sticker-green">{eyebrow}</p>
+        <h2 className="text-balance text-3xl sm:text-4xl">{title}</h2>
+        <p className="max-w-lg text-base leading-relaxed text-muted">{body}</p>
+        <Link href={href} className="btn-go mt-2 self-start px-5 py-3 text-sm">
+          {action}
+        </Link>
+      </Reveal>
+      <Reveal delayMs={120} className={flip ? "lg:order-1" : ""}>
+        <Image
+          src={image.src}
+          width={image.width}
+          height={image.height}
+          alt={image.alt}
+          sizes="(min-width: 1024px) 560px, 100vw"
+          className="h-auto w-full rounded-2xl border border-border shadow-[var(--elevation-2)]"
+        />
+      </Reveal>
+    </div>
+  );
+}
+
+function ModeCard({ face, title, body, href }: { face: FaceKey; title: string; body: string; href: string }) {
+  const mode = faceFor(face);
+  return (
+    <Link
+      href={href}
+      style={{ "--face": stickerVar(mode.sticker) } as React.CSSProperties}
+      className="group flex flex-col gap-3 rounded-2xl border border-border bg-surface p-6 transition-colors hover:border-[var(--face)]"
+    >
+      <Glyph pattern={mode.glyph} sticker={mode.sticker} size={28} />
+      <h3 className="text-xl">{title}</h3>
+      <p className="text-sm leading-relaxed text-muted">{body}</p>
+      <span className="mt-auto pt-1 text-sm font-semibold">
+        {mode.label} <span aria-hidden="true" className="inline-block transition-transform group-hover:translate-x-0.5">→</span>
+      </span>
+    </Link>
   );
 }

@@ -105,7 +105,7 @@ with sync_playwright() as p:
     for run in (900, 1500, 1100, 1300):
         do_solve(page, hold_ms=400, run_ms=run)
 
-    check("every solve is listed", page.locator("footer span").count() == 5)
+    check("every solve is listed", page.locator("[data-testid=recent-time]").count() == 5)
     ao5_val = page.locator("div:has(> span:text-is('ao5')) > span").last.inner_text().strip()
     check("ao5 appears once five solves exist", ao5_val not in ("—", ""), f"ao5 = {ao5_val}")
     # Asserted against the solves actually recorded, not against a hardcoded
@@ -115,8 +115,8 @@ with sync_playwright() as p:
     # about one run in three, which is worse than not having the check: a flaky
     # test is one people learn to re-run rather than read.
     listed = []
-    for i in range(page.locator("footer span").count()):
-        text = page.locator("footer span").nth(i).inner_text().strip().rstrip("+")
+    for i in range(page.locator("[data-testid=recent-time]").count()):
+        text = page.locator("[data-testid=recent-time]").nth(i).inner_text().strip().rstrip("+")
         try:
             listed.append(float(text))
         except ValueError:
@@ -139,22 +139,22 @@ with sync_playwright() as p:
     plus2_display = timer_el(page).inner_text().strip()
     check("+2 adds two seconds to the clock", abs(float(plus2_display) - 2.60) < 0.15,
           plus2_display)
-    check("+2 is marked in the list", "+" in page.inner_text("footer"))
+    check("+2 is marked in the list", "+" in page.locator("[data-testid=recent-solves]").inner_text())
 
     page.click("button:text-is('DNF')")
     page.wait_for_timeout(150)
     check("a DNF reads DNF on the clock, not 0.00",
           timer_el(page).inner_text().strip() == "DNF", timer_el(page).inner_text().strip())
-    check("a DNF is marked in the list", "DNF" in page.inner_text("footer"))
+    check("a DNF is marked in the list", "DNF" in page.locator("[data-testid=recent-solves]").inner_text())
 
     page.click("button:text-is('delete')")
     page.wait_for_timeout(150)
-    check("deleting drops the solve", page.locator("footer span").count() == 5)
+    check("deleting drops the solve", page.locator("[data-testid=recent-time]").count() == 5)
 
     print("\n== persistence ==")
     page.reload(wait_until="networkidle")
     page.wait_for_timeout(2000)
-    check("solves survive a reload", page.locator("footer span").count() == 5)
+    check("solves survive a reload", page.locator("[data-testid=recent-time]").count() == 5)
 
     print("\n== daily ==")
     page.goto(BASE + "/daily", wait_until="networkidle")

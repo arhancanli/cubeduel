@@ -79,7 +79,7 @@ export function GoalPanel({ solves }: { solves: StoredSolve[] }) {
   if (!goal) {
     return (
       <section className="flex flex-col gap-3">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Goal</h2>
+        <h2 className="text-xl">Goal</h2>
         <p className="text-sm text-muted">
           Pick a target and this page will track it — honestly, which mostly
           means telling you when the evidence cannot yet say anything.
@@ -103,7 +103,7 @@ export function GoalPanel({ solves }: { solves: StoredSolve[] }) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Goal</h2>
+        <h2 className="text-xl">Goal</h2>
         <button
           type="button"
           onClick={() => {
@@ -200,7 +200,7 @@ function Figure({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
       <span className="tnum text-2xl font-medium">{value}</span>
       {note ? <span className="text-[11px] text-muted-dim">{note}</span> : null}
     </div>

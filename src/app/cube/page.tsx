@@ -39,7 +39,7 @@ export default function CubePage() {
         <CubeLinkPanel />
 
         <section className="flex flex-col gap-3 border-t border-border pt-8">
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+          <h2 className="text-lg">
             What is honest about this
           </h2>
           <p className="max-w-xl text-xs leading-relaxed text-muted-dim">

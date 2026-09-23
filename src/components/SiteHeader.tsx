@@ -50,43 +50,43 @@ interface NavLink {
 }
 
 /**
- * Two groups, because they are two different activities.
+ * Four groups, named for what you came to do.
  *
- * **Compete** puts something on the record: a rating moves, a result is
- * published, an opponent is waiting. **Practice** does not — nothing there is
- * recorded against you, and that is the point of it.
+ * The first version had two — Compete and Practice — and fourteen entries
+ * whose names overlapped: "Play", "Timer" and "Solve now" were three doors to
+ * solving, and nothing said that "Play" meant the keyboard. A first-time
+ * visitor could not tell where to start. Now the three ways to solve sit
+ * together and are named by what is in your hands.
  *
- * Separating them is not decoration: it is the difference between "everything
- * here is being judged" and "this bit is yours to fail in".
+ * **Compete** still means something goes on the record; **Improve** is every
+ * page that looks back at your solves; **Community** is other people.
  */
-const COMPETE: NavLink[] = [
-  { key: "ranked", href: "/ranked", label: "Ranked", icon: { face: "ranked" } },
-  // Second, because it is the one thing here that is two people at once.
-  { key: "race", href: "/race", label: "Race", icon: { face: "race" } },
-  { key: "rush", href: "/rush", label: "Rush", icon: { face: "rush" } },
-  { key: "duel", href: "/duel", label: "Duel", icon: { face: "duel" } },
-  { key: "daily", href: "/daily", label: "Daily", icon: { face: "daily" } },
-  { key: "leaderboard", href: "/leaderboard", label: "Leaderboard", icon: { line: "podium" } },
-  // Under Compete rather than Practice, because a club board ranks you against
-  // people by the same verified solves the global one uses.
-  { key: "clubs", href: "/clubs", label: "Clubs", icon: { line: "people" } },
+const SOLVE: NavLink[] = [
+  { key: "timer", href: "/timer", label: "Timer", icon: { face: "solve" } },
+  { key: "play", href: "/play", label: "Keyboard", icon: { line: "keys" } },
+  { key: "cube", href: "/cube", label: "Smart cube", icon: { line: "cube" } },
 ];
 
-const PRACTICE: NavLink[] = [
-  { key: "play", href: "/play", label: "Play", icon: { line: "keys" } },
-  { key: "timer", href: "/timer", label: "Timer", icon: { face: "solve" } },
-  // The only entry that assumes nothing: every other page here takes it for
-  // granted that you can already solve a cube.
-  { key: "solve", href: "/solve", label: "How to solve", icon: { line: "book" } },
-  // Learn is where you meet a case, Train is where you keep it.
-  { key: "learn", href: "/learn", label: "Learn", icon: { line: "cases" } },
-  { key: "train", href: "/train", label: "Train", icon: { line: "target" } },
-  { key: "progress", href: "/progress", label: "Progress", icon: { line: "chart" } },
-  // Beside Progress: that page says which phase is slow, this one shows the
-  // moment in a single solve where it happened.
+const COMPETE: NavLink[] = [
+  { key: "ranked", href: "/ranked", label: "Ranked", icon: { face: "ranked" } },
+  { key: "race", href: "/race", label: "Race", icon: { face: "race" } },
+  { key: "duel", href: "/duel", label: "Duel", icon: { face: "duel" } },
+  { key: "daily", href: "/daily", label: "Daily", icon: { face: "daily" } },
+  { key: "rush", href: "/rush", label: "Rush", icon: { face: "rush" } },
+];
+
+const IMPROVE: NavLink[] = [
+  // First: it is the thing only this site does.
   { key: "review", href: "/review", label: "Review", icon: { line: "review" } },
-  // Last: connecting hardware is something you do once, not an activity.
-  { key: "cube", href: "/cube", label: "Your cube", icon: { line: "cube" } },
+  { key: "progress", href: "/progress", label: "Progress", icon: { line: "chart" } },
+  { key: "train", href: "/train", label: "Train", icon: { line: "target" } },
+  { key: "learn", href: "/learn", label: "Algorithms", icon: { line: "cases" } },
+  { key: "solve", href: "/solve", label: "Beginner guide", icon: { line: "book" } },
+];
+
+const COMMUNITY: NavLink[] = [
+  { key: "leaderboard", href: "/leaderboard", label: "Leaderboard", icon: { line: "podium" } },
+  { key: "clubs", href: "/clubs", label: "Clubs", icon: { line: "people" } },
 ];
 
 /** The four places a phone user goes most, plus the way to everything else. */
@@ -94,7 +94,7 @@ const TABS: NavLink[] = [
   { key: "timer", href: "/timer", label: "Solve", icon: { face: "solve" } },
   { key: "ranked", href: "/ranked", label: "Ranked", icon: { face: "ranked" } },
   { key: "daily", href: "/daily", label: "Daily", icon: { face: "daily" } },
-  { key: "progress", href: "/progress", label: "Progress", icon: { line: "chart" } },
+  { key: "review", href: "/review", label: "Review", icon: { line: "review" } },
 ];
 
 export function SiteHeader({
@@ -168,12 +168,14 @@ export function SiteHeader({
         </div>
         {trailing ? <p className="hidden px-3 pb-3 text-xs text-muted-dim lg:block">{trailing}</p> : null}
 
-        <Link href="/timer" onClick={() => setOpen(false)} className="btn-go mx-1 mb-4 justify-center py-3 text-[15px]">
+        <Link href="/timer" onClick={() => setOpen(false)} className="btn-go mx-1 mb-3 justify-center py-3 text-[15px]">
           Solve now
         </Link>
 
+        <NavGroup label="Solve" links={SOLVE} active={active} onNavigate={() => setOpen(false)} />
         <NavGroup label="Compete" links={COMPETE} active={active} onNavigate={() => setOpen(false)} />
-        <NavGroup label="Practice" links={PRACTICE} active={active} onNavigate={() => setOpen(false)} />
+        <NavGroup label="Improve" links={IMPROVE} active={active} onNavigate={() => setOpen(false)} />
+        <NavGroup label="Community" links={COMMUNITY} active={active} onNavigate={() => setOpen(false)} />
 
         <div className="mt-auto flex flex-col gap-2 border-t border-border px-1 pt-4">
           <AuthControl />
@@ -309,7 +311,7 @@ function NavGroup({
   onNavigate: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-0.5 pb-3" role="group" aria-label={label}>
+    <div className="flex flex-col gap-0.5 pb-2" role="group" aria-label={label}>
       <span className="px-3 pb-1.5 pt-1 text-[10.5px] font-semibold uppercase tracking-[0.14em] text-muted-dim">
         {label}
       </span>
@@ -318,7 +320,7 @@ function NavGroup({
           <span
             key={link.key}
             aria-current="page"
-            className="flex items-center gap-3 rounded-lg bg-surface-hi px-3 py-2 text-[15px] font-semibold text-foreground"
+            className="flex items-center gap-3 rounded-lg bg-surface-hi px-3 py-[7px] text-[15px] font-semibold text-foreground"
           >
             <NavIcon icon={link.icon} lit />
             {link.label}
@@ -328,7 +330,7 @@ function NavGroup({
             key={link.key}
             href={link.href}
             onClick={onNavigate}
-            className="group flex items-center gap-3 rounded-lg px-3 py-2 text-[15px] font-medium text-muted transition-colors hover:bg-surface-hi/60 hover:text-foreground"
+            className="group flex items-center gap-3 rounded-lg px-3 py-[7px] text-[15px] font-medium text-muted transition-colors hover:bg-surface-hi/60 hover:text-foreground"
           >
             <NavIcon icon={link.icon} />
             {link.label}

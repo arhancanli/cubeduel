@@ -124,7 +124,7 @@ function Confusable({ study, siblings }: { study: LearnCase; siblings: Sibling[]
   return (
     <section className="flex flex-col gap-4 border-t border-border pt-8">
       <div className="flex flex-col gap-1">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+        <h2 className="text-lg">
           Easy to confuse with
         </h2>
         <p className="max-w-lg text-xs leading-relaxed text-muted-dim">
@@ -245,7 +245,7 @@ function Watch({ study, moves }: { study: LearnCase; moves: string[] }) {
 
       <div className="panel flex flex-col gap-6 rounded-2xl p-5">
         <div className="flex flex-col gap-3">
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+          <h2 className="text-lg">
             The algorithm
           </h2>
           <div className="flex flex-wrap gap-1.5">
@@ -397,7 +397,7 @@ function Try({ study, moves }: { study: LearnCase; moves: string[] }) {
 
       <div className="panel flex flex-col gap-6 rounded-2xl p-5">
         <div className="flex flex-col gap-2">
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+          <h2 className="text-lg">
             Your cube
           </h2>
           {support?.supported ? (
@@ -426,7 +426,7 @@ function Try({ study, moves }: { study: LearnCase; moves: string[] }) {
         </div>
 
         <div className="flex flex-col gap-3">
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+          <h2 className="text-lg">
             If you get stuck
           </h2>
           <p className="font-mono text-sm leading-relaxed">{moves.join(" ")}</p>
@@ -438,7 +438,7 @@ function Try({ study, moves }: { study: LearnCase; moves: string[] }) {
 
         {times.length > 0 ? (
           <div className="flex flex-col gap-3">
-            <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+            <h2 className="text-lg">
               This session
             </h2>
             <div className="flex gap-6">
@@ -462,7 +462,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
       <span className="tnum font-mono text-lg">{value}</span>
-      <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
+      <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
     </div>
   );
 }

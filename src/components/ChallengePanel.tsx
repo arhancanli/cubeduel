@@ -240,7 +240,7 @@ export function ChallengePanel({
 
       {board.length > 0 ? (
         <div className="mt-6">
-          <h3 className="mb-2 text-[10px] uppercase tracking-widest text-muted-dim">
+          <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
             Open to anybody
           </h3>
           <ul className="flex flex-col gap-2" data-testid="open-board">
@@ -276,7 +276,7 @@ export function ChallengePanel({
 
       {onBoard.length > 0 ? (
         <div className="mt-6">
-          <h3 className="mb-2 text-[10px] uppercase tracking-widest text-muted-dim">
+          <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
             Yours, on the board
           </h3>
           <ul className="flex flex-col gap-2">
@@ -300,7 +300,7 @@ export function ChallengePanel({
 
       {waiting.length > 0 ? (
         <div className="mt-6">
-          <h3 className="mb-2 text-[10px] uppercase tracking-widest text-muted-dim">
+          <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
             Your turn
           </h3>
           <ul className="flex flex-col gap-2">
@@ -324,7 +324,7 @@ export function ChallengePanel({
 
       {pending.length > 0 ? (
         <div className="mt-6">
-          <h3 className="mb-2 text-[10px] uppercase tracking-widest text-muted-dim">
+          <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
             Waiting on them
           </h3>
           <ul className="flex flex-col gap-2">
@@ -349,7 +349,7 @@ export function ChallengePanel({
 
       {settled.length > 0 ? (
         <div className="mt-6">
-          <h3 className="mb-2 text-[10px] uppercase tracking-widest text-muted-dim">
+          <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
             Finished
           </h3>
           <ul className="flex flex-col gap-2">

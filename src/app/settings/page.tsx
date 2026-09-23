@@ -171,7 +171,7 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
       </div>
 
       <form action={save} className="flex max-w-sm flex-col gap-3">
-        <label htmlFor="handle" className="text-[10px] uppercase tracking-widest text-muted-dim">
+        <label htmlFor="handle" className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
           Handle
         </label>
         <input

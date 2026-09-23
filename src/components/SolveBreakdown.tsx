@@ -105,7 +105,7 @@ export function SolveBreakdown({ splits }: { splits: PhaseSplit[] }) {
       </div>
 
       {measured ? (
-        <div className="flex items-center gap-4 text-[10px] uppercase tracking-widest text-muted-dim">
+        <div className="flex items-center gap-4 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
           <span className="flex items-center gap-1.5">
             <span className="inline-block h-2 w-4 rounded-sm text-bar" style={STRIPES} />
             looking

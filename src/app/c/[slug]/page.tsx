@@ -85,7 +85,7 @@ export default async function ClubPage(props: PageProps<"/c/[slug]">) {
 
       {role ? (
         <div className="flex flex-col gap-2 rounded-xl border border-border bg-surface px-5 py-4">
-          <span className="text-[10px] uppercase tracking-widest text-muted-dim">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
             Invite code
           </span>
           <code className="font-mono text-lg tracking-[0.2em]">{club.joinCode}</code>

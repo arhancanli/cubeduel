@@ -41,7 +41,7 @@ export function CaseCoach({ solves }: { solves: StoredSolve[] }) {
   if (oll.length === 0 && pll.length === 0) {
     return (
       <section className="flex flex-col gap-2">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Cases to drill</h2>
+        <h2 className="text-xl">Cases to drill</h2>
         <p className="text-sm leading-relaxed text-muted-dim">
           Nothing to show yet. A case has to come up at least {MIN_OCCURRENCES} times before
           its average means anything — until then one bad solve would look like a weakness.
@@ -53,7 +53,7 @@ export function CaseCoach({ solves }: { solves: StoredSolve[] }) {
   return (
     <section className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">Cases to drill</h2>
+        <h2 className="text-xl">Cases to drill</h2>
         <p className="text-xs leading-relaxed text-muted-dim">
           Ranked by time you would get back, not by how slow they feel — how often the
           case comes up, times how much slower it is than your typical case at that stage.

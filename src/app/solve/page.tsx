@@ -51,7 +51,7 @@ export default function SolvePage() {
 
         {/* ---------------------------------------------------------------- */}
         <Reveal className="panel flex flex-col gap-3 rounded-2xl p-5">
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+          <h2 className="text-lg">
             Before you start
           </h2>
           <p className="text-sm leading-relaxed text-muted">
@@ -126,7 +126,7 @@ export default function SolvePage() {
 
         {/* ---------------------------------------------------------------- */}
         <Reveal className="flex flex-col gap-4 border-t border-border pt-10">
-          <h2 className="text-[10px] uppercase tracking-widest text-muted-dim">
+          <h2 className="text-lg">
             Turning a cube with the keyboard
           </h2>
           <p className="max-w-xl text-xs leading-relaxed text-muted-dim">

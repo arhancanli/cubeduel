@@ -81,7 +81,7 @@ export function ClubBoard({
 
       {unrated.length > 0 ? (
         <div className="flex flex-col gap-3">
-          <h3 className="text-[10px] uppercase tracking-widest text-muted-dim">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
             Not rated yet
           </h3>
           <ul className="flex list-none flex-col gap-px overflow-hidden rounded-xl border border-border bg-border p-0">

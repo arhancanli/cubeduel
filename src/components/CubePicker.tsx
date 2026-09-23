@@ -85,7 +85,7 @@ function Group({
     <fieldset className="flex flex-col gap-3">
       <legend className="sr-only">{title}</legend>
       <div className="flex flex-col gap-1">
-        <h3 className="text-[10px] uppercase tracking-widest text-muted-dim">{title}</h3>
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{title}</h3>
         <p className="max-w-md text-xs leading-relaxed text-muted-dim">{note}</p>
       </div>
 

@@ -118,7 +118,20 @@ export function TrainScreen() {
       {/* The page title, for assistive tech. This screen is deliberately
           chrome-free — a visible heading beside the clock would be noise. */}
       <h1 className="sr-only">Case trainer</h1>
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center gap-6 px-6 pb-16 pt-2">
+      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center gap-6 px-4 pb-16 pt-4 sm:px-6 lg:pt-8">
+        {/* What this is, in one line. It used to open straight onto a case with
+            "0/6 cases seen · rep 1" and nothing saying what any of that meant. */}
+        <div className="w-full rounded-2xl border border-border bg-surface px-5 py-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sticker-green">Train</p>
+          <p className="mt-1 text-sm leading-relaxed text-muted">
+            Drill last-layer cases on the keyboard. The cube is set up in the case — solve it with its
+            algorithm. Slow cases come back sooner; ones you have nailed come back later, until each is
+            mastered.{" "}
+            <Link href="/learn" className="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-current">
+              See every algorithm
+            </Link>
+          </p>
+        </div>
         {cards === null ? (
           <p className="pt-20 text-sm text-muted-dim">Building your deck…</p>
         ) : cards.length === 0 ? (
@@ -183,14 +196,26 @@ function Drill({
 
   return (
     <>
-      <div className="flex w-full flex-wrap items-center justify-between gap-3 text-xs text-muted-dim">
-        <span>
-          {card.stage} · {card.name ?? "unnamed case"}
-        </span>
-        <span>
-          {summary.attempted}/{summary.total} cases seen · {summary.mastered}{" "}
-          mastered · rep {position + 1}
-        </span>
+      <div className="flex w-full flex-wrap items-end justify-between gap-3">
+        <div className="flex flex-col">
+          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">
+            {card.stage === "OLL" ? "Orient the top" : "Permute the top"}
+          </span>
+          <span className="font-display text-2xl font-bold">
+            {card.stage} · {card.name ?? "unnamed case"}
+          </span>
+        </div>
+        <div className="flex flex-wrap gap-2 text-xs">
+          <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted">
+            <span className="tnum font-semibold text-foreground">{summary.attempted}</span>/{summary.total} cases seen
+          </span>
+          <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted">
+            <span className="tnum font-semibold text-foreground">{summary.mastered}</span> mastered
+          </span>
+          <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted">
+            rep <span className="tnum font-semibold text-foreground">{position + 1}</span>
+          </span>
+        </div>
       </div>
 
       <CubeView

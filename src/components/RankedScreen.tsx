@@ -358,7 +358,7 @@ function RatingBar({ rating, event }: { rating: RankedRating; event: EventId }) 
   return (
     <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
       <div className="flex flex-col items-center gap-1">
-        <span className="text-[10px] uppercase tracking-widest text-muted-dim">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
           rating
         </span>
         <span className="tnum text-2xl font-medium">
@@ -372,7 +372,7 @@ function RatingBar({ rating, event }: { rating: RankedRating; event: EventId }) 
       </div>
 
       <div className="flex flex-col items-center gap-1">
-        <span className="text-[10px] uppercase tracking-widest text-muted-dim">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
           confidence
         </span>
         <span className="tnum text-2xl font-medium text-muted">
@@ -386,7 +386,7 @@ function RatingBar({ rating, event }: { rating: RankedRating; event: EventId }) 
       </div>
 
       <div className="flex flex-col items-center gap-1">
-        <span className="text-[10px] uppercase tracking-widest text-muted-dim">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
           next update
         </span>
         <span className="tnum text-2xl font-medium text-muted">

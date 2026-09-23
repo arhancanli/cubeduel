@@ -472,7 +472,7 @@ function Seat({
   if (!player) {
     return (
       <div className="flex flex-col gap-1 rounded-xl border border-dashed border-border px-4 py-3">
-        <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
         <span className="text-sm text-muted-dim">Waiting for someone to open the link…</span>
       </div>
     );
@@ -486,7 +486,7 @@ function Seat({
   return (
     <div className="flex flex-col gap-2 rounded-xl border border-border px-4 py-3" data-testid={`seat-${label.toLowerCase()}`}>
       <div className="flex items-baseline justify-between gap-2">
-        <span className="text-[10px] uppercase tracking-widest text-muted-dim">{label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
         {phase === "lobby" ? (
           <span className={`text-[10px] uppercase tracking-widest ${player.ready ? "text-ready" : "text-muted-dim"}`}>
             {player.ready ? "Ready" : "Not ready"}
