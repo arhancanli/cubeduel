@@ -125,6 +125,17 @@ with sync_playwright() as p:
     check("no splits offered on a 2x2", page.get_by_role("button", name="Record phase splits").count() == 0
           and page.get_by_role("button", name="Phase splits on — space ends each phase").count() == 0)
 
+    print("\n== the practice calendar counts every puzzle ==")
+    page.goto(BASE + "/progress", wait_until="load")
+    page.wait_for_selector("[data-testid=practice-calendar]", timeout=15000)
+    summary = page.get_by_test_id("practice-summary").inner_text()
+    check("seven solves on one day, 3x3 and 4x4 together", summary.startswith("1 day of practice · 7 solves"), summary)
+    today = page.locator("[data-testid=practice-calendar] li.ring-1")
+    check("today's square says so", today.count() == 1 and today.get_attribute("aria-label").endswith(": 7 solves"),
+          today.get_attribute("aria-label") if today.count() else "none")
+    overflow = page.evaluate("() => document.documentElement.scrollWidth - document.documentElement.clientWidth")
+    check("the calendar fits the page", overflow <= 1, f"{overflow}px")
+
     print("\n== synced to the account as a 4x4 ==")
     # Sync runs once a signed-in page has loaded; give it time to finish.
     page.goto(BASE + "/", wait_until="load")

@@ -61,7 +61,7 @@ export function StreakCard({ compact = false }: { compact?: boolean }) {
           })}
         </ol>
         {!streak.today && !compact ? (
-          <Link href="/play" className="btn-go self-start px-4 py-2 text-sm sm:self-end">
+          <Link href="/timer" className="btn-go self-start px-4 py-2 text-sm sm:self-end">
             Solve now
           </Link>
         ) : null}

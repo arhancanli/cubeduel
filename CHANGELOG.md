@@ -3,6 +3,31 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.18.0 — 2026-09-24
+
+### Six months of practice, a square a day
+
+- **On Progress, under the streak.** The streak says how many days in a row;
+  this says what the months looked like — the week you missed, the weekend you
+  did two hundred. Each square is a day of your own, shaded by how many solves
+  it had, with the count on it; the line above gives days practised, solves,
+  and your longest streak. Every puzzle counts. It reads this device's
+  history, so it works without an account.
+- **The shades are fixed steps** — 1–4 solves, 5–14, 15–29, 30 and over — not
+  steps relative to your busiest day, which would let one enormous Saturday
+  turn every ordinary day pale and make the same twenty solves look different
+  from one month to the next.
+- Days are the solver's own and weeks run Monday to Sunday, checked across a
+  clock change; a solve stamped in the future by a wrong clock is not counted.
+- The streak's "Solve now" goes to the timer, where most people solve, not the
+  keyboard page.
+
+### Not yet
+
+- **Rating tiers wait for ratings.** Nobody has a rating on the live site yet,
+  and tier boundaries drawn before anyone does would be guesses dressed up as
+  structure. They come once real ratings exist to set them against.
+
 ## 1.17.0 — 2026-09-24
 
 ### The timer times 2×2, 4×4 and 5×5

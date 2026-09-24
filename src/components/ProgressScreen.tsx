@@ -8,6 +8,7 @@ import { CsTimerImport } from "@/components/CsTimerImport";
 import { GoalPanel } from "@/components/GoalPanel";
 import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
+import { PracticeCalendar } from "@/components/PracticeCalendar";
 import { StreakCard } from "@/components/StreakCard";
 import { formatMs } from "@/lib/format";
 import {
@@ -68,6 +69,7 @@ export function ProgressScreen() {
               <Overview solves={solves} trend={trend} />
             </Card>
             <StreakCard />
+            <PracticeCalendar />
             <Card>
               <Recommendation diagnosis={diagnosis} />
             </Card>
