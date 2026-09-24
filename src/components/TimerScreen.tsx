@@ -323,7 +323,10 @@ export function TimerScreen() {
                     ? "min-h-40 text-sm sm:text-base lg:min-h-24"
                     : event === "444"
                       ? "min-h-28 text-base sm:text-lg lg:min-h-16"
-                      : "min-h-14 text-lg sm:text-xl md:text-2xl lg:min-h-10"
+                      : // Three lines held on a phone: before the monospace font
+                        // arrives, its wider fallback wraps a 3x3 scramble to three,
+                        // and the clock jumped as the real font swapped in.
+                        "min-h-[5.4rem] text-lg sm:min-h-[4.25rem] sm:text-xl md:text-2xl lg:min-h-[4.5rem]"
                 }`}
               >
                 {scramble

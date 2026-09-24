@@ -138,8 +138,10 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
               </span>
               <span className="text-[11px] text-muted-dim">The cube below is scrambled for you</span>
             </div>
-            {/* Height held for two lines until the scramble arrives; one on a wide screen. */}
-            <div className="flex min-h-[3.25rem] flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-base leading-snug sm:text-lg lg:min-h-7">
+            {/* Height held for the scramble before it arrives — enough for the
+                wider fallback font too, which wraps it one line longer than
+                the monospace font that replaces it. */}
+            <div className="flex min-h-[4.9rem] flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-base leading-snug sm:min-h-[5.4rem] sm:text-lg lg:min-h-14">
               {scramble.split(" ").map((move, i) => (
                 <span key={`${move}-${i}`}>{move}</span>
               ))}

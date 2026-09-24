@@ -3,6 +3,24 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.18.1 — 2026-09-24
+
+### The timer no longer jumps on the live site
+
+- Checked on production after 1.18.0 went live, the timer shifted by 0.10 for
+  a returning visitor on a phone — just over Google's line for "good". The
+  scramble is set in a monospace font that, on a real network, arrives after
+  the first paint. Its wider fallback wrapped a 3×3 scramble to three lines,
+  the real font to two, and everything below jumped down and back up as it
+  swapped. Desktop had the same fault one line higher. The keyboard page's
+  scramble did too, with the fallback font.
+- **The fix holds the scramble's height for whichever font is showing.**
+- **The check that missed it now looks for it.** The layout-shift suite loaded
+  pages from a local server, where fonts arrive before the first paint, so the
+  swap never happened. It now loads the timer and the keyboard page with the
+  web fonts blocked and with them loaded, at phone and desktop width, and
+  requires every scramble to fit its space either way. It failed on 1.18.0.
+
 ## 1.18.0 — 2026-09-24
 
 ### Six months of practice, a square a day
