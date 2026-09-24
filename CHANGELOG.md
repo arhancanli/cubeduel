@@ -3,6 +3,27 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.16.0 — 2026-09-24
+
+### A review for every solve timed on a real cube
+
+- **Solves timed on your own cube used to have no review at all** — the page
+  said a stopwatch time had "nothing to read back". That turned away most of
+  the people who own a cube. Every timed solve now has one, linked from the
+  timer the moment it finishes ("review →") and listed on Review.
+- **The best cross in the scramble.** Worked out exactly for all six colours,
+  shortest first, and the shortest white cross shown on a cube you can step
+  through — held white-down, green in front, the way most people build it,
+  with the camera below so the cross can be seen being built. The route is
+  rewritten for that hold, and the rewrite is checked against the puzzle: the
+  cube ends in exactly the same state either way.
+- **Which phase cost you.** With phase splits on, each phase is set against
+  your own average over your last split solves, and named only when it is
+  outside your normal spread and by at least a tenth — a hundredth of a second
+  is not worth anybody's attention. Nothing is judged before five other split
+  solves; the page says how many more it needs.
+- Without splits, the review says how to turn them on.
+
 ## 1.15.0 — 2026-09-24
 
 ### Pages arrive readable, and nothing jumps

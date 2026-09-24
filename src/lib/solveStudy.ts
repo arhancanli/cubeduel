@@ -23,7 +23,7 @@ export interface SolveStudy {
   cross: CrossReference | null;
 }
 
-const FACE_COLOUR: Record<string, string> = {
+export const FACE_COLOUR: Record<string, string> = {
   U: "white",
   D: "yellow",
   F: "green",
@@ -40,7 +40,7 @@ export function crossFaceLabel(face: string): string {
 
 const tables = new Map<string, { table: Uint8Array; slots: number[] }>();
 
-async function shortestCross(scramble: string, face: string): Promise<CrossReference | null> {
+export async function shortestCross(scramble: string, face: string): Promise<CrossReference | null> {
   const kpuzzle = await loadKPuzzle();
   const solved = kpuzzle.defaultPattern() as Pattern;
   let entry = tables.get(face);

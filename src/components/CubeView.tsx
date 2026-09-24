@@ -182,7 +182,8 @@ export function CubeView({
             ? {}
             : {
                 cameraLatitude: latitudeRef.current,
-                cameraLatitudeLimit: Math.max(latitudeRef.current, 35),
+                // The limit is a magnitude: a view from below needs it too.
+                cameraLatitudeLimit: Math.max(Math.abs(latitudeRef.current), 35),
               }),
         }) as unknown as TwistyPlayerInstance;
 

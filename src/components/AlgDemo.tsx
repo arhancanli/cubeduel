@@ -19,6 +19,8 @@ export function AlgDemo({
   label,
   hold = "",
   puzzle = "3x3x3",
+  from,
+  cameraLatitude = 45,
 }: {
   alg: string;
   label: string;
@@ -37,12 +39,19 @@ export function AlgDemo({
    * the cube is now held, so R is still the side on your right.
    */
   hold?: string;
+  /**
+   * Start from this position instead of the algorithm's inverse — a scramble,
+   * say, with the algorithm being a route out of it rather than a case fix.
+   */
+  from?: string;
+  /** Degrees above the cube; negative looks up from below, at the bottom face. */
+  cameraLatitude?: number;
 }) {
   const moves = useMemo(() => alg.split(/\s+/).filter(Boolean), [alg]);
   const setup = useMemo(() => {
-    const inverse = invertAlg(alg);
-    return hold ? `${hold} ${inverse}` : inverse;
-  }, [alg, hold]);
+    const start = from ?? invertAlg(alg);
+    return hold ? `${hold} ${start}` : start;
+  }, [alg, hold, from]);
 
   const [at, setAt] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -75,7 +84,7 @@ export function AlgDemo({
           scramble={state}
           interactive
           backView="none"
-          cameraLatitude={45}
+          cameraLatitude={cameraLatitude}
           puzzle={puzzle}
           className="h-full w-full"
         />

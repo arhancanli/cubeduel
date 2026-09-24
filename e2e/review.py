@@ -197,6 +197,69 @@ with sync_playwright() as p:
     page.wait_for_timeout(1200)
     check("a missing solve says so", "not on this device" in page.inner_text("body"))
 
+    # ---------------------------------------------------------------------
+    # A solve timed on a real cube. No turns to read, but a scramble whose
+    # best cross can be worked out, and — with splits — phases that can be
+    # set against the solver's own usual. Timed through the real timer, the
+    # way a person with a cube in their hands does it.
+    print("\n== a solve timed on a real cube ==")
+    tctx = browser.new_context(viewport={"width": 1440, "height": 1000})
+    timer = tctx.new_page()
+    timer.on("pageerror", lambda e: errors.append(str(e)))
+    timer.goto(BASE + "/timer", wait_until="load")
+    timer.wait_for_timeout(2500)
+
+    def time_solve(phase_ms):
+        timer.keyboard.down("Space")
+        timer.wait_for_timeout(450)
+        timer.keyboard.up("Space")
+        for ms in phase_ms:
+            timer.wait_for_timeout(ms)
+            timer.keyboard.press("Space")
+        timer.wait_for_timeout(900)
+
+    # One without splits, then five at a steady pace, then one with a slow F2L.
+    time_solve([1500])
+    timer.get_by_role("button", name="Record phase splits").click()
+    timer.wait_for_timeout(300)
+    for _ in range(5):
+        time_solve([300, 600, 300, 300])
+    time_solve([300, 2200, 300, 300])
+
+    # Straight from the timer, the way somebody finds it.
+    timer.get_by_role("link", name="review →").click()
+    timer.wait_for_url("**/review?id=**")
+    timer.wait_for_selector("[data-testid=timer-phases]", timeout=15000)
+    timer.goto(BASE + "/review", wait_until="load")
+    timer.wait_for_timeout(1500)
+    rows = timer.locator("main ul li a")
+    body = timer.inner_text("main")
+    check("timer solves are listed for review", "timed, phases split" in body and "timed" in body)
+
+    rows.first.click()
+    timer.wait_for_selector("[data-testid=timer-phases]", timeout=15000)
+    summary = timer.get_by_test_id("timer-phases-summary").inner_text()
+    check("the slow phase is named", summary.startswith("F2L cost you this solve"), summary)
+    timer.wait_for_selector("[data-testid=timer-cross]", timeout=30000)
+    options = timer.get_by_test_id("timer-cross-option")
+    check("the cross in all six colours", options.count() == 6, str(options.count()))
+    turns = [int(options.nth(i).inner_text().split("turn")[0].split()[-1]) for i in range(options.count())]
+    check("shortest first", turns == sorted(turns), str(turns))
+    cross_summary = timer.get_by_test_id("timer-cross-summary").inner_text()
+    check("the white cross is stated", "shortest white cross was" in cross_summary, cross_summary)
+    scramble = timer.locator("main p.font-mono").first.inner_text().strip()
+    setup = timer.locator("[data-testid=timer-cross] twisty-player").first.get_attribute("experimental-setup-alg") or ""
+    check("the cube starts from this scramble, turned over", setup.split() == scramble.split() + ["z2"], setup[:80])
+
+    # The first solve had no splits: it still gets the cross, and is told how
+    # to get the rest.
+    timer.goto(BASE + "/review", wait_until="load")
+    timer.wait_for_timeout(1500)
+    timer.locator("main ul li a").last.click()
+    timer.wait_for_selector("[data-testid=timer-cross]", timeout=30000)
+    check("a solve without splits says how to get them", "Which phase cost you?" in timer.inner_text("main"))
+    tctx.close()
+
     print("\n== console ==")
     check("no page errors", len(errors) == 0, "; ".join(errors[:2])[:200])
     browser.close()

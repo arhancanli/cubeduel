@@ -8,6 +8,7 @@ import { InsightsPanel, type InsightSolve } from "@/components/InsightsPanel";
 import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SolveStudy } from "@/components/SolveStudy";
+import { TimerSolveReview } from "@/components/TimerSolveReview";
 import type { TimedMove } from "@/lib/cfop";
 import { formatMs } from "@/lib/format";
 import { decodeMoveStream } from "@/lib/moveStream";
@@ -16,27 +17,31 @@ import { loadHistory, type StoredSolve } from "@/lib/solveHistory";
 /**
  * Review a solve kept on this device.
  *
- * `?id=` names one; without it, the page lists the recent solves that can be
- * reviewed. Only solves with their turns can be — a stopwatch time has nothing
- * to read back — and the list says so rather than showing rows that lead
- * nowhere.
+ * `?id=` names one; without it, the page lists the recent solves. A solve with
+ * its turns — keyboard or smart cube — is read back one turn at a time. A
+ * solve timed on a cube in somebody's hands has no turns, but it has a
+ * scramble, whose best cross can be worked out, and maybe phase splits, which
+ * can be set against their own usual. It used to be turned away as "nothing to
+ * read back", which turned away most of the people who own a cube.
  */
 
 interface Reviewable {
   solve: StoredSolve;
-  moves: TimedMove[];
+  /** Null for a solve timed on a real cube: there are no turns to read. */
+  moves: TimedMove[] | null;
 }
 
 function reviewable(solve: StoredSolve): Reviewable | null {
-  if (!solve.moves || solve.penalty === "DNF") return null;
-  const moves = decodeMoveStream(solve.moves);
-  return moves && moves.length > 0 ? { solve, moves } : null;
+  if (solve.penalty === "DNF" || !solve.scramble) return null;
+  const moves = solve.moves ? decodeMoveStream(solve.moves) : null;
+  if (moves && moves.length > 0) return { solve, moves };
+  return solve.source === "manual" ? { solve, moves: null } : null;
 }
 
 export function ReviewScreen() {
   const [state, setState] = useState<
     | { kind: "loading" }
-    | { kind: "one"; item: Reviewable }
+    | { kind: "one"; item: Reviewable; history: StoredSolve[] }
     | { kind: "missing" }
     | { kind: "list"; items: Reviewable[]; total: number; insight: InsightSolve[] }
   >({ kind: "loading" });
@@ -51,7 +56,7 @@ export function ReviewScreen() {
       if (id) {
         const solve = history.find((s) => s.id === id);
         const item = solve ? reviewable(solve) : null;
-        setState(item ? { kind: "one", item } : { kind: "missing" });
+        setState(item ? { kind: "one", item, history } : { kind: "missing" });
         return;
       }
       const items = history
@@ -59,12 +64,11 @@ export function ReviewScreen() {
         .filter((r): r is Reviewable => r !== null)
         .reverse()
         .slice(0, 30);
-      const insight = items.map(({ solve, moves }) => ({
-        href: `/review?id=${encodeURIComponent(solve.id)}`,
-        scramble: solve.scramble,
-        moves,
-        durationMs: solve.durationMs,
-      }));
+      const insight = items.flatMap(({ solve, moves }) =>
+        moves
+          ? [{ href: `/review?id=${encodeURIComponent(solve.id)}`, scramble: solve.scramble, moves, durationMs: solve.durationMs }]
+          : [],
+      );
       setState({ kind: "list", items, total: history.length, insight });
     };
     // Read after mount: the history lives in this browser, not on the server.
@@ -91,26 +95,29 @@ export function ReviewScreen() {
               </p>
               <p className="mt-2 font-mono text-sm tracking-wide text-muted-dim">{state.item.solve.scramble}</p>
             </PageHero>
-            <SolveStudy
-              scramble={state.item.solve.scramble}
-              moves={state.item.moves}
-              durationMs={state.item.solve.durationMs}
-            />
+            {state.item.moves ? (
+              <SolveStudy
+                scramble={state.item.solve.scramble}
+                moves={state.item.moves}
+                durationMs={state.item.solve.durationMs}
+              />
+            ) : (
+              <TimerSolveReview solve={state.item.solve} history={state.history} />
+            )}
           </>
         ) : (
           <>
             <PageHero eyebrow="Improve" title="Solve review">
-              Every solve read back one turn at a time — the shortest cross you could have built,
-              where you stopped, the turns you undid — and, across your recent solves, the habits
-              that cost you the most.
+              Solves on the keyboard or a smart cube are read back one turn at a time — where you
+              stopped, the turns you undid. Solves timed on your own cube show the best cross the
+              scramble offered and, with phase splits, which phase cost you.
             </PageHero>
             {state.kind === "missing" ? (
               <p className="rounded-2xl border border-border bg-surface px-5 py-5 text-sm text-muted">
-                That solve is not on this device, or it was timed with a stopwatch and has no turns to
-                read back.
+                That solve is not on this device.
               </p>
             ) : null}
-            {state.kind === "list" && state.items.length > 0 ? (
+            {state.kind === "list" && state.insight.length > 0 ? (
               <InsightsPanel solves={state.insight} />
             ) : null}
             {state.kind === "list" ? (
@@ -131,13 +138,11 @@ function SolveList({ items, total }: { items: Reviewable[]; total: number }) {
     return (
       <div className="flex flex-col items-start gap-4 rounded-2xl border border-dashed border-border px-6 py-8">
         <p className="max-w-lg text-sm leading-relaxed text-muted">
-          {total === 0
-            ? "No solves on this device yet."
-            : "None of the solves on this device kept their turns — stopwatch times have only a time."}{" "}
-          Solve on the keyboard, or with a connected smart cube, and every solve can be reviewed.
+          {total === 0 ? "No solves on this device yet." : "None of the solves on this device can be reviewed."}{" "}
+          Time a solve on your own cube, or solve on the keyboard, and it will be here.
         </p>
-        <Link href="/play" className="btn-go px-5 py-2.5 text-sm">
-          Solve on the keyboard
+        <Link href="/timer" className="btn-go px-5 py-2.5 text-sm">
+          Open the timer
         </Link>
       </div>
     );
@@ -155,7 +160,14 @@ function SolveList({ items, total }: { items: Reviewable[]; total: number }) {
             </span>
             <span className="min-w-0 flex-1 truncate text-sm text-muted">
               {new Date(solve.at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
-              <span className="text-muted-dim"> · {moves.length} moves recorded</span>
+              <span className="text-muted-dim">
+                {" · "}
+                {moves
+                  ? `${moves.length} moves recorded`
+                  : solve.splits.length > 0
+                    ? "timed, phases split"
+                    : "timed"}
+              </span>
             </span>
             <span className="shrink-0 text-sm font-semibold">Review →</span>
           </Link>

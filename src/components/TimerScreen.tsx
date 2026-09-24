@@ -359,6 +359,14 @@ export function TimerScreen() {
                   onClick={() => setPenalty("DNF")}
                 />
                 <PenaltyButton label="delete" active={false} onClick={deleteLast} />
+                {lastSolve.penalty !== "DNF" ? (
+                  <Link
+                    href={`/review?id=${encodeURIComponent(lastSolve.id)}`}
+                    className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:border-muted-dim hover:text-foreground"
+                  >
+                    review →
+                  </Link>
+                ) : null}
               </>
             ) : null}
             {/*
