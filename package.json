@@ -1,6 +1,6 @@
 {
   "name": "cubeduel",
-  "version": "1.19.0",
+  "version": "1.19.1",
   "private": true,
   "engines": {
     "node": ">=22"
@@ -31,6 +31,7 @@
     "integration:passkeys": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-passkeys.mts",
     "e2e:https": "NEXT_PUBLIC_SITE_URL=https://localhost:3443 npm run build && (NEXT_PUBLIC_SITE_URL=https://localhost:3443 npm run start & node scripts/tls-dev.mjs &) && sleep 10 && python3 e2e/https.py; code=$?; lsof -ti:3000,3443 | xargs kill -9 2>/dev/null; exit $code",
     "e2e:local": "npm run db:up && npm run build && node scripts/db-local.mjs run -- sh -c 'lsof -ti:3000 | xargs kill -9 2>/dev/null; (npx next start -p 3000 > .next/e2e-server.log 2>&1 &); sleep 8; DEV_LOG=.next/e2e-server.log BASE=http://localhost:3000 npm run e2e; code=$?; lsof -ti:3000 | xargs kill -9 2>/dev/null; exit $code'",
+    "audit:review": "tsx scripts/audit-review.mts",
     "audit": "tsx scripts/audit.mts",
     "sweep": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/sweep.mts",
     "retention": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/retention.mts",

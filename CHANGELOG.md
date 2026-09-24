@@ -3,6 +3,28 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.19.1 — 2026-09-24
+
+### How accurate is the review? Measured: exact
+
+- **The solve review is the core of the site, and until now its accuracy was
+  asserted from a handful of hand-built solves.** It is now measured. A new
+  audit builds CFOP solves whose true phases are known to the move — random
+  cross turns, four F2L inserts from the 41 verified cases turned to each slot,
+  an OLL and a PLL from the case lists, random turns of the top between — with
+  the scramble their inverse, so where every phase ends and which last-layer
+  cases came up is known exactly. The review then reads them.
+- **1,200 solves, three seeds: every phase in order, all 8,400 phase ends read
+  to the exact turn, every OLL and every PLL case named.**
+- **The audit was checked against itself first.** Its first runs reported the
+  cross ending early — and the review was right: a random cross can be
+  finished and then wander without changing it (a trigger like F' U' F, or
+  D2 U2 D2), so the audit now finds the cross's true end by replay instead of
+  assuming its last turn. And an analyser broken to end phases one turn late
+  scores 14%, so a perfect score is not an audit that cannot fail.
+- `npm run audit:review` runs it at any size; a 40-solve run is a unit test,
+  so a change that makes the review misread solves fails the build.
+
 ## 1.19.0 — 2026-09-24
 
 ### 2×2, 4×4 and 5×5 in the real colours
