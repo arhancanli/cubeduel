@@ -163,6 +163,8 @@ export interface ProfileStats {
     moveCount: number;
     solvedAt: string;
     mode: string;
+    /** Which puzzle: a 5x5 time in an unlabelled list reads as a very slow 3x3. */
+    event: string;
   }[];
   history: { at: string; rating: number }[];
 }
@@ -192,7 +194,7 @@ export async function profileStats(
       .maybeSingle(),
     db()
       .from("solves")
-      .select("id, duration_ms, penalty, scramble, move_count, solved_at, mode")
+      .select("id, event, duration_ms, penalty, scramble, move_count, solved_at, mode")
       .eq("profile_id", profileId)
       .order("solved_at", { ascending: false })
       .limit(25),
@@ -251,6 +253,7 @@ export async function profileStats(
         moveCount: row.move_count,
         solvedAt: row.solved_at,
         mode: row.mode,
+        event: row.event,
       })) ?? [],
     history:
       history.data

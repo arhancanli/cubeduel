@@ -137,7 +137,8 @@ export async function buildDeck(): Promise<DeckStore> {
   const known = new Map(stored.cards.map((c) => [c.caseId, c]));
 
   const names = await buildNameTable().catch(() => new Map<string, string>());
-  const solves = loadHistory();
+  // Cases are 3x3 cases.
+  const solves = loadHistory("333");
 
   for (const stage of ["OLL", "PLL"] as const) {
     for (const aggregate of aggregateCases(solves, stage, names)) {

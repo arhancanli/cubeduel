@@ -1,5 +1,6 @@
 "use client";
 
+import { eventLabel, eventOf, hasTimerReview } from "@/lib/timerEvents";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -121,13 +122,20 @@ export function HomeDashboard({ handle, dailyStart }: { handle: string | null; d
           ) : (
             <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-2xl border border-border bg-surface">
               {recent.map((solve) => {
-                const reviewable = solve.moves ? (decodeMoveStream(solve.moves)?.length ?? 0) > 0 : false;
+                // Turns to read back, or a solve timed on a real cube — which has
+                // its own review: the best cross, and its phases.
+                const reviewable =
+                  solve.penalty !== "DNF" &&
+                  (solve.moves
+                    ? (decodeMoveStream(solve.moves)?.length ?? 0) > 0
+                    : solve.source === "manual" && hasTimerReview(eventOf(solve)));
                 return (
                   <li key={solve.id} className="flex items-center gap-4 px-5 py-3">
                     <span className="tnum w-20 shrink-0 font-display text-lg font-bold">
                       {solve.penalty === "DNF" ? "DNF" : formatMs(solve.durationMs, { truncate: false })}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-sm text-muted-dim">
+                      {eventOf(solve) !== "333" ? `${eventLabel(eventOf(solve))} · ` : ""}
                       {new Date(solve.at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
                     </span>
                     {reviewable ? (

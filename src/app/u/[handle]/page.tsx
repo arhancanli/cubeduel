@@ -173,7 +173,8 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
                           solve.durationMs + (solve.penalty === "PLUS2" ? 2000 : 0),
                         )}
                   </span>
-                  <span className="w-16 shrink-0 text-xs text-muted-dim">
+                  <span className="w-24 shrink-0 text-xs text-muted-dim">
+                    {solve.event === "333" ? "" : `${solve.event[0]}×${solve.event[1]} · `}
                     {solve.mode}
                   </span>
                   <span className="tnum hidden w-16 shrink-0 text-xs text-muted-dim sm:inline">

@@ -18,11 +18,12 @@ import { loadState, newSolve, saveState, type PersistedState } from "@/lib/stora
 import type { Penalty, Solve } from "@/lib/types";
 import { useSpeedTimer } from "@/lib/useSpeedTimer";
 import { useLatest } from "@/lib/useLatest";
+import type { EventId } from "@/lib/events";
+import { hasTimerReview, sessionFor, splitLabelsFor, TIMER_EVENTS } from "@/lib/timerEvents";
 
 const RECENT_COUNT = 12;
 
 /** CFOP stages, in order. These names match what the analyser groups on. */
-const SPLIT_LABELS = ["Cross", "F2L", "OLL", "PLL"] as const;
 const SPLIT_MODE_KEY = "cubeduel.splitMode.v1";
 
 /**
@@ -32,10 +33,10 @@ const SPLIT_MODE_KEY = "cubeduel.splitMode.v1";
  * stopwatch genuinely cannot see turns, and inventing a number here would put a
  * fabricated TPS next to a measured time.
  */
-function buildSplits(laps: number[]): PhaseSplit[] {
+function buildSplits(laps: number[], labels: readonly string[]): PhaseSplit[] {
   const splits: PhaseSplit[] = [];
   let prev = 0;
-  SPLIT_LABELS.forEach((label, i) => {
+  labels.forEach((label, i) => {
     const end = laps[i];
     if (end === undefined) return;
     splits.push({
@@ -64,31 +65,60 @@ export function TimerScreen() {
 
   const session = state ? state.sessions.find((s) => s.id === state.activeSessionId) : undefined;
   const solves = useMemo(() => session?.solves ?? [], [session]);
+  // The puzzle is the session's: each puzzle keeps its own session, so an
+  // average never mixes a 3x3 with a 5x5.
+  const event: EventId = TIMER_EVENTS.some((e) => e.id === session?.event)
+    ? (session!.event as EventId)
+    : "333";
+  const eventRef = useLatest(event);
+  const puzzle = TIMER_EVENTS.find((e) => e.id === event)!.puzzle;
 
   const nextRound = useCallback(() => {
     setReview(null);
   }, []);
 
   const advanceScramble = useCallback(async () => {
+    const wanted = eventRef.current;
     try {
-      const next = await nextScramble("333");
+      const next = await nextScramble(wanted);
+      // Switched puzzle while this one was being generated: a 3x3 scramble
+      // must never land on the 5x5 timer.
+      if (eventRef.current !== wanted) return;
       setScramble(next);
       setScrambleError(false);
     } catch {
-      setScrambleError(true);
+      if (eventRef.current === wanted) setScrambleError(true);
     }
-  }, []);
+  }, [eventRef]);
 
   useEffect(() => {
     setState(loadState());
-    warmScrambles("333");
-    void advanceScramble();
     try {
       setSplitMode(window.localStorage.getItem(SPLIT_MODE_KEY) === "1");
     } catch {
       /* Private mode — the default is fine. */
     }
-  }, [advanceScramble]);
+  }, []);
+
+  // A new scramble whenever the puzzle changes — including the first time the
+  // stored session is read, which may not be a 3x3.
+  const loaded = state !== null;
+  useEffect(() => {
+    if (!loaded) return;
+    setReview(null);
+    setScramble("");
+    warmScrambles(event);
+    void advanceScramble();
+  }, [event, loaded, advanceScramble]);
+
+  const chooseEvent = useCallback((next: EventId) => {
+    setState((current) => {
+      if (!current) return current;
+      const moved = sessionFor(current, next);
+      if (moved !== current) saveState(moved);
+      return moved;
+    });
+  }, []);
 
   const toggleSplitMode = useCallback(() => {
     setSplitMode((on) => {
@@ -125,12 +155,14 @@ export function TimerScreen() {
 
   const handleComplete = useCallback(
     (ms: number, laps: number[]) => {
-      const splits = laps.length > 0 ? buildSplits(laps) : [];
+      const event = eventRef.current;
+      const splits = laps.length > 0 ? buildSplits(laps, splitLabelsFor(event)) : [];
       // Reviewed against history as it stood *before* this solve — a par that this
-      // solve helped set would flatten its own gap toward zero.
-      setReview(reviewSolve(splits, ms, loadHistory()));
+      // solve helped set would flatten its own gap toward zero. The quick panel
+      // reads CFOP phases, so it is a 3x3's; other puzzles get the full review.
+      setReview(event === "333" ? reviewSolve(splits, ms, loadHistory("333")) : null);
 
-      const solved = newSolve(ms, activeScrambleRef.current, "333");
+      const solved = newSolve(ms, activeScrambleRef.current, event);
       // The next scramble is issued immediately even though the review is on screen.
       // A cuber doing fifty solves in a session holds space again without looking, and
       // making them dismiss a panel first would tax the loop far more than the review
@@ -155,12 +187,14 @@ export function TimerScreen() {
         pllSetup: null,
         // A real cube and a key press: a time, and no turns behind it.
         source: "manual",
+        event,
       });
     },
-    [mutateSolves, advanceScrambleRef],
+    [mutateSolves, advanceScrambleRef, eventRef],
   );
 
-  const splitLabels = useMemo(() => (splitMode ? SPLIT_LABELS : []), [splitMode]);
+  const eventSplits = splitLabelsFor(event);
+  const splitLabels = useMemo(() => (splitMode ? eventSplits : []), [splitMode, eventSplits]);
 
   const { phase, splitIndex, displayRef, touchHandlers, setDisplayedTime } = useSpeedTimer({
     onComplete: handleComplete,
@@ -248,10 +282,29 @@ export function TimerScreen() {
           <SolveSwitch active="timer" className={chromeClass} />
 
           <section className={`w-full rounded-2xl border border-border bg-surface px-4 py-4 sm:px-6 ${chromeClass}`}>
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">
-                Scramble · 3×3
-              </span>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+              {/* Which puzzle. Each keeps its own session, so switching never
+                  mixes a 3x3 average with a 5x5 one. */}
+              <div role="radiogroup" aria-label="Puzzle" className="flex gap-1 rounded-lg bg-surface-hi p-0.5">
+                {TIMER_EVENTS.map((e) => (
+                  <button
+                    key={e.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={e.id === event}
+                    onClick={(click) => {
+                      // Focus would take the spacebar away from the timer.
+                      click.currentTarget.blur();
+                      chooseEvent(e.id);
+                    }}
+                    className={`rounded-md px-2.5 py-1 text-xs font-semibold tabular-nums transition-colors ${
+                      e.id === event ? "bg-background text-foreground" : "text-muted-dim hover:text-foreground"
+                    }`}
+                  >
+                    {e.label}
+                  </button>
+                ))}
+              </div>
               <span className="text-[11px] text-muted-dim">Hold it with white on top, green in front</span>
             </div>
             {scrambleError ? (
@@ -264,7 +317,15 @@ export function TimerScreen() {
                 Scrambles are read in chunks; stretched tracking destroys the chunking
                 and is the single most common flaw in existing timers.
               */
-              <div className="flex min-h-14 flex-wrap items-center gap-x-3 gap-y-1.5 font-mono text-lg leading-snug sm:text-xl md:text-2xl lg:min-h-10">
+              <div
+                className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 font-mono leading-snug ${
+                  event === "555"
+                    ? "min-h-40 text-sm sm:text-base lg:min-h-24"
+                    : event === "444"
+                      ? "min-h-28 text-base sm:text-lg lg:min-h-16"
+                      : "min-h-14 text-lg sm:text-xl md:text-2xl lg:min-h-10"
+                }`}
+              >
                 {scramble
                   ? scramble.split(" ").map((move, i) => <span key={`${move}-${i}`}>{move}</span>)
                   : null}
@@ -277,6 +338,7 @@ export function TimerScreen() {
               short laptop screens. */}
           <CubeView
             scramble={scramble}
+            puzzle={puzzle}
             backView="none"
             className={`h-[26vh] max-h-72 min-h-40 w-full max-w-md ${chromeClass}`}
           />
@@ -310,9 +372,9 @@ export function TimerScreen() {
             because nothing should compete with the clock — but in split mode you have
             to know which phase your next tap ends, or the taps are meaningless.
           */}
-          {splitMode ? (
+          {splitMode && eventSplits.length > 0 ? (
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest">
-              {SPLIT_LABELS.map((label, i) => {
+              {eventSplits.map((label, i) => {
                 const done = phase === "running" && i < splitIndex;
                 const current = phase === "running" && i === splitIndex;
                 return (
@@ -359,7 +421,7 @@ export function TimerScreen() {
                   onClick={() => setPenalty("DNF")}
                 />
                 <PenaltyButton label="delete" active={false} onClick={deleteLast} />
-                {lastSolve.penalty !== "DNF" ? (
+                {lastSolve.penalty !== "DNF" && hasTimerReview(event) ? (
                   <Link
                     href={`/review?id=${encodeURIComponent(lastSolve.id)}`}
                     className="rounded-md border border-border px-3 py-1.5 text-xs font-semibold text-muted transition-colors hover:border-muted-dim hover:text-foreground"
@@ -374,13 +436,14 @@ export function TimerScreen() {
               people with a smart cube or a keyboard. Four taps is coarser data and it
               works with the cube already in your hands.
             */}
+            {eventSplits.length > 0 ? (
             <button
               type="button"
-              onClick={(event) => {
-                event.currentTarget.blur();
+              onClick={(click) => {
+                click.currentTarget.blur();
                 toggleSplitMode();
               }}
-              title="Tap space at the end of the cross, F2L and OLL, so the site can tell you which part of your solve is slow."
+              title={`Tap space at the end of each phase — ${eventSplits.join(", ")} — so the site can tell you which part of your solve is slow.`}
               className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 splitMode
                   ? "border-ready/40 bg-ready/10 text-ready"
@@ -389,6 +452,7 @@ export function TimerScreen() {
             >
               {splitMode ? "Phase splits on — space ends each phase" : "Record phase splits"}
             </button>
+            ) : null}
           </div>
         </div>
 

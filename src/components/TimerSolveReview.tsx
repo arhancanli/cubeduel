@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AlgDemo } from "@/components/AlgDemo";
 import { formatMs } from "@/lib/format";
 import type { StoredSolve } from "@/lib/solveHistory";
+import { eventOf, splitLabelsFor } from "@/lib/timerEvents";
 import { crossOptions, MIN_OTHERS, reviewSplits, turnOver, type CrossOption, type PhaseReview } from "@/lib/timerReview";
 
 const DOT: Record<string, string> = {
@@ -30,9 +31,14 @@ const VERDICT: Record<PhaseReview["verdict"], { label: string; className: string
  */
 export function TimerSolveReview({ solve, history }: { solve: StoredSolve; history: StoredSolve[] }) {
   const splits = reviewSplits(solve, history);
+  const event = eventOf(solve);
+  const phases = splitLabelsFor(event);
   const [crosses, setCrosses] = useState<CrossOption[] | null>(null);
 
   useEffect(() => {
+    // The cross is a 3x3 idea; on a big cube it comes after reduction and the
+    // scramble says nothing useful about it.
+    if (event !== "333") return;
     let cancelled = false;
     crossOptions(solve.scramble).then(
       (options) => !cancelled && setCrosses(options),
@@ -41,12 +47,12 @@ export function TimerSolveReview({ solve, history }: { solve: StoredSolve; histo
     return () => {
       cancelled = true;
     };
-  }, [solve.scramble]);
+  }, [solve.scramble, event]);
 
   return (
     <div className="flex flex-col gap-10">
-      {splits ? <Phases review={splits} /> : <NoSplits />}
-      <BestCross options={crosses} scramble={solve.scramble} />
+      {splits ? <Phases review={splits} /> : phases.length > 0 ? <NoSplits phases={phases} /> : null}
+      {event === "333" ? <BestCross options={crosses} scramble={solve.scramble} /> : null}
     </div>
   );
 }
@@ -70,7 +76,7 @@ function Phases({ review }: { review: NonNullable<ReturnType<typeof reviewSplits
         {review.phases.map((p) => {
           const verdict = VERDICT[p.verdict];
           return (
-            <li key={p.phase} className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-5 py-3.5">
+            <li key={p.phase} data-testid="timer-phase" className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 px-5 py-3.5">
               <span className="text-sm font-semibold">{p.phase}</span>
               <span className="h-2 overflow-hidden rounded-full bg-surface-hi" aria-hidden="true">
                 <span
@@ -107,13 +113,13 @@ function Phases({ review }: { review: NonNullable<ReturnType<typeof reviewSplits
   );
 }
 
-function NoSplits() {
+function NoSplits({ phases }: { phases: readonly string[] }) {
   return (
     <section className="flex flex-col items-start gap-3 rounded-2xl border border-dashed border-border px-5 py-5">
       <h2 className="text-lg">Which phase cost you?</h2>
       <p className="max-w-xl text-sm leading-relaxed text-muted">
         This solve was timed without phase splits. Turn them on under the timer and press space as
-        each phase ends — cross, F2L, OLL, PLL — and every solve will show where its time went,
+        each phase ends — {phases.join(", ")} — and every solve will show where its time went,
         against your own usual.
       </p>
       <Link href="/timer" className="text-sm font-semibold underline decoration-border underline-offset-4 hover:decoration-current">

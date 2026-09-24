@@ -167,3 +167,32 @@ test("a tiny difference is not called out, however steady your other solves were
   const slow = solve(2600, 9000, 3000, 3000);
   assert.equal(reviewSplits(slow, [...steady, slow])!.phases[0].verdict, "slower");
 });
+
+function big(centres: number, edges: number, rest: number, event: "444" | "555" = "444"): StoredSolve {
+  const s = solve(1, 1, 1, 1, { event });
+  s.splits = [
+    { phase: "Centres", durationMs: centres },
+    { phase: "Edges", durationMs: edges },
+    { phase: "3x3", durationMs: rest },
+  ] as PhaseSplit[];
+  s.durationMs = centres + edges + rest;
+  return s;
+}
+
+test("a 4x4 solve is read in its own phases, against 4x4 solves only", () => {
+  const fours = [big(20000, 18000, 17000), big(21000, 17500, 16500), big(19000, 18500, 17500), big(20500, 18200, 17200), big(19500, 17800, 16800)];
+  // 3x3 and 5x5 solves in the same history must not count as your 4x4 usual.
+  const noise = [...usual(), big(60000, 50000, 40000, "555")];
+  const now = big(20000, 30000, 17000);
+  const r = reviewSplits(now, [...noise, ...fours, now])!;
+  assert.deepEqual(r.phases.map((p) => p.phase), ["Centres", "Edges", "3x3"]);
+  assert.equal(r.sample, 5);
+  assert.equal(r.costliest, "Edges");
+  assert.equal(r.phases[0].usualMs, 20000);
+});
+
+test("a 3x3 solve's usual ignores big-cube solves", () => {
+  const now = solve(2000, 13000, 3000, 3000);
+  const r = reviewSplits(now, [...usual(), big(20000, 18000, 17000), now])!;
+  assert.equal(r.sample, 5);
+});

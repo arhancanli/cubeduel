@@ -13,7 +13,8 @@ import type { PhaseSplit } from "./cfop";
  * stopwatch's hand-marked laps call the whole stage "F2L". Anything else was not
  * written by either.
  */
-const PHASE = /^(Cross|F2L(?: [1-4])?|OLL|PLL|Unfinished)$/;
+// CFOP for a 3x3; reduction (centres, edges, then a 3x3) for the big cubes.
+const PHASE = /^(Cross|F2L(?: [1-4])?|OLL|PLL|Centres|Edges|3x3|Unfinished)$/;
 
 function finiteNonNegative(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0;

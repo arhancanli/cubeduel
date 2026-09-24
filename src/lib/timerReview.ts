@@ -1,5 +1,7 @@
+import type { EventId } from "./events";
 import type { StoredSolve } from "./solveHistory";
-import { groupSplits, PHASE_ORDER, type PhaseGroup } from "./phaseStats";
+import { groupSplits, PHASE_ORDER } from "./phaseStats";
+import { eventOf, splitLabelsFor } from "./timerEvents";
 import { FACE_COLOUR, shortestCross } from "./solveStudy";
 
 /**
@@ -26,7 +28,7 @@ const RECENT = 50;
 export type PhaseVerdict = "slower" | "faster" | "usual" | "unknown";
 
 export interface PhaseReview {
-  phase: PhaseGroup;
+  phase: string;
   ms: number;
   /** Your mean for this phase over recent solves; null below the minimum sample. */
   usualMs: number | null;
@@ -36,15 +38,27 @@ export interface PhaseReview {
 export interface SplitReview {
   phases: PhaseReview[];
   /** The phase furthest above your usual, if any was outside your normal spread. */
-  costliest: PhaseGroup | null;
+  costliest: string | null;
   /** How many solves "your usual" is made of. */
   sample: number;
 }
 
-function complete(solve: StoredSolve): Map<PhaseGroup, number> | null {
-  if (solve.penalty === "DNF" || solve.splits.length === 0) return null;
-  const groups = groupSplits(solve.splits);
-  return PHASE_ORDER.every((p) => groups.has(p)) ? groups : null;
+/** The phases a solve of this puzzle is read in. */
+function phasesOf(event: EventId): readonly string[] {
+  return event === "333" ? PHASE_ORDER : splitLabelsFor(event);
+}
+
+function complete(solve: StoredSolve, phases: readonly string[]): Map<string, number> | null {
+  if (solve.penalty === "DNF" || solve.splits.length === 0 || phases.length === 0) return null;
+  let groups: Map<string, number>;
+  if (eventOf(solve) === "333") {
+    // A stream-read 3x3 solve splits F2L into its four pairs; they are one phase here.
+    groups = groupSplits(solve.splits);
+  } else {
+    groups = new Map();
+    for (const s of solve.splits) groups.set(s.phase, (groups.get(s.phase) ?? 0) + s.durationMs);
+  }
+  return phases.every((p) => groups.has(p)) ? groups : null;
 }
 
 /**
@@ -55,17 +69,20 @@ function complete(solve: StoredSolve): Map<PhaseGroup, number> | null {
  * wobble between solves, and calling it out would be reading tea leaves.
  */
 export function reviewSplits(solve: StoredSolve, history: readonly StoredSolve[]): SplitReview | null {
-  const mine = complete(solve);
+  const event = eventOf(solve);
+  const order = phasesOf(event);
+  const mine = complete(solve, order);
   if (!mine) return null;
 
+  // Only the same puzzle: a 5x5's centres say nothing about a 3x3's cross.
   const others = history
-    .filter((s) => s.id !== solve.id)
-    .map(complete)
-    .filter((g): g is Map<PhaseGroup, number> => g !== null)
+    .filter((s) => s.id !== solve.id && eventOf(s) === event)
+    .map((s) => complete(s, order))
+    .filter((g): g is Map<string, number> => g !== null)
     .slice(-RECENT);
   const judged = others.length >= MIN_OTHERS;
 
-  const phases = PHASE_ORDER.map((phase): PhaseReview => {
+  const phases = order.map((phase): PhaseReview => {
     const ms = mine.get(phase)!;
     if (!judged) return { phase, ms, usualMs: null, verdict: "unknown" };
     const xs = others.map((g) => g.get(phase)!);
@@ -76,7 +93,7 @@ export function reviewSplits(solve: StoredSolve, history: readonly StoredSolve[]
     return { phase, ms, usualMs: Math.round(mean), verdict };
   });
 
-  let costliest: PhaseGroup | null = null;
+  let costliest: string | null = null;
   let worst = 0;
   for (const p of phases) {
     if (p.verdict !== "slower" || p.usualMs === null) continue;

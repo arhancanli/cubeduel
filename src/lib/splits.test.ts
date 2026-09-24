@@ -67,3 +67,8 @@ test("a recognition longer than its own phase is not kept", () => {
   const [kept] = sanitizeSplits([{ ...lap("OLL", 0, 1000), recognitionMs: 5000 }]);
   assert.equal(kept.recognitionMs, undefined);
 });
+
+test("big-cube laps — centres, edges, then the 3x3 stage — are kept", () => {
+  const laps = [lap("Centres", 0, 20000), lap("Edges", 20000, 38000), lap("3x3", 38000, 55000)];
+  assert.deepEqual(sanitizeSplits(laps), laps);
+});

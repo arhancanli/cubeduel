@@ -140,6 +140,9 @@ export async function syncLocalHistory(): Promise<SyncOutcome | null> {
             ollCase: solve.ollCase,
             pllCase: solve.pllCase,
             source: solve.source,
+            // Without it the server takes a solve to be a 3x3 — right for
+            // everything recorded before other puzzles, wrong for a 5x5.
+            event: solve.event,
             moves: solve.moves,
           })),
         }),

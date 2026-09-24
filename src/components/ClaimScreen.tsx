@@ -71,7 +71,8 @@ export function ClaimScreen() {
   // during the server render — reading it in a render body would make the two
   // passes disagree and throw a hydration error.
   useEffect(() => {
-    const claim = summariseClaim(loadHistory());
+    // Bests and the rating estimate are a 3x3's.
+    const claim = summariseClaim(loadHistory("333"));
     setSummary(claim);
     setCanUsePasskeys(passkeysSupported());
 

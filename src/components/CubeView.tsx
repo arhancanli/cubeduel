@@ -77,7 +77,7 @@ interface Props {
   cameraLatitude?: number;
   className?: string;
   /** Which puzzle to draw. Everything else here is written for the 3×3. */
-  puzzle?: "3x3x3" | "2x2x2";
+  puzzle?: "2x2x2" | "3x3x3" | "4x4x4" | "5x5x5";
 }
 
 /** The slice of TwistyPlayer callers are allowed to touch. */

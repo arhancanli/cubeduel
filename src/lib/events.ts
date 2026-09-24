@@ -147,3 +147,14 @@ export function eventOf(value: unknown): EventDef {
 export function hasSolver(event: EventId): boolean {
   return event === "333";
 }
+
+/**
+ * The puzzle a synced solve says it was. Absent means 3x3 — every client before
+ * the timer timed anything else sent none. Anything unrecognised is refused
+ * rather than guessed: storing it as a 3x3 would put a stranger's number in
+ * somebody's 3x3 history.
+ */
+export function parseSyncedEvent(value: unknown): EventId | null {
+  if (value === undefined) return "333";
+  return typeof value === "string" && (EVENT_IDS as readonly string[]).includes(value) ? (value as EventId) : null;
+}

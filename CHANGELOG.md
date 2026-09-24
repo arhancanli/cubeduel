@@ -3,6 +3,40 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.17.0 — 2026-09-24
+
+### The timer times 2×2, 4×4 and 5×5
+
+- **Pick the puzzle above the scramble.** Ranked already rated 2×2, 4×4 and
+  5×5, but the everyday timer was 3×3 only — somebody practising a big cube had
+  nowhere on the site to do it. Each puzzle gets its own random-state scramble,
+  its own 3D cube, and its own session, so an average never mixes a 3×3 with a
+  5×5. The timer remembers which puzzle you were on.
+- **Big-cube phase splits.** On 4×4 and 5×5, space marks the end of the
+  centres, then the edges, then the 3×3 stage — reduction, the way nearly
+  everybody solves them. The review reads those phases against your own 4×4
+  (or 5×5) solves only. A 2×2 is too short to split by hand, and has no review.
+- **A big-cube time never passes for a 3×3.** Progress, the case trainer, your
+  bests on the home page and the sign-up summary read 3×3 solves only. The
+  Review and home lists label other puzzles.
+
+### Fixed
+
+- **Synced solves were all stored as 3×3.** The server wrote `event: "333"` on
+  every solve uploaded from this device, and the upload did not say which
+  puzzle a solve was. Both now carry it; anything unrecognised is refused
+  rather than guessed. Checked end to end: a 4×4 solve timed on the timer
+  shows up on the public profile as a 4×4.
+- A profile's recent solves now say which puzzle each one was — ranked 4×4
+  solves were already listed there unlabelled.
+- The home page now links timed solves to their review, which it had missed.
+
+### Known
+
+- 4×4 and 5×5 are drawn in cubing.js's standard colours rather than the real
+  Rubik's pigments: big cubes keep their sticker colours in the geometry, not
+  in per-sticker materials, and the repaint does not reach them yet.
+
 ## 1.16.0 — 2026-09-24
 
 ### A review for every solve timed on a real cube

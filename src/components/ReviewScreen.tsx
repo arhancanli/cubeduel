@@ -9,6 +9,7 @@ import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SolveStudy } from "@/components/SolveStudy";
 import { TimerSolveReview } from "@/components/TimerSolveReview";
+import { eventLabel, eventOf, hasTimerReview } from "@/lib/timerEvents";
 import type { TimedMove } from "@/lib/cfop";
 import { formatMs } from "@/lib/format";
 import { decodeMoveStream } from "@/lib/moveStream";
@@ -35,7 +36,7 @@ function reviewable(solve: StoredSolve): Reviewable | null {
   if (solve.penalty === "DNF" || !solve.scramble) return null;
   const moves = solve.moves ? decodeMoveStream(solve.moves) : null;
   if (moves && moves.length > 0) return { solve, moves };
-  return solve.source === "manual" ? { solve, moves: null } : null;
+  return solve.source === "manual" && hasTimerReview(eventOf(solve)) ? { solve, moves: null } : null;
 }
 
 export function ReviewScreen() {
@@ -82,7 +83,10 @@ export function ReviewScreen() {
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         {state.kind === "one" ? (
           <>
-            <PageHero eyebrow="Solve review" title={formatMs(state.item.solve.durationMs, { truncate: false })}>
+            <PageHero
+              eyebrow={eventOf(state.item.solve) === "333" ? "Solve review" : `Solve review · ${eventLabel(eventOf(state.item.solve))}`}
+              title={formatMs(state.item.solve.durationMs, { truncate: false })}
+            >
               <p>
                 {new Date(state.item.solve.at).toLocaleString(undefined, {
                   dateStyle: "medium",
@@ -161,6 +165,7 @@ function SolveList({ items, total }: { items: Reviewable[]; total: number }) {
             <span className="min-w-0 flex-1 truncate text-sm text-muted">
               {new Date(solve.at).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" })}
               <span className="text-muted-dim">
+                {eventOf(solve) !== "333" ? ` · ${eventLabel(eventOf(solve))}` : ""}
                 {" · "}
                 {moves
                   ? `${moves.length} moves recorded`

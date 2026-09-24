@@ -1,6 +1,8 @@
 "use client";
 
 import { track } from "./analytics";
+import type { EventId } from "./events";
+import { forEvent } from "./timerEvents";
 import { HISTORY_KEY } from "./firstVisit";
 import type { PhaseSplit } from "./cfop";
 import { mergeImported, type Merge } from "./cstimerImport";
@@ -50,6 +52,11 @@ export interface StoredSolve {
    * been solved on the keyboard when it had not.
    */
   source: "keyboard" | "smartcube" | "manual";
+  /**
+   * Which puzzle. Absent on everything recorded before the timer timed more
+   * than a 3x3 — which is exactly what those solves were.
+   */
+  event?: EventId;
   /**
    * Every turn and when it happened, as `encodeMoveStream` writes it. Absent on a
    * stopwatch solve, on solves recorded before streams were kept, and on the
@@ -101,14 +108,20 @@ function isUsable(value: unknown): value is StoredSolve {
   );
 }
 
-export function loadHistory(): StoredSolve[] {
+/**
+ * Every solve on this device, or — given an event — that puzzle's only. Anything
+ * that reads times as a 3x3 (bests, phase analysis, the case coach) must ask for
+ * "333": a 5x5 time among them would be the slowest 3x3 anybody ever did.
+ */
+export function loadHistory(event?: EventId): StoredSolve[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(HISTORY_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as HistoryStore;
     if (parsed?.version !== 1 || !Array.isArray(parsed.solves)) return [];
-    return parsed.solves.filter(isUsable);
+    const usable = parsed.solves.filter(isUsable);
+    return event ? forEvent(usable, event) : usable;
   } catch {
     return [];
   }

@@ -15,6 +15,7 @@ import { TodayStrip } from "@/components/TodayStrip";
 import { formatAverage, formatMs } from "@/lib/format";
 import { ao5, bestSingle } from "@/lib/stats";
 import { loadHistory, type StoredSolve } from "@/lib/solveHistory";
+import { forEvent } from "@/lib/timerEvents";
 import { faceFor, stickerVar, type FaceKey } from "@/lib/modes";
 import { useSession } from "@/lib/useSession";
 
@@ -84,7 +85,7 @@ export function LandingScreen({ dailyStart }: { dailyStart: string }) {
 
           {returning && history ? (
             <>
-              <ReturningStats history={history} />
+              <ReturningStats history={forEvent(history, "333")} />
               <StreakCard compact />
             </>
           ) : (

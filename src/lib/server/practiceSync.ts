@@ -2,6 +2,7 @@ import "server-only";
 
 import { decodeMoveStream, isRotation } from "../moveStream";
 import { sanitizeSplits } from "../splits";
+import { parseSyncedEvent } from "../events";
 import type { Penalty } from "../types";
 import { MAX_MOVES, MAX_PLAUSIBLE_TPS } from "../verifySolve";
 import type { Insert } from "./database.types";
@@ -68,6 +69,8 @@ interface IncomingSolve {
   ollCase?: unknown;
   pllCase?: unknown;
   source?: unknown;
+  /** Which puzzle; absent from clients older than the multi-puzzle timer. */
+  event?: unknown;
   /** `encodeMoveStream` output. */
   moves?: unknown;
 }
@@ -116,6 +119,8 @@ export async function storePracticeSolves(
     if (durationMs < 0 || durationMs > 86_400_000) continue;
     if (typeof penalty !== "string" || !PENALTIES.has(penalty as Penalty)) continue;
     if (typeof source !== "string" || !SOURCES.has(source)) continue;
+    const event = parseSyncedEvent(raw.event);
+    if (event === null) continue;
 
     const solvedAt =
       typeof at === "number" && Number.isFinite(at) && at > 0 ? at : Date.now();
@@ -133,6 +138,8 @@ export async function storePracticeSolves(
       decoded.length > 0 &&
       decoded.length <= MAX_MOVES &&
       source !== "manual" &&
+      // Streams are only ever read as a 3x3 solve.
+      event === "333" &&
       decoded.at(-1)!.atMs <= durationMs + 5 &&
       durationMs > 0 &&
       turnCount / (durationMs / 1000) <= MAX_PLAUSIBLE_TPS &&
@@ -159,7 +166,7 @@ export async function storePracticeSolves(
     rows.push({
       profile_id: profileId,
       client_id: id,
-      event: "333",
+      event,
       scramble,
       duration_ms: Math.round(durationMs),
       penalty,

@@ -37,7 +37,7 @@ export function ProgressScreen() {
   const [solves, setSolves] = useState<StoredSolve[] | null>(null);
 
   useEffect(() => {
-    setSolves(loadHistory());
+    setSolves(loadHistory("333"));
   }, []);
 
   if (solves === null) {
@@ -49,7 +49,7 @@ export function ProgressScreen() {
   const looking = lookAndTurn(solves);
   const trend = totalTimeTrend(solves);
 
-  const reload = () => setSolves(loadHistory());
+  const reload = () => setSolves(loadHistory("333"));
 
   // One layout for both states, with the importer in the same place in each.
   // Importing into an empty history turns this page from the empty state into
