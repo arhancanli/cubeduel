@@ -48,6 +48,21 @@ export const DEFAULT_FACE_COLOURS = {
 /** The body plastic, which cubing.js paints black. */
 export const DEFAULT_BODY_COLOUR = "#000000";
 
+/**
+ * The colours cubing.js gives big cubes (and the 2x2). These are not materials
+ * at all but a colour per vertex, from a palette of its own, so the 3x3's map
+ * never matched them and every 4x4 and 5x5 was drawn in web primaries.
+ * Read off a live 4x4's geometry.
+ */
+export const BIG_CUBE_FACE_COLOURS = {
+  U: "#ffffff",
+  D: "#f4f400",
+  F: "#44ee00",
+  B: "#2266ff",
+  R: "#ff0000",
+  L: "#ff8000",
+} as const;
+
 export type Face = keyof typeof DEFAULT_FACE_COLOURS;
 
 export interface CubeFinish {
@@ -245,6 +260,41 @@ export function repaintMap(appearance: CubeAppearance): Map<string, string> {
   }
   map.set(DEFAULT_BODY_COLOUR.toLowerCase(), appearance.finish.body);
   return map;
+}
+
+/** From cubing.js's per-vertex palette to an appearance's colours. */
+export function vertexRepaintMap(appearance: CubeAppearance): Map<string, string> {
+  const map = new Map<string, string>();
+  for (const [face, from] of Object.entries(BIG_CUBE_FACE_COLOURS)) {
+    map.set(from, appearance.faces[face as Face]);
+  }
+  map.set(DEFAULT_BODY_COLOUR, appearance.finish.body);
+  return map;
+}
+
+function hexOf(r: number, g: number, b: number): string {
+  return "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("");
+}
+
+/**
+ * New vertex colours from the ORIGINAL ones — never from a previous repaint, or
+ * a second change of appearance would match nothing, the mistake the material
+ * repaint once made. Anything not in the palette is kept.
+ *
+ * Bytes, three per vertex, as cubing.js stores them; and the colours as drawn,
+ * since its renderer shows a vertex colour as stored.
+ */
+export function repaintVertexColours(original: Uint8Array, map: Map<string, string>): Uint8Array {
+  const out = Uint8Array.from(original);
+  for (let i = 0; i + 2 < out.length; i += 3) {
+    const to = map.get(hexOf(out[i], out[i + 1], out[i + 2]));
+    if (!to) continue;
+    const n = parseInt(to.slice(1), 16);
+    out[i] = (n >> 16) & 255;
+    out[i + 1] = (n >> 8) & 255;
+    out[i + 2] = n & 255;
+  }
+  return out;
 }
 
 const STORAGE_KEY = "cubeduel.cube.v1";

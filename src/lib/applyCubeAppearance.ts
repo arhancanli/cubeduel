@@ -1,6 +1,12 @@
 "use client";
 
-import { appearanceById, repaintMap, type CubeAppearance } from "./cubeAppearance";
+import {
+  appearanceById,
+  repaintMap,
+  repaintVertexColours,
+  vertexRepaintMap,
+  type CubeAppearance,
+} from "./cubeAppearance";
 
 /**
  * Repaints a rendered cube.
@@ -68,6 +74,8 @@ interface ThreeMaterial {
   color?: ThreeColour;
   roughness?: number;
   metalness?: number;
+  /** True where the colour comes per vertex and the material only multiplies it. */
+  vertexColors?: boolean;
   needsUpdate?: boolean;
   /** Three.js's per-object scratch space, which is where the original goes. */
   userData?: Record<string, unknown>;
@@ -80,6 +88,10 @@ interface ThreeObject {
 interface ThreeNode {
   isMesh?: boolean;
   material?: ThreeMaterial | ThreeMaterial[];
+  geometry?: {
+    attributes?: { color?: { array: ArrayLike<number> & { set(values: ArrayLike<number>): void }; needsUpdate?: boolean } };
+    userData?: Record<string, unknown>;
+  };
 }
 
 type Repaintable = HTMLElement & {
@@ -130,6 +142,7 @@ export async function applyAppearance(
   const appearance =
     typeof appearanceOrId === "string" ? appearanceById(appearanceOrId) : appearanceOrId;
   const wanted = repaintMap(appearance);
+  const wantedVertices = vertexRepaintMap(appearance);
 
   let object: ThreeObject;
   try {
@@ -141,13 +154,42 @@ export async function applyAppearance(
   let repainted = 0;
   let skipped = 0;
 
+  // Big cubes and the 2x2 carry their sticker colours per vertex, in one byte
+  // buffer holding two copies: the colours being drawn, then a pristine copy
+  // that every move copies back from. Repainting only the drawn half was undone
+  // by the very next redraw — so the whole buffer is rewritten, from originals
+  // stashed on first sight as the material colours are.
+  try {
+    const big = object as unknown as {
+      filler?: { colors?: unknown };
+      fixedGeo?: { getAttribute?(name: string): { needsUpdate?: boolean } | undefined };
+      userData?: Record<string, unknown>;
+    };
+    const colours = big.filler?.colors;
+    if (colours instanceof Uint8Array && big.userData) {
+      if (!(big.userData[ORIGINAL_KEY] instanceof Uint8Array)) {
+        big.userData[ORIGINAL_KEY] = Uint8Array.from(colours);
+      }
+      colours.set(repaintVertexColours(big.userData[ORIGINAL_KEY] as Uint8Array, wantedVertices));
+      const attribute = big.fixedGeo?.getAttribute?.("color");
+      if (attribute) attribute.needsUpdate = true;
+      repainted++;
+    }
+  } catch {
+    // The shape of cubing.js's internals changed: this cube keeps its own colours.
+  }
+
   try {
     object.traverse((node) => {
       if (!node.isMesh || !node.material) return;
 
+      const vertexColours = node.geometry?.attributes?.color;
       const materials = Array.isArray(node.material) ? node.material : [node.material];
       for (const material of materials) {
         if (!material?.color) continue;
+        // A material that multiplies vertex colours must stay white, or it
+        // tints every sticker; the colour is in the vertices.
+        if (vertexColours && material.vertexColors) continue;
 
         // The colour this material started with, which is what the map is
         // keyed on. Recorded once, on first sight, before anything changes it.

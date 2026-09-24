@@ -236,6 +236,45 @@ with sync_playwright() as p:
         middle = greens[len(greens) // 2]
         check("in Rubik's green, not a darkened one", 0.38 < middle < 0.55, f"blue/green {middle:.3f}")
 
+    # Big cubes and the 2x2 keep their colours per vertex, not per material,
+    # and every move copies them back from a pristine copy — so a repaint of
+    # only what was drawn was undone at once, and 4x4 and 5x5 were drawn in
+    # cubing.js's web primaries whatever appearance was chosen. Read straight
+    # from what the renderer draws.
+    print("\n== big cubes are drawn in the chosen colours ==")
+    DRAWN = """async () => {
+        const el = document.querySelector('twisty-player');
+        const obj = await el.experimentalCurrentThreeJSPuzzleObject();
+        const drawn = obj.fixedGeo && obj.fixedGeo.getAttribute('color').array;
+        if (!drawn) return null;
+        const seen = new Set();
+        for (let i = 0; i + 2 < drawn.length; i += 3)
+            seen.add('#' + [drawn[i], drawn[i + 1], drawn[i + 2]].map(v => v.toString(16).padStart(2, '0')).join(''));
+        return [...seen];
+    }"""
+    # Classic's Rubik's red; contrast's magenta left side, a colour no other
+    # scheme uses — so seeing it proves a second appearance reached the 5x5.
+    for appearance, must_have in [("classic", "#b71234"), ("contrast", "#e01bb8")]:
+        bctx = browser.new_context(viewport={"width": 1280, "height": 900})
+        bctx.add_init_script(f"localStorage.setItem('cubeduel.cube.v1', '{appearance}')")
+        big = bctx.new_page()
+        big.goto(BASE + "/timer", wait_until="load")
+        big.wait_for_timeout(1500)
+        big.get_by_role("radio", name="5×5").click()
+        big.wait_for_timeout(6000)
+        # A solve brings a new scramble: the colours must survive the redraw.
+        big.keyboard.down("Space")
+        big.wait_for_timeout(450)
+        big.keyboard.up("Space")
+        big.wait_for_timeout(700)
+        big.keyboard.press("KeyJ")
+        big.wait_for_timeout(3000)
+        drawn = set(big.evaluate(DRAWN) or [])
+        primaries = drawn & {"#ff0000", "#44ee00", "#2266ff", "#f4f400", "#ff8000"}
+        check(f"{appearance}: no web primaries on a 5x5", not primaries and len(drawn) >= 6, ", ".join(sorted(drawn)))
+        check(f"{appearance}: its own colours are drawn", must_have in drawn, must_have)
+        bctx.close()
+
     browser.close()
 
 delete_account(EMAIL)

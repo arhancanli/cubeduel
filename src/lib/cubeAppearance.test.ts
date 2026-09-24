@@ -6,8 +6,11 @@ import {
   DEFAULT_APPEARANCE_ID,
   DEFAULT_BODY_COLOUR,
   DEFAULT_FACE_COLOURS,
+  BIG_CUBE_FACE_COLOURS,
   appearanceById,
   repaintMap,
+  repaintVertexColours,
+  vertexRepaintMap,
 } from "./cubeAppearance";
 import { deltaE, worstPair, type Deficiency } from "./colourVision";
 
@@ -170,4 +173,36 @@ test("the default pigments are not cubing.js's web primaries", () => {
       `classic still uses the raw ${primary}`,
     );
   }
+});
+
+// Big cubes (and the 2x2) keep their sticker colours per vertex, in cubing.js's
+// own palette — a different one from the 3x3's materials. Measured off a live
+// 4x4 by reading the geometry's colour attribute.
+test("the big-cube palette maps every face and the body", () => {
+  for (const appearance of APPEARANCES) {
+    const map = vertexRepaintMap(appearance);
+    for (const [face, from] of Object.entries(BIG_CUBE_FACE_COLOURS)) {
+      assert.equal(map.get(from), appearance.faces[face as keyof typeof BIG_CUBE_FACE_COLOURS], `${appearance.id} ${face}`);
+    }
+    assert.equal(map.get(DEFAULT_BODY_COLOUR), appearance.finish.body);
+  }
+});
+
+test("vertex colours are rewritten from the originals, face by face", () => {
+  const classic = appearanceById(DEFAULT_APPEARANCE_ID);
+  // Two vertices: cubing.js's big-cube red, then its orange, as the bytes it
+  // stores them in.
+  const original = Uint8Array.from([255, 0, 0, 255, 128, 0]);
+  const out = repaintVertexColours(original, vertexRepaintMap(classic));
+  assert.ok(out instanceof Uint8Array);
+  const hex = (i: number) =>
+    "#" + [0, 1, 2].map((k) => out[i * 3 + k].toString(16).padStart(2, "0")).join("");
+  assert.equal(hex(0), classic.faces.R.toLowerCase());
+  assert.equal(hex(1), classic.faces.L.toLowerCase());
+});
+
+test("a vertex colour that is not in the palette is left exactly as it was", () => {
+  const original = Uint8Array.from([128, 64, 32]);
+  const out = repaintVertexColours(original, vertexRepaintMap(appearanceById(DEFAULT_APPEARANCE_ID)));
+  assert.deepEqual([...out], [...original]);
 });

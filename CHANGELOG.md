@@ -3,6 +3,26 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.19.0 — 2026-09-24
+
+### 2×2, 4×4 and 5×5 in the real colours
+
+- **Every cube on the site is now drawn in the colours you chose.** The 3×3
+  has used the real Rubik's pigments since 1.15; the 2×2, 4×4 and 5×5 were
+  still drawn in cubing.js's web primaries — pure red beside a bright orange,
+  a lime green — whatever appearance was picked, including the high-contrast
+  scheme meant for colour-blind cubers.
+- **Why they were missed:** those puzzles keep their sticker colours per
+  vertex in one byte buffer, not per material, and the buffer holds two
+  copies — the colours being drawn, then a pristine copy that every move
+  copies back from. A first attempt repainted only what was drawn and was
+  undone by the very next redraw. The whole buffer is now rewritten, from
+  originals kept on first sight, so a second change of appearance works too.
+- **Checked from what the renderer draws:** a 5×5 in the classic scheme and in
+  the high-contrast one, after a solve brings a new scramble, shows only that
+  scheme's colours and none of cubing.js's. Repainting only the drawn half
+  fails the check.
+
 ## 1.18.1 — 2026-09-24
 
 ### The timer no longer jumps on the live site
