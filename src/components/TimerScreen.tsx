@@ -11,7 +11,8 @@ import { FirstVisit } from "@/components/FirstVisit";
 import { SolveReviewPanel } from "@/components/SolveReview";
 import { formatAverage, formatMs, formatSolve } from "@/lib/format";
 import { nextScramble, warmScrambles } from "@/lib/scramble";
-import { ao5, ao12, bestSingle, effectiveMs } from "@/lib/stats";
+import { ao5, ao12, ao50, ao100, bestSingle, effectiveMs, sessionMean } from "@/lib/stats";
+import { SessionChart } from "@/components/SessionChart";
 import { loadHistory, recordSolve, removeSolve, updateSolvePenalty } from "@/lib/solveHistory";
 import { reviewSolve, type SolveReview } from "@/lib/solveReview";
 import { loadState, newSolve, saveState, type PersistedState } from "@/lib/storage";
@@ -480,6 +481,14 @@ export function TimerScreen() {
             <Stat label="best" value={best === null ? "—" : formatMs(best)} />
             <Stat label="solves" value={String(solves.length)} />
           </div>
+          {/* The longer view serious sessions are judged by: trimmed 5% from each
+              end, as csTimer does, so the numbers agree with other timers. */}
+          <div className="grid grid-cols-3 gap-2" data-testid="long-averages">
+            <SmallStat label="ao50" value={formatAverage(ao50(solves))} />
+            <SmallStat label="ao100" value={formatAverage(ao100(solves))} />
+            <SmallStat label="mean" value={formatAverage(sessionMean(solves))} />
+          </div>
+          <SessionChart solves={solves} />
 
           <section className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface">
             <h2 className="border-b border-border px-4 py-3 text-sm">Recent solves</h2>
@@ -530,6 +539,15 @@ function Stat({ label, value }: { label: string; value: string }) {
     <div className="flex flex-col gap-1 rounded-xl border border-border bg-surface px-4 py-3">
       <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
       <span className="tnum font-display text-2xl font-bold">{value}</span>
+    </div>
+  );
+}
+
+function SmallStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5 rounded-xl border border-border bg-surface px-3 py-2">
+      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
+      <span className="tnum text-sm font-semibold">{value}</span>
     </div>
   );
 }

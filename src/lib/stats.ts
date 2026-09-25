@@ -65,23 +65,33 @@ function truncateToCentiseconds(ms: number): number {
 }
 
 /**
- * WCA trimmed average: drop the single best and single worst, mean the rest.
- * One DNF is survivable because it is trimmed as the worst; two are not.
- * Used for ao5, ao12, and any other trimmed average.
+ * How many to drop from each end. One for ao5 and ao12, as the WCA does; for the
+ * big averages the community's rule, and csTimer's: 5% from each end, rounded
+ * up — three from an ao50, five from an ao100. Trimming one from an ao50 would
+ * give a number no other timer agrees with.
+ */
+export function trimFromEachEnd(size: number): number {
+  return size <= 12 ? 1 : Math.ceil(size * 0.05);
+}
+
+/**
+ * Trimmed average: drop the best and worst `trimFromEachEnd(size)`, mean the
+ * rest. DNFs count as the worst, so as many DNFs as are trimmed are survivable
+ * and one more is not.
  */
 export function trimmedAverage(window: Timed[], size: number): AvgResult {
   if (window.length < size) return NO_AVG;
   const sample = window.slice(-size);
+  const trim = trimFromEachEnd(size);
 
   const times = sample.map(resultMs);
   const dnfCount = times.filter((t) => t === null).length;
-  if (dnfCount >= 2) return DNF_AVG;
+  if (dnfCount > trim) return DNF_AVG;
 
   const finite = (times.filter((t) => t !== null) as number[]).sort((a, b) => a - b);
 
-  // With one DNF the worst is already excluded from `finite`, so only the best
-  // still needs trimming. With none, trim both ends.
-  const kept = dnfCount === 1 ? finite.slice(1) : finite.slice(1, -1);
+  // DNFs already fill part of the worst end, so only the rest of it is trimmed.
+  const kept = finite.slice(trim, finite.length - (trim - dnfCount));
   if (kept.length === 0) return NO_AVG;
 
   const sum = kept.reduce((a, b) => a + b, 0);
@@ -146,6 +156,14 @@ export function ao5(solves: Timed[]): AvgResult {
 
 export function ao12(solves: Timed[]): AvgResult {
   return trimmedAverage(solves, 12);
+}
+
+export function ao50(solves: Timed[]): AvgResult {
+  return trimmedAverage(solves, 50);
+}
+
+export function ao100(solves: Timed[]): AvgResult {
+  return trimmedAverage(solves, 100);
 }
 
 export function mo3(solves: Timed[]): AvgResult {

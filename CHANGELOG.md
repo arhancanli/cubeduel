@@ -3,6 +3,22 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.23.0 — 2026-09-25
+
+### The timer's longer view
+
+- **ao50, ao100 and the session mean,** beside ao5 and ao12 — the numbers a
+  serious session is judged by.
+- **Trimmed the way every other timer trims them.** The trimmed average used to
+  drop exactly one best and one worst whatever its size — right for ao5 and
+  ao12, wrong for anything bigger. The big averages now drop 5% from each end,
+  rounded up, as csTimer and the community do: three from an ao50, five from an
+  ao100, and as many DNFs as are trimmed are survivable. ao5 and ao12 are
+  unchanged to the hundredth.
+- **The session as a picture.** Every solve a dot, oldest on the left, with the
+  rolling ao5 drawn over it, the best marked and DNFs as ticks — the warm-up,
+  the slump and the good run a column of numbers hides.
+
 ## 1.22.0 — 2026-09-25
 
 ### Train what you are actually learning

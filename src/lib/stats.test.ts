@@ -10,6 +10,8 @@ import {
   effectiveMs,
   sessionMean,
   trimmedAverage,
+  ao50,
+  ao100,
 } from "./stats";
 import { formatAverage, formatMs, formatSolve } from "./format";
 import type { Penalty, Solve } from "./types";
@@ -159,4 +161,36 @@ test("truncation applies after a penalty, not before", () => {
   assert.equal(result.kind, "value");
   assert.equal((result as { ms: number }).ms % 10, 0);
   assert.ok(formatSolve(solve(12.999, "PLUS2")).startsWith("14.99"));
+});
+
+// Big averages trim 5% from each end, rounded up, as csTimer and the community
+// do: 3 from each end of an ao50, 5 of an ao100. ao5 and ao12 keep trimming one.
+const run = (times: (number | null)[]) =>
+  times.map((ms, i) => ({ id: String(i), ms: ms ?? 0, penalty: ms === null ? "DNF" : "OK", scramble: "", event: "333", at: i }) as never);
+
+test("an ao50 drops the three best and three worst", () => {
+  const times = Array.from({ length: 50 }, (_, i) => 10_000 + i * 100); // 10.00 … 14.90
+  // Keep indices 3..46: mean of 10.30 … 14.60 = 12.45
+  assert.deepEqual(ao50(run(times)), { kind: "value", ms: 12_450 });
+});
+
+test("an ao100 drops five from each end", () => {
+  const times = Array.from({ length: 100 }, (_, i) => 10_000 + i * 10); // 10.00 … 10.99
+  // Keep 10.05 … 10.94: mean 10.495, reported to the centisecond
+  const got = ao100(run(times));
+  assert.equal(got.kind, "value");
+  assert.ok(Math.abs((got as { ms: number }).ms - 10_495) <= 5, JSON.stringify(got));
+});
+
+test("an ao50 survives three DNFs and not four", () => {
+  const base = Array.from({ length: 50 }, () => 12_000) as (number | null)[];
+  const three = [...base.slice(0, 47), null, null, null];
+  const four = [...base.slice(0, 46), null, null, null, null];
+  assert.equal(ao50(run(three)).kind, "value");
+  assert.equal(ao50(run(four)).kind, "dnf");
+});
+
+test("ao5 and ao12 still trim exactly one from each end", () => {
+  assert.deepEqual(ao5(run([10_000, 11_000, 12_000, 13_000, 60_000])), { kind: "value", ms: 12_000 });
+  assert.equal(ao5(run([10_000, 11_000, 12_000, null, null])).kind, "dnf");
 });

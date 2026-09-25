@@ -153,6 +153,12 @@ with sync_playwright() as p:
     page.wait_for_timeout(150)
     check("deleting drops the solve", page.locator("[data-testid=recent-time]").count() == 5)
 
+    print("\n== the longer view ==")
+    longs = page.get_by_test_id("long-averages").inner_text()
+    check("ao50, ao100 and the session mean are shown", "AO50" in longs.upper() and "MEAN" in longs.upper(), longs.replace("\n", " "))
+    check("ao50 waits for fifty solves rather than guessing", "—" in longs, longs.replace("\n", " "))
+    check("the session is drawn", page.get_by_test_id("session-chart").count() == 1)
+
     print("\n== a mis-tap is not a solve ==")
     # A thumb on the spacebar used to be saved as a 0.12 solve, and became the
     # personal best every real solve was then measured against.
