@@ -1,6 +1,7 @@
 
 import { HistorySync } from "@/components/HistorySync";
 import { MacPrompt } from "@/components/MacPrompt";
+import { ServiceWorker } from "@/components/ServiceWorker";
 import { SessionTracker } from "@/components/SessionTracker";
 import { welcomedScript } from "@/lib/firstVisit";
 import { SITE_URL } from "@/lib/site";
@@ -96,6 +97,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SessionTracker />
         {/* Renders nothing until a modern GAN cube needs its address typed in. */}
         <MacPrompt />
+        {/* Renders nothing; lets the timer open with no connection once visited. */}
+        <ServiceWorker />
       </body>
     </html>
   );

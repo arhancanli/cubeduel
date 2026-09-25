@@ -3,6 +3,27 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.28.0 — 2026-09-25
+
+### Install it, and time with no connection
+
+- **cubeduel installs like an app.** On a phone, "Add to Home Screen" (or
+  Chrome's install button on a computer) now gives a proper icon and a
+  full-screen window that opens straight onto the timer, with shortcuts to the
+  keyboard cube and the trainer on a long press.
+- **The timer really works offline now.** The README said it did for months;
+  it was only true while the tab stayed open. Once you have visited, the timer
+  and the keyboard cube open with the network switched off, with a scramble to
+  solve, and your times land in the same local history as always. Pages are
+  still fetched fresh whenever there is a connection, so nobody gets stuck on
+  an old version; nothing that talks to the server is ever cached.
+- **Checked with the network off.** A new browser suite visits once, switches
+  the connection off and reopens both pages. With the service worker removed,
+  it fails.
+- **Search engines beyond Google hear about new pages the day they ship.**
+  `npm run indexnow` sends every page in the sitemap to Bing, Yandex and the
+  other IndexNow engines at once, after checking the site is serving its key.
+
 ## 1.27.0 — 2026-09-25
 
 ### Last-layer cases on the yellow face

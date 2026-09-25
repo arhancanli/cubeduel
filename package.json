@@ -1,6 +1,6 @@
 {
   "name": "cubeduel",
-  "version": "1.27.0",
+  "version": "1.28.0",
   "private": true,
   "engines": {
     "node": ">=22"
@@ -19,7 +19,7 @@
     "dailies": "node scripts/generate-dailies.mjs",
     "pool": "node scripts/generate-pool.mjs",
     "check:bundle": "node scripts/check-bundle.mjs",
-    "e2e": "python3 e2e/a11y.py && python3 e2e/timer.py && python3 e2e/play.py && python3 e2e/train.py && python3 e2e/goal.py && python3 e2e/mobile.py && python3 e2e/ranked.py && python3 e2e/duel.py && python3 e2e/challenge.py && python3 e2e/rush.py && python3 e2e/auth.py && python3 e2e/recovery.py && python3 e2e/cube.py && python3 e2e/clubs.py && python3 e2e/solve.py && python3 e2e/learn.py && python3 e2e/cubelink.py && python3 e2e/keymap.py && python3 e2e/howto.py && python3 e2e/looking.py && python3 e2e/cstimer.py && python3 e2e/race.py && python3 e2e/cards.py && python3 e2e/review.py && python3 e2e/home.py && python3 e2e/solver.py && python3 e2e/lessons.py && python3 e2e/vitals.py && python3 e2e/puzzles.py",
+    "e2e": "python3 e2e/a11y.py && python3 e2e/timer.py && python3 e2e/play.py && python3 e2e/train.py && python3 e2e/goal.py && python3 e2e/mobile.py && python3 e2e/ranked.py && python3 e2e/duel.py && python3 e2e/challenge.py && python3 e2e/rush.py && python3 e2e/auth.py && python3 e2e/recovery.py && python3 e2e/cube.py && python3 e2e/clubs.py && python3 e2e/solve.py && python3 e2e/learn.py && python3 e2e/cubelink.py && python3 e2e/keymap.py && python3 e2e/howto.py && python3 e2e/looking.py && python3 e2e/cstimer.py && python3 e2e/race.py && python3 e2e/cards.py && python3 e2e/review.py && python3 e2e/home.py && python3 e2e/solver.py && python3 e2e/lessons.py && python3 e2e/vitals.py && python3 e2e/puzzles.py && python3 e2e/offline.py",
     "bench:solver": "tsx scripts/bench-solver.mts",
     "db:up": "node scripts/db-local.mjs up",
     "db:down": "node scripts/db-local.mjs down",
@@ -33,6 +33,7 @@
     "e2e:local": "npm run db:up && npm run build && node scripts/db-local.mjs run -- sh -c 'lsof -ti:3000 | xargs kill -9 2>/dev/null; (npx next start -p 3000 > .next/e2e-server.log 2>&1 &); sleep 8; DEV_LOG=.next/e2e-server.log BASE=http://localhost:3000 npm run e2e; code=$?; lsof -ti:3000 | xargs kill -9 2>/dev/null; exit $code'",
     "audit:review": "tsx scripts/audit-review.mts",
     "audit": "tsx scripts/audit.mts",
+    "indexnow": "node scripts/indexnow.mjs",
     "sweep": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/sweep.mts",
     "retention": "NODE_OPTIONS=--conditions=react-server tsx --env-file=.env.local scripts/retention.mts",
     "integration:wca": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-wca.mts",

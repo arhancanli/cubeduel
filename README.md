@@ -179,8 +179,9 @@ npm run dev                    # http://localhost:3000
 ```
 
 **It runs with no credentials at all.** Solving, the daily, progress analysis and
-the trainer are entirely local — `localStorage` is the source of truth and the app
-works offline. Accounts, ranked, leaderboards and profiles need Supabase; without
+the trainer are entirely local — `localStorage` is the source of truth. It installs
+to a home screen like an app, and once visited the timer and keyboard cube open
+with no connection at all. Accounts, ranked, leaderboards and profiles need Supabase; without
 it those pages say so plainly instead of breaking.
 
 For development, `npm run db:up` gives you all of it with no account anywhere:
@@ -208,7 +209,7 @@ in the commit history was caught by exactly one of them.
 | | | |
 |---|---|---|
 | `npm test` | 847 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 29 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, and a layout-shift check on a phone for somebody new. |
+| `npm run e2e` | 30 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, a layout-shift check on a phone for somebody new, and the timer reopened with the network switched off. |
 | `npm run audit:review` | the review's accuracy | Builds CFOP solves whose true phases are known to the move — cross turns, four F2L inserts from the verified cases, an OLL and a PLL from the case lists, the scramble their inverse — and has the review read them. 1,200 solves: every phase end read to the exact turn (8,400 of 8,400) and every OLL and PLL case named. A smaller run is a unit test; an analyser that ends phases one turn late scores 14% on it. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
@@ -971,6 +972,11 @@ sitemap" with no explanation is indistinguishable from "nobody remembered".
 The 78 case pages are enumerated from the case library rather than typed out,
 so they cannot drift from it. Nothing user-made is listed: profiles, solves,
 clubs and challenge links are served when somebody shares them, not advertised.
+
+Google reads the sitemap on its own schedule. Bing, Yandex, Seznam, Naver and
+Yep can be told directly: `npm run indexnow` after a deploy sends every sitemap
+page to IndexNow in one request. It first fetches the key file from the live
+site, because that is what the engines check, and stops if it is not there yet.
 
 ## How to solve a cube at all (`/solve`, `src/lib/beginner.ts`)
 
