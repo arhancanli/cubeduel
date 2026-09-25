@@ -41,6 +41,18 @@ export interface LearnCase {
   moveCount: number;
 }
 
+/**
+ * How the cube is held to show or drill a last-layer case: turned over, yellow
+ * on top and green still in front — the way nearly everybody meets these cases,
+ * with the white cross underneath. Every case is built with white on top, so
+ * the hold goes first and the case is set up on the yellow face.
+ */
+export const LAST_LAYER_HOLD = "z2";
+
+export function holdForLastLayer(setup: string): string {
+  return setup ? `${LAST_LAYER_HOLD} ${setup}` : LAST_LAYER_HOLD;
+}
+
 export function invertAlg(alg: string): string {
   return alg
     .split(/\s+/)

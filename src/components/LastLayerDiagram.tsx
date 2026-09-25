@@ -1,5 +1,6 @@
 "use client";
 
+import { holdForLastLayer } from "@/lib/learn";
 import { useEffect, useRef, useState } from "react";
 
 /**
@@ -84,7 +85,8 @@ export function LastLayerDiagram({
           experimentalDragInput: "none",
         }) as unknown as HTMLElement;
 
-        player.setAttribute("experimental-setup-alg", setup);
+        // Yellow on top, as the case is met in a solve — see LAST_LAYER_HOLD.
+        player.setAttribute("experimental-setup-alg", holdForLastLayer(setup));
         player.style.width = "100%";
         player.style.height = "100%";
         host.replaceChildren(player);

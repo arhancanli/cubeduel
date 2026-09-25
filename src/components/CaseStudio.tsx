@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CubeView } from "@/components/CubeView";
 import { LastLayerDiagram } from "@/components/LastLayerDiagram";
 import { formatMs } from "@/lib/format";
-import type { LearnCase } from "@/lib/learn";
+import { holdForLastLayer, type LearnCase } from "@/lib/learn";
 import { useSolveSession } from "@/lib/useSolveSession";
 import { ConnectCubeMenu } from "@/components/ConnectCubeMenu";
 
@@ -223,8 +223,10 @@ function Watch({ study, moves }: { study: LearnCase; moves: string[] }) {
   }, [playing, atEnd, tempo, at]);
 
   const state = useMemo(() => {
+    // Yellow on top, as the case is met in a solve — see LAST_LAYER_HOLD.
+    const held = holdForLastLayer(study.setup);
     const done = moves.slice(0, at);
-    return done.length > 0 ? `${study.setup} ${done.join(" ")}` : study.setup;
+    return done.length > 0 ? `${held} ${done.join(" ")}` : held;
   }, [study.setup, moves, at]);
 
   const restart = useCallback(() => {
@@ -351,7 +353,8 @@ function Watch({ study, moves }: { study: LearnCase; moves: string[] }) {
 function Try({ study, moves }: { study: LearnCase; moves: string[] }) {
   const [times, setTimes] = useState<number[]>([]);
 
-  const supply = useCallback(async () => study.setup, [study.setup]);
+  // The drill is held the same way as the picture, so the keys match what is seen.
+  const supply = useCallback(async () => holdForLastLayer(study.setup), [study.setup]);
 
   const session = useSolveSession({
     nextScramble: supply,
@@ -379,7 +382,7 @@ function Try({ study, moves }: { study: LearnCase; moves: string[] }) {
       <div className="flex flex-col gap-4">
         <div className="cube-stage relative mx-auto aspect-square w-full max-w-lg">
           <CubeView
-            scramble={session.scramble || study.setup}
+            scramble={session.scramble || holdForLastLayer(study.setup)}
             interactive
             backView="top-right"
             movePressInput

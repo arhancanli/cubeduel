@@ -3,6 +3,23 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.27.0 — 2026-09-25
+
+### Last-layer cases on the yellow face
+
+- **Every OLL and PLL case is now shown yellow-up, green in front** — on the
+  Algorithms pages, each case's page and its drill, and the trainer — the way
+  nearly everybody meets them, with the white cross underneath. They used to be
+  drawn on the white face, so a learner saw a different colour on screen from
+  the one in their hands.
+- **Checked against the puzzle, not just redrawn.** Held yellow-up, every one
+  of the 78 cases must still read as the same case and be finished by its own
+  algorithm, and the hold must keep green in front — an `x2`, which would also
+  put yellow on top but spin green to the back, fails the check. The trainer's
+  keyboard check takes the same hold, so a correct solve is still recognised.
+- Progress keeps drawing the cases from your own solves exactly as they were,
+  in whatever colour your last layer really was.
+
 ## 1.26.0 — 2026-09-25
 
 ### Every review shows how the engine would solve it

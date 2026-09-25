@@ -19,7 +19,7 @@ import {
   type TrainingCard,
 } from "@/lib/trainer";
 import { buildDeck, saveDeck } from "@/lib/trainerDeck";
-import { invertAlg, learnCases, type LearnCase } from "@/lib/learn";
+import { holdForLastLayer, invertAlg, learnCases, type LearnCase } from "@/lib/learn";
 import {
   addSet,
   cardsInSet,
@@ -252,7 +252,9 @@ function Drill({
   const done = lastResult !== null;
 
   const { moveCount, pushMove } = useKeyboardSolve({
-    scramble: card.setupAlg,
+    // Held yellow-up, as the case is met in a solve. The tracker takes the same
+    // hold, so the keys and the check agree on which face is which.
+    scramble: holdForLastLayer(card.setupAlg),
     active: !done,
     // An OLL drill ends when the top is one colour. Waiting for a full solve
     // would fold PLL into every OLL time and corrupt the schedule.
@@ -289,7 +291,7 @@ function Drill({
       </div>
 
       <CubeView
-        scramble={card.setupAlg}
+        scramble={holdForLastLayer(card.setupAlg)}
         backView="none"
         className="h-[30vh] max-h-72 min-h-40 w-full max-w-sm"
       />

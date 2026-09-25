@@ -85,6 +85,10 @@ with sync_playwright() as p:
     # than guessing which case came up.
     setup = page.locator("twisty-player").first.get_attribute("experimental-setup-alg")
     check("the case has a setup algorithm", bool(setup and setup.strip()), str(setup))
+    # Cases are held yellow-up (z2) as they are met in a solve; the hold is not
+    # part of the case, so the answer is the rest of the setup, undone.
+    check("the case is held yellow-up", (setup or "").split()[:1] == ["z2"], str(setup))
+    setup = " ".join((setup or "").split()[1:])
 
     solution = " ".join(invert(m) for m in reversed(setup.split()))
 
@@ -132,7 +136,7 @@ with sync_playwright() as p:
     progress = page.get_by_test_id("train-progress").inner_text()
     check("all of PLL is in play", progress.endswith("of 21 drilled"), progress)
     check("and the case on the cube is a PLL", "PLL ·" in page.inner_text("main"))
-    setup = page.locator("twisty-player").first.get_attribute("experimental-setup-alg") or ""
+    setup = " ".join((page.locator("twisty-player").first.get_attribute("experimental-setup-alg") or "").split()[1:])
     page.get_by_role("button", name="Show the algorithm").click()
     page.wait_for_timeout(200)
     shown = page.get_by_test_id("train-algorithm").inner_text().split()
