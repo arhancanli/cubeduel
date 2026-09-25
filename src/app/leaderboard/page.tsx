@@ -6,6 +6,8 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
 import { ESTABLISHED_DEVIATION, WINDOW_SIZE, msForRating } from "@/lib/rating";
 import { dailyBoard, ratingBoard, rushBoard } from "@/lib/server/boards";
+import { followingBoard, type CircleEntry } from "@/lib/server/follows";
+import { currentProfile } from "@/lib/server/profiles";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 import dailies from "@/data/dailies.json";
 import { todayNumber } from "@/lib/daily";
@@ -13,7 +15,7 @@ import { todayNumber } from "@/lib/daily";
 export const metadata: Metadata = {
   title: "Leaderboard",
   description:
-    "The global keyboard-cubing ladder and today's daily scramble, from verified solves only.",
+    "The global keyboard-cubing ladder, rated from verified solves only, and today's daily scramble.",
 };
 
 // The boards change whenever anyone finishes a window, and a stale ranking is a
@@ -41,13 +43,16 @@ export default async function LeaderboardPage() {
   let board: Awaited<ReturnType<typeof ratingBoard>> | null = null;
   let daily: Awaited<ReturnType<typeof dailyBoard>> | null = null;
   let rush: Awaited<ReturnType<typeof rushBoard>> | null = null;
+  let circle: CircleEntry[] | null = null;
   let failed = false;
 
   try {
-    [board, daily, rush] = await Promise.all([
+    const viewer = await currentProfile();
+    [board, daily, rush, circle] = await Promise.all([
       ratingBoard("333", "keyboard"),
       dailyBoard(day),
       rushBoard(),
+      viewer ? followingBoard(viewer.id) : Promise.resolve(null),
     ]);
   } catch {
     failed = true;
@@ -72,6 +77,8 @@ export default async function LeaderboardPage() {
 
   return (
     <Shell>
+      {circle && circle.length > 1 ? <FollowingSection circle={circle} /> : null}
+
       <section className="w-full">
         <header className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-lg tracking-tight">Global · 3x3 keyboard</h2>
@@ -128,6 +135,11 @@ export default async function LeaderboardPage() {
           issued for. A rating appears only once it is precise enough to mean
           something — before that a player is unranked rather than badly ranked.
         </p>
+        {circle && circle.length === 1 ? (
+          <p className="mt-2 max-w-2xl text-xs leading-relaxed text-muted-dim" data-testid="follow-hint">
+            Follow players from their profiles and they appear here beside you, provisional ratings included.
+          </p>
+        ) : null}
       </section>
 
       <section className="w-full">
@@ -227,6 +239,68 @@ export default async function LeaderboardPage() {
   );
 }
 
+/**
+ * You and the people you follow, on the same ratings as the global board.
+ * Provisional ratings are shown here, marked, because among people you know a
+ * settling number is still worth seeing; unrated players are listed last.
+ */
+function FollowingSection({ circle }: { circle: CircleEntry[] }) {
+  let rank = 0;
+  return (
+    <section className="w-full" data-testid="following-board">
+      <header className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="text-lg tracking-tight">You and who you follow</h2>
+        <p className="text-xs text-muted-dim">3x3 keyboard · same ratings as the global board</p>
+      </header>
+      <ol className="divide-y divide-border overflow-hidden rounded-2xl border border-border">
+        {circle.map((entry) => {
+          if (entry.rating !== null) rank += 1;
+          return (
+            <li
+              key={entry.handle}
+              data-you={entry.isYou || undefined}
+              className={`flex items-center gap-4 px-4 py-3 ${entry.isYou ? "bg-surface-hi" : "bg-surface"}`}
+            >
+              {entry.rating !== null ? (
+                <RankBadge rank={rank} />
+              ) : (
+                <span className="w-8 shrink-0 text-center text-sm text-muted-dim">–</span>
+              )}
+              <Link
+                href={`/u/${entry.handle}`}
+                className="min-w-0 flex-1 truncate text-sm transition-colors hover:text-foreground"
+              >
+                <span className="font-semibold">{entry.displayName}</span>
+                <span className="ml-2 text-muted-dim">{entry.isYou ? "you" : `@${entry.handle}`}</span>
+              </Link>
+              {entry.rating === null ? (
+                <span className="text-xs text-muted-dim">unrated</span>
+              ) : (
+                <>
+                  {entry.established ? null : (
+                    <span
+                      className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim"
+                      title={`Not yet precise enough for the global board (±${ESTABLISHED_DEVIATION} or better)`}
+                    >
+                      provisional
+                    </span>
+                  )}
+                  <span className="tnum w-16 shrink-0 text-right font-display text-lg font-bold">
+                    {Math.round(entry.rating)}
+                  </span>
+                  <span className="tnum hidden w-12 shrink-0 text-right text-xs text-muted-dim sm:inline">
+                    ±{Math.round(entry.deviation ?? 0)}
+                  </span>
+                </>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </section>
+  );
+}
+
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col">
@@ -235,8 +309,8 @@ function Shell({ children }: { children: React.ReactNode }) {
         {/* A visible heading, not a hidden one: this page is a document rather
             than a solving surface, and it opened on an h2 with nothing above it. */}
         <PageHero eyebrow="Compete" title="Leaderboard">
-          Every time on this page was replayed by the server against the scramble
-          it was issued for.
+          Every rating here comes from solves the server replayed against the
+          scramble it issued. A daily time it could not check says so.
         </PageHero>
         {children}
       </div>

@@ -209,13 +209,14 @@ in the commit history was caught by exactly one of them.
 | | | |
 |---|---|---|
 | `npm test` | 861 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 31 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, a layout-shift check on a phone for somebody new, the timer reopened with the network switched off, and a milestone given and taken back by a DNF. |
+| `npm run e2e` | 32 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, a layout-shift check on a phone for somebody new, the timer reopened with the network switched off, a milestone given and taken back by a DNF, and two accounts following each other through the leaderboard and the daily. |
 | `npm run audit:review` | the review's accuracy | Builds CFOP solves whose true phases are known to the move — cross turns, four F2L inserts from the verified cases, an OLL and a PLL from the case lists, the scramble their inverse — and has the review read them. 1,200 solves: every phase end read to the exact turn (8,400 of 8,400) and every OLL and PLL case named. A smaller run is a unit test; an analyser that ends phases one turn late scores 14% on it. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
-| `npm run integration:local` | 13 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
+| `npm run integration:local` | 14 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
 | `npm run integration` | local Postgres | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | local Postgres | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts, and a third player racing for the same open seat — one accept lands, the other is refused, the board drops the row, and the scramble stays hidden through all of it. Each guarantee was mutation-tested by breaking it and confirming the suite goes red. |
+| `npm run integration:follows` | local Postgres | Who ends up in your circle: you and who you follow — never who follows you, never a stranger — on the right day, DNFs last. Idempotent follow and unfollow, the database refusing a self-follow on its own, the 500 cap exercised against 500 real rows, and both circle functions called anonymously and refused. |
 | `npm run integration:milestones` | local Postgres | What a profile claims about a player. A history longer than the thousand rows one request returns, with its fastest solve past row 1,000; a refused solve that must earn nothing; and each milestone's proof — verified, practice or self-timed — told apart. Every one of those was broken in turn and the suite went red. |
 | `npm run integration:rush` | local Postgres | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
 | `npm run integration:events` | local Postgres | Every event's ranked path end to end: a server-issued 4x4 scramble, solved, verified against a 4x4 and stored — plus a check that the scales really do differ, since 25 seconds is world class on 4x4 and nowhere near it on 3x3. |
@@ -1146,6 +1147,24 @@ and says what stands behind it: *verified* when the server replayed its turns,
 stopwatch time. A solve the server refused earns nothing, however fast.
 `scripts/integration-milestones.mts` holds that against a real database,
 including a history longer than the thousand rows one request returns.
+
+## Following (`src/lib/server/follows.ts`, migration 0016)
+
+One-way, like following somebody's games: a profile is already public, so
+following it asks nobody's permission and reveals nothing new. It changes only
+what *you* see — the people you follow on the leaderboard beside you, and their
+times on today's daily once you have posted yours. No feed, no notifications,
+no messages; a solo sport needs somebody to measure yourself against far more
+than it needs a social network.
+
+The circle uses the global board's ratings, unchanged. The one difference is
+that a provisional rating is shown, marked as one, because among people you
+know "roughly 1600, still settling" is worth seeing where on the global board it
+would only be noise. Both joins run in SQL (`circle_board`, `circle_daily`)
+rather than sending every followed id back in a request — five hundred ids is an
+eighteen-kilobyte URL — and like every function here they are revoked from
+`anon` and `authenticated`, which `scripts/integration-follows.mts` checks by
+calling them anonymously.
 
 ## Clubs and the WCA (`src/lib/club.ts`, `src/lib/wca.ts`)
 

@@ -126,6 +126,20 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["club_members"]["Insert"]>;
         Relationships: [];
       };
+      follows: {
+        Row: {
+          follower_id: string;
+          followee_id: string;
+          created_at: string;
+        };
+        Insert: {
+          follower_id: string;
+          followee_id: string;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["follows"]["Insert"]>;
+        Relationships: [];
+      };
       users: {
         Row: {
           id: string;
@@ -681,6 +695,29 @@ export interface Database {
           p_attempt_ids: string[];
         };
         Returns: undefined;
+      };
+      /** You and everyone you follow, with 3x3 keyboard ratings. See 0016. */
+      circle_board: {
+        Args: { p_profile: string };
+        Returns: {
+          handle: string;
+          display_name: string;
+          rating: number | null;
+          deviation: number | null;
+          is_you: boolean;
+        }[];
+      };
+      /** Today's daily for you and everyone you follow. See 0016. */
+      circle_daily: {
+        Args: { p_profile: string; p_day: number };
+        Returns: {
+          handle: string;
+          display_name: string;
+          duration_ms: number;
+          penalty: string;
+          verified: boolean;
+          is_you: boolean;
+        }[];
       };
     };
     Enums: Record<never, never>;

@@ -31,6 +31,7 @@ import { encodeMoveStream, isRotation } from "@/lib/moveStream";
 import { SolveBreakdown } from "@/components/SolveBreakdown";
 import { recordSolve } from "@/lib/solveHistory";
 import { submitDailyResult } from "@/lib/sync";
+import { FollowingDaily } from "@/components/FollowingDaily";
 import { useKeyboardSolve } from "@/lib/useKeyboardSolve";
 import { useSpeedTimer } from "@/lib/useSpeedTimer";
 
@@ -110,6 +111,8 @@ export function DailyRound({
    * the progress analysis for the same reason.
    */
   const [splits, setSplits] = useState<PhaseSplit[]>([]);
+  /** Bumped when this result reaches the server, so the people-you-follow list re-reads with you in it. */
+  const [posted, setPosted] = useState(0);
 
   const handleComplete = useCallback(
     (ms: number, moves?: { move: string; atMs: number }[]) => {
@@ -126,7 +129,7 @@ export function DailyRound({
         // Only keyboard solves carry a stream. A hand-timed result has nothing
         // to prove itself with and is stored unverified, which the board says.
         moves,
-      });
+      }).then(() => setPosted((n) => n + 1));
       // The daily is still a solve. Keeping it out of history meant a player whose
       // only habit was the daily saw an empty analysis page forever.
       const store = (analysis: SolveAnalysis) => {
@@ -179,7 +182,7 @@ export function DailyRound({
    */
   const handleCancel = useCallback(() => {
     abandonToDnf(dayKey);
-    void submitDailyResult({ dayKey, durationMs: 0, penalty: "DNF" });
+    void submitDailyResult({ dayKey, durationMs: 0, penalty: "DNF" }).then(() => setPosted((n) => n + 1));
     setEntry(getEntry(dayKey));
     setStage("done");
   }, [dayKey]);
@@ -454,6 +457,8 @@ export function DailyRound({
         >
           {copied ? "Copied" : "Share result"}
         </button>
+
+        <FollowingDaily refresh={posted} />
 
         {stats ? <DailyMemory stats={stats} todayKey={dayKey} /> : null}
 

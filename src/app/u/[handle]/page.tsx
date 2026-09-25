@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { FollowButton } from "@/components/FollowButton";
 import { ProfileMilestones } from "@/components/ProfileMilestones";
 import { RatingHistory } from "@/components/RatingHistory";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -9,7 +10,8 @@ import { formatMs } from "@/lib/format";
 import { ESTABLISHED_DEVIATION, WINDOW_SIZE, msForRating } from "@/lib/rating";
 import { profileStats } from "@/lib/server/boards";
 import { profileMilestones } from "@/lib/server/profileMilestones";
-import { profileByHandle } from "@/lib/server/profiles";
+import { followerCount, followingCount, isFollowing } from "@/lib/server/follows";
+import { currentProfile, profileByHandle } from "@/lib/server/profiles";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 
 export const dynamic = "force-dynamic";
@@ -46,7 +48,15 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
   const profile = await profileByHandle(handle);
   if (!profile) notFound();
 
-  const [stats, earned] = await Promise.all([profileStats(profile.id), profileMilestones(profile.id)]);
+  const viewer = await currentProfile();
+  const isOwn = viewer?.id === profile.id;
+  const [stats, earned, followers, following, viewerFollows] = await Promise.all([
+    profileStats(profile.id),
+    profileMilestones(profile.id),
+    followerCount(profile.id),
+    followingCount(profile.id),
+    viewer && !isOwn ? isFollowing(viewer.id, profile.id) : Promise.resolve(false),
+  ]);
 
   return (
     <main className="flex min-h-dvh flex-col">
@@ -78,6 +88,23 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
           {profile.bio ? (
             <p className="mt-2 max-w-prose text-sm text-muted">{profile.bio}</p>
           ) : null}
+          {isOwn ? (
+            <p className="mt-2 text-sm text-muted">
+              <span className="tnum font-semibold text-foreground">{followers}</span> follower{followers === 1 ? "" : "s"}
+              <span className="mx-2 text-muted-dim">·</span>
+              <span className="tnum font-semibold text-foreground">{following}</span> following
+            </p>
+          ) : (
+            <div className="mt-3">
+              <FollowButton
+                handle={profile.handle}
+                signedIn={viewer !== null}
+                initiallyFollowing={viewerFollows}
+                initialFollowers={followers}
+                following={following}
+              />
+            </div>
+          )}
           </div>
         </header>
 

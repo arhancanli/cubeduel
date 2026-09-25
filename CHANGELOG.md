@@ -3,6 +3,23 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.30.0 — 2026-09-25
+
+### Follow the people you measure yourself against
+
+- **Follow players from their profile.** One tap, one-way, like following
+  somebody's games. Profiles show followers and following.
+- **"You and who you follow" on the leaderboard**, on the same ratings as the
+  global board — provisional ratings included here, and marked, since among
+  people you know a settling number is still worth seeing.
+- **Your daily, beside theirs.** After you post today's daily, the people you
+  follow who played it are listed with you, fastest first.
+- Nothing else: no feed, no notifications, no messages.
+- **Fixed:** the leaderboard said every time on it had been replayed by the
+  server, directly above daily times marked unverified. It now says what is
+  true — every rating is from verified solves, and an unchecked daily time says
+  so.
+
 ## 1.29.0 — 2026-09-25
 
 ### Milestones: sub-30, sub-20, sub-10

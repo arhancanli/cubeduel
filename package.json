@@ -1,6 +1,6 @@
 {
   "name": "cubeduel",
-  "version": "1.29.0",
+  "version": "1.30.0",
   "private": true,
   "engines": {
     "node": ">=22"
@@ -19,7 +19,7 @@
     "dailies": "node scripts/generate-dailies.mjs",
     "pool": "node scripts/generate-pool.mjs",
     "check:bundle": "node scripts/check-bundle.mjs",
-    "e2e": "python3 e2e/a11y.py && python3 e2e/timer.py && python3 e2e/play.py && python3 e2e/train.py && python3 e2e/goal.py && python3 e2e/mobile.py && python3 e2e/ranked.py && python3 e2e/duel.py && python3 e2e/challenge.py && python3 e2e/rush.py && python3 e2e/auth.py && python3 e2e/recovery.py && python3 e2e/cube.py && python3 e2e/clubs.py && python3 e2e/solve.py && python3 e2e/learn.py && python3 e2e/cubelink.py && python3 e2e/keymap.py && python3 e2e/howto.py && python3 e2e/looking.py && python3 e2e/cstimer.py && python3 e2e/race.py && python3 e2e/cards.py && python3 e2e/review.py && python3 e2e/home.py && python3 e2e/solver.py && python3 e2e/lessons.py && python3 e2e/vitals.py && python3 e2e/puzzles.py && python3 e2e/offline.py && python3 e2e/milestones.py",
+    "e2e": "python3 e2e/a11y.py && python3 e2e/timer.py && python3 e2e/play.py && python3 e2e/train.py && python3 e2e/goal.py && python3 e2e/mobile.py && python3 e2e/ranked.py && python3 e2e/duel.py && python3 e2e/challenge.py && python3 e2e/rush.py && python3 e2e/auth.py && python3 e2e/recovery.py && python3 e2e/cube.py && python3 e2e/clubs.py && python3 e2e/solve.py && python3 e2e/learn.py && python3 e2e/cubelink.py && python3 e2e/keymap.py && python3 e2e/howto.py && python3 e2e/looking.py && python3 e2e/cstimer.py && python3 e2e/race.py && python3 e2e/cards.py && python3 e2e/review.py && python3 e2e/home.py && python3 e2e/solver.py && python3 e2e/lessons.py && python3 e2e/vitals.py && python3 e2e/puzzles.py && python3 e2e/offline.py && python3 e2e/milestones.py && python3 e2e/follow.py",
     "bench:solver": "tsx scripts/bench-solver.mts",
     "db:up": "node scripts/db-local.mjs up",
     "db:down": "node scripts/db-local.mjs down",
@@ -42,6 +42,7 @@
     "integration:events": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-events.mts",
     "integration:profile-race": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-profile-race.mts",
     "dailies:annotate": "tsx scripts/annotate-dailies.mts",
+    "integration:follows": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-follows.mts",
     "integration:milestones": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-milestones.mts",
     "integration:solve": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-solve-page.mts",
     "integration:sync": "node scripts/db-local.mjs run -- node scripts/integration-all.mjs integration-sync.mts",
