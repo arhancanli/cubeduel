@@ -19,6 +19,15 @@ import {
   type TrainingCard,
 } from "@/lib/trainer";
 import { buildDeck, saveDeck } from "@/lib/trainerDeck";
+import { invertAlg, learnCases, type LearnCase } from "@/lib/learn";
+import {
+  addSet,
+  cardsInSet,
+  setCases,
+  TRAIN_SET_KEY,
+  TRAIN_SETS,
+  type TrainSetId,
+} from "@/lib/trainerSets";
 
 /**
  * The drill loop.
@@ -52,28 +61,69 @@ export function TrainScreen() {
 
   const displayRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<TrainingCard[]>([]);
+  // What is being drilled. The whole deck is kept either way: a set only
+  // decides which of its cards come up.
+  const [setId, setSetId] = useState<TrainSetId>("yours");
+  const setIdRef = useRef<TrainSetId>("yours");
+  const casesRef = useRef<LearnCase[]>([]);
+  const active = useCallback(
+    (deck: readonly TrainingCard[]) => cardsInSet(deck, setIdRef.current, casesRef.current),
+    [],
+  );
   const positionRef = useRef(0);
 
   useEffect(() => {
     let cancelled = false;
-    void buildDeck().then((store) => {
+    void Promise.all([buildDeck(), learnCases()]).then(([store, cases]) => {
       if (cancelled) return;
-      cardsRef.current = store.cards;
+      casesRef.current = cases;
+      let chosen: TrainSetId = "yours";
+      try {
+        const stored = window.localStorage.getItem(TRAIN_SET_KEY);
+        if (TRAIN_SETS.some((t) => t.id === stored)) chosen = stored as TrainSetId;
+      } catch {
+        /* storage blocked: start with your own cases */
+      }
+      setIdRef.current = chosen;
+      setSetId(chosen);
+      const deck = chosen === "yours" ? store.cards : addSet(store.cards, setCases(chosen, cases));
+      if (deck !== store.cards) saveDeck({ version: 1, cards: deck, position: store.position });
+      cardsRef.current = deck;
       positionRef.current = store.position;
-      setCards(store.cards);
+      setCards(deck);
       setPosition(store.position);
-      setCurrent(nextCard(store.cards, store.position));
+      setCurrent(nextCard(active(deck), store.position));
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [active]);
 
   const advance = useCallback(() => {
     setLastResult(null);
-    setCurrent(nextCard(cardsRef.current, positionRef.current));
+    setCurrent(nextCard(active(cardsRef.current), positionRef.current));
     setDrillId((id) => id + 1);
-  }, []);
+  }, [active]);
+
+  const chooseSet = useCallback(
+    (id: TrainSetId) => {
+      setIdRef.current = id;
+      setSetId(id);
+      try {
+        window.localStorage.setItem(TRAIN_SET_KEY, id);
+      } catch {
+        /* not worth failing over */
+      }
+      const deck = id === "yours" ? cardsRef.current : addSet(cardsRef.current, setCases(id, casesRef.current));
+      cardsRef.current = deck;
+      setCards(deck);
+      saveDeck({ version: 1, cards: deck, position: positionRef.current });
+      setLastResult(null);
+      setCurrent(nextCard(active(deck), positionRef.current));
+      setDrillId((n) => n + 1);
+    },
+    [active],
+  );
 
   const handleSolved = useCallback(
     (durationMs: number) => {
@@ -124,17 +174,39 @@ export function TrainScreen() {
         <div className="w-full rounded-2xl border border-border bg-surface px-5 py-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sticker-green">Train</p>
           <p className="mt-1 text-sm leading-relaxed text-muted">
-            Drill last-layer cases on the keyboard. The cube is set up in the case — solve it with its
-            algorithm. Slow cases come back sooner; ones you have nailed come back later, until each is
-            mastered.{" "}
+            The cube is set up in a last-layer case: solve it on the keyboard. Slow cases come back
+            sooner, fast ones later, until each is mastered.{" "}
             <Link href="/learn" className="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-current">
-              See every algorithm
+              Every algorithm
             </Link>
           </p>
+          <div className="mt-4 flex flex-col gap-2">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">What to drill</p>
+            <div role="radiogroup" aria-label="What to drill" className="flex flex-wrap gap-1.5">
+              {TRAIN_SETS.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={setId === t.id}
+                  onClick={(click) => {
+                    // Focus would take the keys away from the cube.
+                    click.currentTarget.blur();
+                    chooseSet(t.id);
+                  }}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    setId === t.id ? "bg-foreground text-background" : "bg-surface-hi text-muted hover:text-foreground"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         {cards === null ? (
           <p className="pt-20 text-sm text-muted-dim">Building your deck…</p>
-        ) : cards.length === 0 ? (
+        ) : active(cards).length === 0 ? (
           <EmptyDeck />
         ) : current === null ? (
           <p className="pt-20 text-sm text-muted-dim">Nothing due.</p>
@@ -142,7 +214,7 @@ export function TrainScreen() {
           <Drill
             key={`${current.caseId}-${drillId}`}
             card={current}
-            cards={cards}
+            cards={active(cards)}
             position={position}
             displayRef={displayRef}
             lastResult={lastResult}
@@ -206,14 +278,12 @@ function Drill({
           </span>
         </div>
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted">
-            <span className="tnum font-semibold text-foreground">{summary.attempted}</span>/{summary.total} cases seen
+          <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted" data-testid="train-progress">
+            <span className="tnum font-semibold text-foreground">{summary.attempted}</span> of{" "}
+            <span className="tnum">{summary.total}</span> drilled
           </span>
           <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted">
             <span className="tnum font-semibold text-foreground">{summary.mastered}</span> mastered
-          </span>
-          <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted">
-            rep <span className="tnum font-semibold text-foreground">{position + 1}</span>
           </span>
         </div>
       </div>
@@ -261,9 +331,17 @@ function Drill({
 
       {done ? null : <MovePad onMove={pushMove} className="md:hidden" />}
 
-      <div className="mt-2 hidden md:block">
-        <KeyMapHint activeCode={null} />
-      </div>
+      <AlgorithmHint key={card.caseId} setupAlg={card.setupAlg} />
+
+      {/* Reference, not the point of the page: folded away until wanted. */}
+      <details className="mt-2 hidden w-full md:block">
+        <summary className="cursor-pointer text-center text-xs font-semibold text-muted-dim hover:text-foreground">
+          Keyboard controls
+        </summary>
+        <div className="pt-4">
+          <KeyMapHint activeCode={null} />
+        </div>
+      </details>
     </>
   );
 }
@@ -327,20 +405,40 @@ function CardHistory({
 
 function EmptyDeck() {
   return (
-    <div className="max-w-md pt-20 text-center">
-      <h1 className="text-xl tracking-tight">Nothing to drill yet.</h1>
+    <div className="max-w-md pt-12 text-center">
+      <h2 className="text-xl tracking-tight">No cases from your solves yet.</h2>
       <p className="mt-4 text-sm leading-relaxed text-muted">
-        The deck is built from cases your own solves actually produced, so there
-        is nothing here until some solves have been analysed. That is deliberate:
-        a canned list of 57 algorithms typed in by hand is a list of 57 chances to
-        teach you the wrong finger trick.
+        They appear here once a few keyboard or smart-cube solves have been read. To start now,
+        pick a set above — all of PLL, or OLL one shape at a time.
       </p>
-      <Link
-        href="/play"
-        className="btn-secondary mt-6 inline-block px-5 py-2.5 text-sm"
-      >
+      <Link href="/play" className="btn-secondary mt-6 inline-block px-5 py-2.5 text-sm">
         Solve a few first
       </Link>
     </div>
+  );
+}
+
+/**
+ * The algorithm, on request. Shown straight away it would be read instead of
+ * recalled; hidden completely, a case you do not know yet could not be learned
+ * here at all.
+ */
+function AlgorithmHint({ setupAlg }: { setupAlg: string }) {
+  const [shown, setShown] = useState(false);
+  return shown ? (
+    <p className="max-w-md text-center font-mono text-sm tracking-wide text-muted" data-testid="train-algorithm">
+      {invertAlg(setupAlg)}
+    </p>
+  ) : (
+    <button
+      type="button"
+      onClick={(click) => {
+        click.currentTarget.blur();
+        setShown(true);
+      }}
+      className="text-xs font-semibold text-muted-dim underline decoration-border underline-offset-4 hover:text-foreground"
+    >
+      Show the algorithm
+    </button>
   );
 }

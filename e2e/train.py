@@ -120,8 +120,32 @@ with sync_playwright() as p:
     page.reload(wait_until="networkidle")
     page.wait_for_timeout(3500)
     reloaded = page.inner_text("body")
-    check("the deck remembers reps already done", "rep 2" in reloaded or "1/" in reloaded,
-          [l for l in reloaded.split("\n") if "rep" in l][:1])
+    progress = page.get_by_test_id("train-progress").inner_text()
+    check("the deck remembers reps already done", progress.startswith("1 of"), progress)
+
+    print("\n== choosing what to drill ==")
+    # It used to drill only the cases met in your solves, plus six starters. The
+    # Algorithms pages verify every case against the puzzle, so a learner can
+    # now pick the set they are studying.
+    page.get_by_role("radio", name="All 21 PLL").click()
+    page.wait_for_timeout(2500)
+    progress = page.get_by_test_id("train-progress").inner_text()
+    check("all of PLL is in play", progress.endswith("of 21 drilled"), progress)
+    check("and the case on the cube is a PLL", "PLL ·" in page.inner_text("main"))
+    setup = page.locator("twisty-player").first.get_attribute("experimental-setup-alg") or ""
+    page.get_by_role("button", name="Show the algorithm").click()
+    page.wait_for_timeout(200)
+    shown = page.get_by_test_id("train-algorithm").inner_text().split()
+    check("the algorithm shown is the one that solves this case",
+          shown == [invert(m) for m in reversed(setup.split())], " ".join(shown))
+    page.reload(wait_until="networkidle")
+    page.wait_for_timeout(3500)
+    check("the chosen set is remembered",
+          page.get_by_role("radio", name="All 21 PLL").get_attribute("aria-checked") == "true")
+    page.get_by_role("radio", name="OLL · dot").click()
+    page.wait_for_timeout(2500)
+    progress = page.get_by_test_id("train-progress").inner_text()
+    check("OLL one shape at a time: the eight dot cases", progress.endswith("of 8 drilled"), progress)
 
     print("\n== console ==")
     check("no page errors", len(errors) == 0, "; ".join(errors[:2])[:200])

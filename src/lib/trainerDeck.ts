@@ -149,6 +149,8 @@ export async function buildDeck(): Promise<DeckStore> {
       if (existing) {
         // Refresh the label if the name table learned it since.
         if (!existing.name && aggregate.name) existing.name = aggregate.name;
+        // Met in a real solve now, so it is one of "your" cases too.
+        if (existing.fromSet) existing.fromSet = false;
         continue;
       }
       known.set(

@@ -3,6 +3,25 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.22.0 — 2026-09-25
+
+### Train what you are actually learning
+
+- **Choose what to drill:** all 21 PLL, all 57 OLL, or OLL one shape at a time
+  — cross, line, L-shape, dot — the way learners study it. The trainer began
+  with only the cases met in your own solves plus six starters, because a
+  hand-typed list of algorithms could teach something wrong. The Algorithms
+  pages now build every case by running its algorithm backwards from solved,
+  so a list can no longer be wrong. "Cases from my solves" is still there.
+- **One record per case, whatever the set.** Sune drilled among the cross OLLs
+  is the same card in all of OLL; switching sets never loses what you practised.
+- **Show the algorithm,** on request. Shown at once it would be read instead of
+  recalled; hidden entirely, a case you do not know yet could not be learned
+  here at all.
+- **Plain words.** "0/6 cases seen · rep 1" is now "0 of 21 drilled · 0
+  mastered"; the keyboard map, reference rather than the point of the page, is
+  folded under "Keyboard controls".
+
 ## 1.21.0 — 2026-09-25
 
 ### The smart cubes people actually own

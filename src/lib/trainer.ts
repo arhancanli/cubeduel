@@ -41,6 +41,11 @@ export interface TrainingCard {
   dueAt: number;
   /** Epoch ms, for the between-session decay. */
   lastSeenAt: number | null;
+  /**
+   * Added by choosing a set, not met in a solve. Such a card belongs to its
+   * set, and stays out of "cases from my solves" until a solve brings it up.
+   */
+  fromSet?: boolean;
 }
 
 /**
