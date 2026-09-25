@@ -3,6 +3,22 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.20.0 — 2026-09-25
+
+### Keyboard cubing that keeps up with your fingers
+
+- **Turns are fast now.** The cube drew every turn over half a second —
+  cubing.js's default, never changed. Typing four to eight turns a second, each
+  turn was cut off half-drawn by the next, and the cube looked mushy and behind
+  you. A turn now takes about 120ms, the speed of a real fast turn.
+- **Pick your speed:** Smooth, Fast or Instant, under the cube. Remembered in
+  this browser, and changed in place — the cube is never rebuilt.
+- **See the back.** A keyboard solver cannot flip the cube over to look. "Show
+  the back" puts the three hidden faces — back, left and bottom — beside it at
+  full size (the small corner inset was too small to read).
+- Every control hands focus back, so the next key turns the cube rather than
+  pressing the control again.
+
 ## 1.19.2 — 2026-09-25
 
 ### Found by using the site like a visitor

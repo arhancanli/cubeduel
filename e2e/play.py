@@ -174,6 +174,29 @@ with sync_playwright() as p:
     check("a trend is refused below the minimum", "at least 12 analysed solves" in prog)
     page.screenshot(path="/tmp/progress-thin.png", full_page=True)
 
+    print("\n== how the cube moves, and what it shows ==")
+    # cubing.js draws a turn over half a second, so fast typing left the cube
+    # half-turned and behind. The default is a real fast turn now.
+    TEMPO = "async () => await document.querySelector('twisty-player').experimentalModel.tempoScale.get()"
+    page.goto(BASE + "/play", wait_until="load")
+    page.wait_for_selector("twisty-player", timeout=30000)
+    page.wait_for_timeout(2500)
+    tempo = page.evaluate(TEMPO)
+    check("turns are fast by default (about 120ms, not 500)", tempo and 3.5 < tempo < 5, str(tempo))
+    page.get_by_role("radio", name="Instant").click()
+    page.wait_for_timeout(300)
+    check("choosing Instant makes turns instant", page.evaluate(TEMPO) >= 40, str(page.evaluate(TEMPO)))
+    page.get_by_role("button", name="Show the back").click()
+    page.wait_for_timeout(2500)
+    check("the back can be shown", page.evaluate("async () => await document.querySelector('twisty-player').experimentalModel.backView.get()") == "side-by-side")
+    page.reload(wait_until="load")
+    page.wait_for_selector("twisty-player", timeout=30000)
+    page.wait_for_timeout(2500)
+    check("the choice is remembered", page.evaluate(TEMPO) >= 40
+          and page.evaluate("async () => await document.querySelector('twisty-player').experimentalModel.backView.get()") == "side-by-side")
+    check("a key after clicking a control still turns the cube",
+          page.evaluate("() => document.activeElement === document.body || document.activeElement === null"))
+
     print("\n== console ==")
     check("no page errors", len(errors) == 0, "; ".join(errors[:2])[:160])
 

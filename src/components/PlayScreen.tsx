@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CubeView } from "@/components/CubeView";
 import { KeyMapHint } from "@/components/KeyMapHint";
@@ -14,6 +14,14 @@ import { countMoves, encodeMoveStream, type SolveRecording } from "@/lib/moveStr
 import { nextScramble, warmScrambles } from "@/lib/scramble";
 import { recordSolve } from "@/lib/solveHistory";
 import { useSolveSession } from "@/lib/useSolveSession";
+import {
+  DEFAULT_PLAY_VIEW,
+  parsePlayView,
+  PLAY_VIEW_KEY,
+  tempoFor,
+  TURN_SPEEDS,
+  type PlayView,
+} from "@/lib/playView";
 
 /**
  * Cubing without a cube — the practice mode.
@@ -113,6 +121,25 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
 
   const solving = phase === "running";
 
+  // Turn speed and the back view: a preference, read after mount because it
+  // lives in this browser.
+  const [view, setView] = useState<PlayView>(DEFAULT_PLAY_VIEW);
+  useEffect(() => {
+    try {
+      setView(parsePlayView(window.localStorage.getItem(PLAY_VIEW_KEY)));
+    } catch {
+      /* storage blocked: the default is fine */
+    }
+  }, []);
+  const changeView = useCallback((next: PlayView) => {
+    setView(next);
+    try {
+      window.localStorage.setItem(PLAY_VIEW_KEY, JSON.stringify(next));
+    } catch {
+      /* not worth failing over */
+    }
+  }, []);
+
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="play" />
@@ -158,10 +185,14 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
              * The MovePad below is the touch path, and it is tested.
              */
             interactive
-            backView="none"
+            // Full size beside the cube: the corner inset is too small to read.
+            backView={view.showBack ? "side-by-side" : "none"}
+            tempoScale={tempoFor(view.speed)}
             onPlayerReady={session.onPlayerReady}
             className="h-[30vh] max-h-80 min-h-44 w-full max-w-md"
           />
+
+          <ViewControls view={view} onChange={changeView} dimmed={solving} />
 
           <div className="flex flex-col items-center gap-2">
             <div
@@ -378,6 +409,62 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div className="flex flex-col items-center gap-1">
       <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</span>
       <span className="tnum text-lg font-medium text-muted">{value}</span>
+    </div>
+  );
+}
+
+/**
+ * How the cube moves and what it shows. Every control gives focus back, so the
+ * next key press turns the cube instead of pressing the control again.
+ */
+function ViewControls({
+  view,
+  onChange,
+  dimmed,
+}: {
+  view: PlayView;
+  onChange: (next: PlayView) => void;
+  dimmed: boolean;
+}) {
+  return (
+    <div
+      className={`flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-muted-dim transition-opacity duration-200 ${
+        dimmed ? "opacity-30" : "opacity-100"
+      }`}
+    >
+      <div role="radiogroup" aria-label="Turn speed" className="flex items-center gap-1">
+        <span className="mr-1">Turns</span>
+        {TURN_SPEEDS.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            role="radio"
+            aria-checked={view.speed === s.id}
+            onClick={(click) => {
+              click.currentTarget.blur();
+              onChange({ ...view, speed: s.id });
+            }}
+            className={`rounded-md px-2 py-1 font-semibold transition-colors ${
+              view.speed === s.id ? "bg-surface-hi text-foreground" : "hover:text-foreground"
+            }`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+      <button
+        type="button"
+        aria-pressed={view.showBack}
+        onClick={(click) => {
+          click.currentTarget.blur();
+          onChange({ ...view, showBack: !view.showBack });
+        }}
+        className={`rounded-md px-2 py-1 font-semibold transition-colors ${
+          view.showBack ? "bg-surface-hi text-foreground" : "hover:text-foreground"
+        }`}
+      >
+        {view.showBack ? "Hide the back" : "Show the back"}
+      </button>
     </div>
   );
 }

@@ -197,7 +197,7 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 810 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 813 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 29 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, and a layout-shift check on a phone for somebody new. |
 | `npm run audit:review` | the review's accuracy | Builds CFOP solves whose true phases are known to the move — cross turns, four F2L inserts from the verified cases, an OLL and a PLL from the case lists, the scramble their inverse — and has the review read them. 1,200 solves: every phase end read to the exact turn (8,400 of 8,400) and every OLL and PLL case named. A smaller run is a unit test; an analyser that ends phases one turn late scores 14% on it. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |

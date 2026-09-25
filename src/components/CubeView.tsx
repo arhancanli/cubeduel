@@ -78,6 +78,11 @@ interface Props {
   className?: string;
   /** Which puzzle to draw. Everything else here is written for the 3×3. */
   puzzle?: "2x2x2" | "3x3x3" | "4x4x4" | "5x5x5";
+  /**
+   * How fast a turn is drawn: 1 is cubing.js's half a second. Changed in
+   * place, so a new speed never rebuilds the cube.
+   */
+  tempoScale?: number;
 }
 
 /** The slice of TwistyPlayer callers are allowed to touch. */
@@ -98,6 +103,7 @@ export function CubeView({
   cameraLatitude,
   puzzle = "3x3x3",
   className = "",
+  tempoScale,
 }: Props) {
   // Held in a ref so a caller passing an inline function cannot force the whole
   // Three.js scene to be rebuilt on every render.
@@ -249,6 +255,12 @@ export function CubeView({
       playerRef.current.setAttribute(SETUP_ALG_ATTR, scramble);
     }
   }, [scramble]);
+
+  // The turn speed, set on the live player: no rebuild, the cube stays put.
+  useEffect(() => {
+    const player = playerRef.current as unknown as { tempoScale?: number } | null;
+    if (player && tempoScale) player.tempoScale = tempoScale;
+  }, [tempoScale, ready]);
 
   /**
    * Follow the preference.
