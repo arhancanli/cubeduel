@@ -3,6 +3,19 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.24.0 — 2026-09-25
+
+### Say less, show the way in
+
+- **Race a friend** opened on a paragraph of eighty words, with the way to
+  start one as two small links inside a sentence. It now says it in one line —
+  the same scramble on two screens, at the same moment, fastest solve wins —
+  shows how a race goes in three steps, and puts "Create an account to race"
+  and "Sign in" on real buttons.
+- **Clubs** had the same fault — "Make one" as a link inside a grey box — and
+  now has the same fix.
+- A browser check holds both: signed out, the way in is a button.
+
 ## 1.23.0 — 2026-09-25
 
 ### The timer's longer view

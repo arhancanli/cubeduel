@@ -18,16 +18,19 @@ export function RaceStart({ signedIn }: { signedIn: boolean }) {
 
   if (!signedIn) {
     return (
-      <p className="max-w-md text-center text-sm leading-relaxed text-muted">
-        <Link href="/join?next=/race" className="text-foreground underline underline-offset-4">
-          Create an account
-        </Link>{" "}
-        or{" "}
-        <Link href="/sign-in?next=/race" className="text-foreground underline underline-offset-4">
-          sign in
-        </Link>{" "}
-        to start a race. The person you send it to will need one too — a result has to belong to somebody.
-      </p>
+      <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-wrap justify-center gap-3">
+          <Link href="/join?next=/race" className="btn-go px-6 py-3 text-sm">
+            Create an account to race
+          </Link>
+          <Link href="/sign-in?next=/race" className="btn-secondary px-6 py-3 text-sm">
+            Sign in
+          </Link>
+        </div>
+        <p className="max-w-sm text-center text-xs leading-relaxed text-muted-dim">
+          Free. Your friend needs one too — a result has to belong to somebody.
+        </p>
+      </div>
     );
   }
 

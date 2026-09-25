@@ -195,6 +195,15 @@ with sync_playwright() as p:
         outline,
     )
 
+    # Signed out, the way in to a page that needs an account is a real button,
+    # not two small links inside a sentence — which is how Race and Clubs had it.
+    print("\n== the way in is a button ==")
+    for path in ["/race", "/clubs"]:
+        page.goto(BASE + path, wait_until="load")
+        page.wait_for_timeout(1500)
+        cta = page.locator("main a.btn-go[href^='/join']")
+        check(f"{path}: 'create an account' is a button", cta.count() == 1 and cta.first.is_visible(), str(cta.count()))
+
     # Content that is only visible once scripts run is invisible to a slow
     # phone until they do, and to anything that never runs them. The fade-in
     # wrapper used to send every heading at opacity 0; this reads the page as

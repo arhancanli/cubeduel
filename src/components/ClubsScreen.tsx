@@ -147,14 +147,19 @@ export function ClubsScreen({
         ) : null}
 
         {!signedIn ? (
-          <Reveal className="rounded-xl border border-border bg-surface px-5 py-4">
-            <p className="text-sm text-muted">
-              Clubs need an account, because a rating has to belong to somebody.{" "}
-              <Link href="/join" className="text-foreground underline underline-offset-4">
-                Make one
-              </Link>{" "}
-              — it takes a moment and keeps the solves you have already done.
+          <Reveal className="flex flex-col items-start gap-4 rounded-2xl border border-border bg-surface px-5 py-5">
+            <p className="text-sm leading-relaxed text-muted">
+              Clubs need an account — a place on a board has to belong to somebody. Making one keeps the
+              solves you have already done.
             </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/join?next=/clubs" className="btn-go px-5 py-2.5 text-sm">
+                Create an account
+              </Link>
+              <Link href="/sign-in?next=/clubs" className="btn-secondary px-5 py-2.5 text-sm">
+                Sign in
+              </Link>
+            </div>
           </Reveal>
         ) : (
           <>
