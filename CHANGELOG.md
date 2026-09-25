@@ -3,6 +3,19 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.26.0 — 2026-09-25
+
+### Every review shows how the engine would solve it
+
+- **The solver's own route, on every 3×3 review.** This site's from-scratch
+  Kociemba solver is the one thing here no other timer has, and the review
+  never showed its answer — only a move count, only right after a keyboard
+  solve. Now every reviewed 3×3 solve, keyboard or timed on a real cube, shows
+  the route it finds for that exact scramble on a cube you can step through,
+  and sets your turns beside it: "You used 38 turns — 2.1 times the engine's 18."
+- Said as a route, not "the optimal solution": the solver finds short routes,
+  about 19 moves, not proven-shortest ones.
+
 ## 1.25.0 — 2026-09-25
 
 ### Which mode is which

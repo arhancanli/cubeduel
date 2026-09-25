@@ -9,10 +9,11 @@ import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SolveStudy } from "@/components/SolveStudy";
 import { TimerSolveReview } from "@/components/TimerSolveReview";
+import { EngineSolution } from "@/components/EngineSolution";
 import { eventLabel, eventOf, hasTimerReview } from "@/lib/timerEvents";
 import type { TimedMove } from "@/lib/cfop";
 import { formatMs } from "@/lib/format";
-import { decodeMoveStream } from "@/lib/moveStream";
+import { countMoves, decodeMoveStream } from "@/lib/moveStream";
 import { loadHistory, type StoredSolve } from "@/lib/solveHistory";
 
 /**
@@ -108,6 +109,12 @@ export function ReviewScreen() {
             ) : (
               <TimerSolveReview solve={state.item.solve} history={state.history} />
             )}
+            {eventOf(state.item.solve) === "333" ? (
+              <EngineSolution
+                scramble={state.item.solve.scramble}
+                yourTurns={state.item.moves ? countMoves(state.item.moves.map((m) => m.move)) : null}
+              />
+            ) : null}
           </>
         ) : (
           <>

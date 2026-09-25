@@ -192,6 +192,17 @@ with sync_playwright() as p:
         check("no horizontal scroll", overflow <= 1, f"{overflow}px")
         phone.close()
 
+    print("\n== the engine's route for the same scramble ==")
+    page.goto(BASE + "/review", wait_until="load")
+    page.wait_for_timeout(1200)
+    page.locator("main ul li a").first.click()
+    page.wait_for_selector("[data-testid=engine-summary]", timeout=30000)
+    summary = page.get_by_test_id("engine-summary").inner_text()
+    check("the engine's move count is shown", " moves." in summary, summary)
+    check("and set against this solve's own turns", "You used" in summary or "You beat" in summary or "You matched" in summary, summary)
+    setup = page.locator("[data-testid=engine-solution] twisty-player").first.get_attribute("experimental-setup-alg") or ""
+    check("its cube starts from this solve's scramble", setup.split() == SCRAMBLE.split(), setup[:80])
+
     print("\n== a solve that is not here ==")
     page.goto(BASE + "/review?id=sv_nothing", wait_until="networkidle")
     page.wait_for_timeout(1200)
