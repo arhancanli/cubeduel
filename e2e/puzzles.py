@@ -95,9 +95,11 @@ with sync_playwright() as p:
     labels = page.locator("div.uppercase.tracking-widest span").all_inner_texts()
     check("the phases are a big cube's", [l.strip().lower() for l in labels] == ["centres", "edges", "3x3"],
           str(labels))
+    # Real 4x4 times: anything under five seconds is refused as a mis-tap, since
+    # no 4x4 has ever been solved that fast.
     for _ in range(5):
-        time_solve(page, [600, 500, 500])
-    time_solve(page, [600, 2000, 500])
+        time_solve(page, [2000, 1800, 1800])
+    time_solve(page, [2000, 3900, 1800])
     check("six 4x4 solves in the 4x4 session", recent_count(page) == 6, str(recent_count(page)))
 
     page.get_by_role("link", name="review →").click()

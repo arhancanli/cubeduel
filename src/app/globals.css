@@ -98,6 +98,34 @@ html[data-welcomed] [data-first-visit] {
   display: none;
 }
 
+/*
+ * The home page, for somebody who has solved here: their numbers replace the
+ * one-line pitch, but only once the page has read them. Room is held for them
+ * before the first paint, by breakpoint, measured from the real block
+ * (261 / 233 / 326 / 253px), so they fill space instead of pushing the page.
+ */
+html[data-returning] [data-returning-slot] {
+  min-height: 17rem;
+}
+html[data-returning] [data-returning-slot] > [data-new-only] {
+  display: none;
+}
+@media (min-width: 640px) {
+  html[data-returning] [data-returning-slot] {
+    min-height: 15.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  html[data-returning] [data-returning-slot] {
+    min-height: 21rem;
+  }
+}
+@media (min-width: 1280px) {
+  html[data-returning] [data-returning-slot] {
+    min-height: 16.5rem;
+  }
+}
+
 /* Everything except the time recedes while a solve is in progress. */
 .solving-hidden {
   opacity: 0;

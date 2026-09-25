@@ -153,6 +153,24 @@ with sync_playwright() as p:
     page.wait_for_timeout(150)
     check("deleting drops the solve", page.locator("[data-testid=recent-time]").count() == 5)
 
+    print("\n== a mis-tap is not a solve ==")
+    # A thumb on the spacebar used to be saved as a 0.12 solve, and became the
+    # personal best every real solve was then measured against.
+    before = page.locator("[data-testid=recent-solve]").count()
+    scramble_before = " ".join(page.locator("section .font-mono span").all_inner_texts())
+    page.keyboard.down("Space")
+    page.wait_for_timeout(400)
+    page.keyboard.up("Space")
+    page.wait_for_timeout(120)
+    page.keyboard.press("KeyJ")
+    page.wait_for_timeout(600)
+    check("it is not saved", page.locator("[data-testid=recent-solve]").count() == before,
+          f"{before} -> {page.locator('[data-testid=recent-solve]').count()}")
+    hint = page.get_by_test_id("timer-hint").inner_text()
+    check("and the page says why", "too quick to be a solve" in hint, hint)
+    check("the scramble stays, since the cube still has it on",
+          " ".join(page.locator("section .font-mono span").all_inner_texts()) == scramble_before)
+
     print("\n== persistence ==")
     page.reload(wait_until="networkidle")
     page.wait_for_timeout(2000)

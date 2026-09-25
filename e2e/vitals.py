@@ -22,8 +22,10 @@ scramble box grew to a second line, and the clock jumped down twice.
     BASE=http://localhost:3000 python3 e2e/vitals.py
 """
 
+import json
 import os
 import sys
+import time
 
 from playwright.sync_api import sync_playwright
 
@@ -72,6 +74,24 @@ with sync_playwright() as p:
         check(f"{path}: layout shift under 0.1", cls < 0.1, str(cls))
         if path == "/timer":
             check("/timer: the welcome is shown to somebody new", page.get_by_test_id("first-visit").is_visible())
+        ctx.close()
+
+    print("\n== the home page for somebody who has solved here ==")
+    # Their numbers replace the pitch once the page can read them; room is held
+    # for them before the first paint. Swapping them in afterwards used to shift
+    # the page by 0.10 — past Google's line — on phone and desktop alike.
+    HISTORY = json.dumps({"version": 1, "solves": [
+        {"id": f"h{i}", "at": time.time() * 1000 - i * 3600e3, "scramble": "R U", "durationMs": 20000 + i * 300,
+         "penalty": "OK", "moveCount": 0, "tps": 0, "splits": [], "ollCase": None, "pllCase": None,
+         "ollSetup": None, "pllSetup": None, "source": "manual"} for i in range(12)]})
+    for width, height in [(390, 844), (500, 900), (768, 1000), (1024, 900), (1180, 900), (1280, 900), (1440, 1000)]:
+        ctx = browser.new_context(viewport={"width": width, "height": height}, has_touch=width < 800)
+        ctx.add_init_script(f"localStorage.setItem('cubeduel.history.v1', {json.dumps(HISTORY)})")
+        page = ctx.new_page()
+        page.goto(BASE + "/", wait_until="load")
+        page.wait_for_timeout(3000)
+        cls = page.evaluate(CLS)
+        check(f"/ at {width}px, returning: layout shift under 0.1", cls < 0.1, str(cls))
         ctx.close()
 
     print("\n== somebody returning ==")

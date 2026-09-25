@@ -3,6 +3,23 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.19.2 — 2026-09-25
+
+### Found by using the site like a visitor
+
+- **A mis-tap no longer becomes your personal best.** A thumb on the spacebar
+  stopped the clock at 0.12 and was saved as a 3×3 solve — and then shown as
+  the best time every real solve was measured against. A stop faster than the
+  puzzle allows (below every world-record single: 0.5s on a 3×3, 0.25s on a
+  2×2) is now not saved, the page says so, and the scramble stays, since the
+  cube in your hands still has it on.
+- **The home page no longer jumps for somebody who has solved here.** Their
+  numbers and streak replace the one-line pitch, but only once the page can
+  read them, and swapping them in shifted the page by 0.10 — past Google's line
+  — on phone and desktop. The same script that runs before the first paint now
+  marks a browser with solves, and room is held for them: 0.015 at worst,
+  across seven widths from phone to wide desktop.
+
 ## 1.19.1 — 2026-09-24
 
 ### How accurate is the review? Measured: exact

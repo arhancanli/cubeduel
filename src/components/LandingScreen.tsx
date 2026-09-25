@@ -83,14 +83,20 @@ export function LandingScreen({ dailyStart }: { dailyStart: string }) {
             </Link>
           </div>
 
-          {returning && history ? (
-            <>
-              <ReturningStats history={forEvent(history, "333")} />
-              <StreakCard compact />
-            </>
-          ) : (
-            <p className="text-sm text-muted-dim">Solving needs no account. Free, and it works offline.</p>
-          )}
+          {/* Room for a returning visitor's numbers is held before the first
+              paint — see `data-returning` in globals.css. */}
+          <div data-returning-slot className="flex flex-col gap-6">
+            {returning && history ? (
+              <>
+                <ReturningStats history={forEvent(history, "333")} />
+                <StreakCard compact />
+              </>
+            ) : (
+              <p data-new-only className="text-sm text-muted-dim">
+                Solving needs no account. Free, and it works offline.
+              </p>
+            )}
+          </div>
 
           {/* The other half of the audience: every call to action above assumes
               you can already solve a cube. One quiet line rather than a third

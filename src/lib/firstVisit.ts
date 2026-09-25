@@ -14,8 +14,18 @@ export const HISTORY_KEY = "cubeduel.history.v1";
 /** Set on <html> for a returning visitor. */
 export const WELCOMED_ATTR = "data-welcomed";
 
-export const welcomedScript = `(function(){try{var s=window.localStorage;var h=JSON.parse(s.getItem(${JSON.stringify(
+/**
+ * Set on <html> when this browser has solves. The home page shows those
+ * visitors their numbers instead of the pitch, and the numbers can only be read
+ * once the page runs; this lets CSS hold the room for them before the first
+ * paint, where swapping them in afterwards jumped the page by 0.10.
+ */
+export const RETURNING_ATTR = "data-returning";
+
+export const welcomedScript = `(function(){var d=document.documentElement;try{var s=window.localStorage;var h=JSON.parse(s.getItem(${JSON.stringify(
   HISTORY_KEY,
-)})||"null");if(s.getItem(${JSON.stringify(WELCOMED_KEY)})!==null||(h&&h.solves&&h.solves.length>0))document.documentElement.setAttribute(${JSON.stringify(
+)})||"null");var solved=!!(h&&h.solves&&h.solves.length>0);if(solved)d.setAttribute(${JSON.stringify(
+  RETURNING_ATTR,
+)},"");if(s.getItem(${JSON.stringify(WELCOMED_KEY)})!==null||solved)d.setAttribute(${JSON.stringify(
   WELCOMED_ATTR,
-)},"")}catch(e){document.documentElement.setAttribute(${JSON.stringify(WELCOMED_ATTR)},"")}})()`;
+)},"")}catch(e){d.setAttribute(${JSON.stringify(WELCOMED_ATTR)},"")}})()`;

@@ -4,7 +4,7 @@ import { test } from "node:test";
 import type { StoredSolve } from "./solveHistory";
 import type { PersistedState } from "./storage";
 import { parseSyncedEvent } from "./events";
-import { eventOf, forEvent, hasTimerReview, sessionFor, splitLabelsFor, TIMER_EVENTS } from "./timerEvents";
+import { eventOf, forEvent, hasTimerReview, isMisfire, sessionFor, splitLabelsFor, TIMER_EVENTS } from "./timerEvents";
 
 test("the timer offers 2x2 to 5x5, each drawn as its own puzzle", () => {
   assert.deepEqual(
@@ -74,4 +74,15 @@ test("a synced solve's puzzle: absent means 3x3, anything unknown is refused", (
 
 test("every timed puzzle but the 2x2 has a review", () => {
   assert.deepEqual(TIMER_EVENTS.filter((e) => hasTimerReview(e.id)).map((e) => e.id), ["333", "444", "555"]);
+});
+
+test("a stop faster than the puzzle allows is a mis-tap, not a solve", () => {
+  // Below every world-record single: a 3x3 cannot be solved in half a second.
+  assert.equal(isMisfire(120, "333"), true);
+  assert.equal(isMisfire(499, "333"), true);
+  assert.equal(isMisfire(500, "333"), false);
+  assert.equal(isMisfire(9000, "333"), false);
+  // Each puzzle has its own floor: 0.3s is a mis-tap on a 3x3 but a 2x2 can go below it.
+  assert.equal(isMisfire(300, "222"), false);
+  assert.equal(isMisfire(3000, "444"), true);
 });

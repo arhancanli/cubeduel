@@ -35,6 +35,16 @@ export function splitLabelsFor(event: EventId): readonly string[] {
 }
 
 /**
+ * A stop too fast to be a solve on this puzzle — a thumb on the spacebar, not a
+ * 0.12 world record. The floor sits below every world-record single, so no
+ * real solve is ever refused. Such a stop used to be saved, and became the
+ * personal best that every later solve was measured against.
+ */
+export function isMisfire(ms: number, event: EventId): boolean {
+  return ms < EVENTS[event].minSolveMs;
+}
+
+/**
  * Whether a solve timed on a real cube has a review. A 2x2 has no phases worth
  * splitting and no cross to find, so its review would be its time again.
  */

@@ -19,7 +19,7 @@ import type { Penalty, Solve } from "@/lib/types";
 import { useSpeedTimer } from "@/lib/useSpeedTimer";
 import { useLatest } from "@/lib/useLatest";
 import type { EventId } from "@/lib/events";
-import { hasTimerReview, sessionFor, splitLabelsFor, TIMER_EVENTS } from "@/lib/timerEvents";
+import { hasTimerReview, isMisfire, sessionFor, splitLabelsFor, TIMER_EVENTS } from "@/lib/timerEvents";
 
 const RECENT_COUNT = 12;
 
@@ -58,6 +58,9 @@ export function TimerScreen() {
   const [scrambleError, setScrambleError] = useState(false);
   const [splitMode, setSplitMode] = useState(false);
   const [review, setReview] = useState<SolveReview | null>(null);
+  // The last stop that was too fast to be a solve, shown so a mis-tap is
+  // explained rather than silently swallowed. Null once a real solve lands.
+  const [misfireMs, setMisfireMs] = useState<number | null>(null);
 
   // The scramble that was on screen when the timer started — the one the solve is
   // actually for. Held in a ref so prefetching the next one can't swap it mid-solve.
@@ -156,6 +159,14 @@ export function TimerScreen() {
   const handleComplete = useCallback(
     (ms: number, laps: number[]) => {
       const event = eventRef.current;
+      // A thumb on the spacebar, not a solve: not saved, and the scramble is
+      // kept, since the cube in their hands still has it on.
+      if (isMisfire(ms, event)) {
+        setMisfireMs(ms);
+        setReview(null);
+        return;
+      }
+      setMisfireMs(null);
       const splits = laps.length > 0 ? buildSplits(laps, splitLabelsFor(event)) : [];
       // Reviewed against history as it stood *before* this solve — a par that this
       // solve helped set would flatten its own gap toward zero. The quick panel
@@ -362,8 +373,10 @@ export function TimerScreen() {
             </span>
           </div>
 
-          <p className={`text-center text-sm text-muted ${chromeClass}`}>
-            {phase === "holding"
+          <p className={`text-center text-sm text-muted ${chromeClass}`} data-testid="timer-hint">
+            {misfireMs !== null && (phase === "idle" || phase === "stopped")
+              ? `${formatMs(misfireMs, { truncate: false })} is too quick to be a solve, so it wasn't saved. Same scramble — go again.`
+              : phase === "holding"
               ? "Keep holding…"
               : phase === "ready"
                 ? "Release to start"
