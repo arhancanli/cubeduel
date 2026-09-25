@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ProfileMilestones } from "@/components/ProfileMilestones";
 import { RatingHistory } from "@/components/RatingHistory";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs } from "@/lib/format";
 import { ESTABLISHED_DEVIATION, WINDOW_SIZE, msForRating } from "@/lib/rating";
 import { profileStats } from "@/lib/server/boards";
+import { profileMilestones } from "@/lib/server/profileMilestones";
 import { profileByHandle } from "@/lib/server/profiles";
 import { isDatabaseConfigured } from "@/lib/server/supabase";
 
@@ -44,7 +46,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
   const profile = await profileByHandle(handle);
   if (!profile) notFound();
 
-  const stats = await profileStats(profile.id);
+  const [stats, earned] = await Promise.all([profileStats(profile.id), profileMilestones(profile.id)]);
 
   return (
     <main className="flex min-h-dvh flex-col">
@@ -137,6 +139,8 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
             roughly {WINDOW_SIZE * 4} ranked solves.
           </p>
         ) : null}
+
+        <ProfileMilestones ladders={earned.ladders} proof={earned.proof} />
 
         {stats.history.length > 1 ? (
           <section>

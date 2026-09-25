@@ -3,6 +3,26 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.29.0 — 2026-09-25
+
+### Milestones: sub-30, sub-20, sub-10
+
+- **The barriers cubers actually measure themselves by**, as a ladder on
+  Progress: sub-2 minutes down to sub-10 on a 3×3, and their own ladders for
+  the keyboard, 2×2, 4×4 and 5×5. Each barrier is broken three ways — a single,
+  an ao5 and an ao12 — because "sub-20" means an average, not a lucky solve.
+- **It leads with the next one.** "Next: Sub-20 average of 12 — your best ao12
+  is 21.77, 1.77 to go." Barriers you broke long ago fold into a single line.
+- **Said when it happens.** The solve that breaks a barrier says so right under
+  its time, on the timer and on the keyboard. Add a DNF and it is taken back;
+  remove it and it returns. Nothing is stored — every milestone is worked out
+  from your solves, so it can never disagree with them.
+- **On profiles, with proof.** A player's fastest barrier per kind links to the
+  solve that broke it, marked *verified* when the server replayed its turns,
+  *practice* or *self-timed* otherwise. A solve the server refused earns nothing.
+- Checked against an independent WCA average in the browser suite, and against
+  a real database with more solves than one request returns.
+
 ## 1.28.0 — 2026-09-25
 
 ### Install it, and time with no connection

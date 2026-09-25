@@ -13,6 +13,7 @@ import { SolveBreakdown } from "@/components/SolveBreakdown";
 import { formatMs } from "@/lib/format";
 import { countMoves, encodeMoveStream, type SolveRecording } from "@/lib/moveStream";
 import { nextScramble, warmScrambles } from "@/lib/scramble";
+import { MilestoneMoment } from "@/components/MilestoneMoment";
 import { recordSolve } from "@/lib/solveHistory";
 import { useSolveSession } from "@/lib/useSolveSession";
 import {
@@ -233,6 +234,11 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
                 scramble: a recommendation that has to win a click against
                 "again" at the moment of highest emotion only gets read if it
                 is the obvious one. */}
+            {phase === "solved" && reviewId ? (
+              <div className="flex w-full justify-center">
+                <MilestoneMoment solveId={reviewId} penalty="OK" />
+              </div>
+            ) : null}
             {phase === "solved" && reviewId ? (
               <Link href={`/review?id=${encodeURIComponent(reviewId)}`} className="btn-go px-5 py-2.5 text-sm">
                 Review this solve

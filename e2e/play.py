@@ -115,6 +115,12 @@ with sync_playwright() as p:
     page.wait_for_timeout(600)
     check("the clock is stopped, not still running", timer_text(page) == final,
           f"{final} -> {timer_text(page)}")
+    # The first keyboard solve on this browser breaks barriers on the keyboard
+    # ladder — its own, apart from a real cube's.
+    moment = page.locator("[data-testid=milestone-moment]")
+    check("the first keyboard solve is a milestone, on the keyboard",
+          moment.count() == 1 and "on the keyboard" in moment.inner_text(),
+          moment.inner_text().replace("\n", " | ") if moment.count() else "none")
 
     print("\n== the solve report ==")
     # "turns": what was typed, a half turn being two. "Moves" is kept for the

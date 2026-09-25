@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { CaseCoach } from "@/components/CaseCoach";
 import { CsTimerImport } from "@/components/CsTimerImport";
 import { GoalPanel } from "@/components/GoalPanel";
+import { MilestonesCard } from "@/components/MilestonesCard";
 import { PageHero } from "@/components/PageHero";
 import { SiteHeader } from "@/components/SiteHeader";
 import { PracticeCalendar } from "@/components/PracticeCalendar";
@@ -60,7 +61,11 @@ export function ProgressScreen() {
     <Shell titled={solves.length > 0}>
       <div className="flex w-full flex-col gap-4">
         {solves.length === 0 ? (
-          <EmptyProgress />
+          <>
+            <EmptyProgress />
+            {/* Somebody who only times a 4x4 has no 3x3 analysis, but has a ladder. */}
+            <MilestonesCard />
+          </>
         ) : (
           <>
             {/* Your numbers first: they are what somebody opening this page
@@ -68,6 +73,7 @@ export function ProgressScreen() {
             <Card>
               <Overview solves={solves} trend={trend} />
             </Card>
+            <MilestonesCard />
             <StreakCard />
             <PracticeCalendar />
             <Card>

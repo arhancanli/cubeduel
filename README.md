@@ -208,14 +208,15 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 847 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 30 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, a layout-shift check on a phone for somebody new, and the timer reopened with the network switched off. |
+| `npm test` | 861 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 31 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, a layout-shift check on a phone for somebody new, the timer reopened with the network switched off, and a milestone given and taken back by a DNF. |
 | `npm run audit:review` | the review's accuracy | Builds CFOP solves whose true phases are known to the move — cross turns, four F2L inserts from the verified cases, an OLL and a PLL from the case lists, the scramble their inverse — and has the review read them. 1,200 solves: every phase end read to the exact turn (8,400 of 8,400) and every OLL and PLL case named. A smaller run is a unit test; an analyser that ends phases one turn late scores 14% on it. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
-| `npm run integration:local` | 12 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
+| `npm run integration:local` | 13 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
 | `npm run integration` | local Postgres | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | local Postgres | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts, and a third player racing for the same open seat — one accept lands, the other is refused, the board drops the row, and the scramble stays hidden through all of it. Each guarantee was mutation-tested by breaking it and confirming the suite goes red. |
+| `npm run integration:milestones` | local Postgres | What a profile claims about a player. A history longer than the thousand rows one request returns, with its fastest solve past row 1,000; a refused solve that must earn nothing; and each milestone's proof — verified, practice or self-timed — told apart. Every one of those was broken in turn and the suite went red. |
 | `npm run integration:rush` | local Postgres | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
 | `npm run integration:events` | local Postgres | Every event's ranked path end to end: a server-issued 4x4 scramble, solved, verified against a 4x4 and stored — plus a check that the scales really do differ, since 25 seconds is world class on 4x4 and nowhere near it on 3x3. |
 | `npm run integration:profile-race` | local Postgres | Eight concurrent first visits for the same new account, including the path where every candidate handle is taken. Exists because a new player's first page load could render "Something broke", intermittently enough to look like a fluke. |
@@ -1116,6 +1117,36 @@ state, the one thing you want to study before pressing play. And the clock runs 
 millisecond past the final move, so a solve whose last turn lands on the buzzer
 can actually complete.
 
+## Milestones (`src/lib/milestones.ts`)
+
+Cubers measure themselves in barriers — sub-1 minute, sub-30, sub-20, sub-10 —
+and the community means something precise by them: "sub-20" is an average under
+20, not one lucky single. So each barrier is earned three ways, a single, an
+ao5 and an ao12, on a ladder per puzzle: 3×3 on a real cube, 3×3 on the
+keyboard (a different skill with different times), 2×2, 4×4 and 5×5.
+
+**Nothing is stored.** Every milestone is derived from the solves each time it
+is read, with the same WCA arithmetic as the timer: results truncated to the
+hundredth, one DNF survivable in an ao5, a +2 counting. So a DNF added a second
+after a solve takes its milestone back, an imported csTimer history earns its
+milestones on the days they were really earned, and the page can never
+disagree with the times. `e2e/milestones.py` checks the ladder against an
+independent average of the same imported times, computed in the test.
+
+**It is said when it happens.** The solve that breaks a barrier says so under
+its time — only the fastest barrier it broke, so a first-ever 25 second solve
+announces sub-30, not four things at once. `/progress` leads with the one
+barrier worth chasing next and how far away it is; barriers broken long ago
+fold into a line.
+
+**A profile shows its proof.** Each player's fastest barrier per kind links to
+the solve that broke it — for an average, the solve that completed the window —
+and says what stands behind it: *verified* when the server replayed its turns,
+*practice* when it was turned here but never replayed, *self-timed* for a
+stopwatch time. A solve the server refused earns nothing, however fast.
+`scripts/integration-milestones.mts` holds that against a real database,
+including a history longer than the thousand rows one request returns.
+
 ## Clubs and the WCA (`src/lib/club.ts`, `src/lib/wca.ts`)
 
 Two features that exist because cubing is a solo sport. You solve alone against
@@ -1152,11 +1183,6 @@ without pretending they are the same. Nothing read from the WCA ever writes to
 
 ## Not built yet
 
-- **Live real-time races.** Head-to-head works asynchronously (see Challenges);
-  watching an opponent's bar move in the same second needs matchmaking and a live
-  channel, and needs a population before it needs code. The `challenges` row is
-  shaped for it: both sides are symmetric and independently timestamped, so live
-  is the case where the two `started_at` values happen to coincide.
 - **Acting on the humanness score.** Every verified solve is now assessed and the
   score stored (see below), but nothing consults it automatically. Turning a
   statistic into a ban needs a review process and an appeal, and shipping the

@@ -155,6 +155,19 @@ with sync_playwright() as p:
     body = page.inner_text("main")
     check("the profile lists 4x4 practice solves as 4x4", body.count("4×4 · practice") == 6,
           f"{body.count('4×4 · practice')} labelled")
+    # Six 4x4 stopwatch solves of 5-10s: under the fastest 4x4 barrier as a
+    # single and an ao5, and not enough for an ao12. The profile says so, and
+    # says they are a stopwatch's word, not replayed.
+    four = page.locator("[data-testid=profile-milestones] > div > div", has_text="4×4")
+    single = four.locator("li[data-kind=single] a")
+    check("the profile shows the 4x4's fastest barrier as a single", single.count() == 1 and "Sub-40" in single.inner_text(),
+          single.inner_text().replace("\n", " ") if single.count() else "none")
+    check("and as an ao5", four.locator("li[data-kind=ao5] a").count() == 1)
+    check("no ao12 from six solves", "none yet" in four.locator("li[data-kind=ao12]").inner_text() if four.count() else False)
+    check("a stopwatch time is labelled self-timed, not verified",
+          single.count() == 1 and single.locator("[data-proof]").get_attribute("data-proof") == "self-timed")
+    check("the milestone links to the solve that earned it",
+          single.count() == 1 and (single.get_attribute("href") or "").startswith("/s/"))
 
     print("\n== console ==")
     check("no page errors", len(errors) == 0, "; ".join(errors[:2])[:200])

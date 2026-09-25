@@ -19,6 +19,7 @@ import { loadState, newSolve, saveState, type PersistedState } from "@/lib/stora
 import type { Penalty, Solve } from "@/lib/types";
 import { useSpeedTimer } from "@/lib/useSpeedTimer";
 import { useLatest } from "@/lib/useLatest";
+import { MilestoneMoment } from "@/components/MilestoneMoment";
 import type { EventId } from "@/lib/events";
 import { hasTimerReview, isMisfire, sessionFor, splitLabelsFor, TIMER_EVENTS } from "@/lib/timerEvents";
 
@@ -62,6 +63,9 @@ export function TimerScreen() {
   // The last stop that was too fast to be a solve, shown so a mis-tap is
   // explained rather than silently swallowed. Null once a real solve lands.
   const [misfireMs, setMisfireMs] = useState<number | null>(null);
+  // The solve finished on this page, so only a solve done now is celebrated —
+  // not the last one of a session reopened tomorrow.
+  const [momentId, setMomentId] = useState<string | null>(null);
 
   // The scramble that was on screen when the timer started — the one the solve is
   // actually for. Held in a ref so prefetching the next one can't swap it mid-solve.
@@ -181,6 +185,7 @@ export function TimerScreen() {
       // is worth. "Again" then only has to clear the panel.
       void advanceScrambleRef.current();
       mutateSolves((list) => [...list, solved]);
+      setMomentId(solved.id);
       // Also to the shared history, sharing the session solve's id so a penalty
       // applied afterwards can amend the same record. A hand-timed solve carries no
       // move stream, so it has no phase splits — it still counts toward totals,
@@ -373,6 +378,14 @@ export function TimerScreen() {
               PB
             </span>
           </div>
+
+          {/* Right under the time, where the eyes already are — below the
+              review it sat under the fold on a laptop. */}
+          {lastSolve && lastSolve.id === momentId ? (
+            <div className={`flex w-full justify-center ${chromeClass}`}>
+              <MilestoneMoment solveId={lastSolve.id} penalty={lastSolve.penalty} />
+            </div>
+          ) : null}
 
           <p className={`text-center text-sm text-muted ${chromeClass}`} data-testid="timer-hint">
             {misfireMs !== null && (phase === "idle" || phase === "stopped")
