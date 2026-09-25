@@ -126,6 +126,54 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["club_members"]["Insert"]>;
         Relationships: [];
       };
+      weekly_rounds: {
+        Row: {
+          week: string;
+          event: string;
+          scrambles: string[];
+          created_at: string;
+        };
+        Insert: {
+          week: string;
+          event?: string;
+          scrambles: string[];
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["weekly_rounds"]["Insert"]>;
+        Relationships: [];
+      };
+      weekly_attempts: {
+        Row: {
+          id: string;
+          week: string;
+          profile_id: string;
+          idx: number;
+          pool: string;
+          issued_at: string;
+          expires_at: string;
+          status: string;
+          solve_id: string | null;
+          duration_ms: number | null;
+          penalty: string | null;
+          completed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          week: string;
+          profile_id: string;
+          idx: number;
+          pool: string;
+          issued_at?: string;
+          expires_at: string;
+          status?: string;
+          solve_id?: string | null;
+          duration_ms?: number | null;
+          penalty?: string | null;
+          completed_at?: string | null;
+        };
+        Update: Partial<Database["public"]["Tables"]["weekly_attempts"]["Insert"]>;
+        Relationships: [];
+      };
       follows: {
         Row: {
           follower_id: string;

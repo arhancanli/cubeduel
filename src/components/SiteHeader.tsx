@@ -28,6 +28,7 @@ export type NavKey =
   | "daily"
   | "play"
   | "ranked"
+  | "weekly"
   | "duel"
   | "rush"
   | "train"
@@ -73,6 +74,7 @@ const COMPETE: NavLink[] = [
   { key: "race", href: "/race", label: "Race", icon: { face: "race" } },
   { key: "duel", href: "/duel", label: "Duel", icon: { face: "duel" } },
   { key: "daily", href: "/daily", label: "Daily", icon: { face: "daily" } },
+  { key: "weekly", href: "/weekly", label: "Weekly", icon: { line: "trophy" } },
   { key: "rush", href: "/rush", label: "Rush", icon: { face: "rush" } },
 ];
 
@@ -351,10 +353,11 @@ function NavIcon({ icon, size = 18, lit = false }: { icon: Icon; size?: number; 
   return <LineIcon name={icon.line} size={size} className={lit ? "text-foreground" : "text-muted-dim"} />;
 }
 
-type LineIconName = "podium" | "people" | "keys" | "book" | "cases" | "target" | "chart" | "cube" | "review" | "more";
+type LineIconName = "trophy" | "podium" | "people" | "keys" | "book" | "cases" | "target" | "chart" | "cube" | "review" | "more";
 
 const LINE_PATHS: Record<LineIconName, string> = {
   podium: "M4 20V13h5v7M9 20V8h6v12M15 20v-9h5v9M3 20h18",
+  trophy: "M8 4h8v5a4 4 0 0 1-8 0V4ZM8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M12 13v4M8.5 20h7M10 17h4v3h-4z",
   people: "M9 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M16 5.5a3 3 0 0 1 0 5.8M18 14.5c1.8.8 3 2.8 3 5.5",
   keys: "M3 7h18v11H3zM7 11h.01M11 11h.01M15 11h.01M8 15h8",
   book: "M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5v-13ZM20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5v-13Z",

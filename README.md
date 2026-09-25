@@ -208,14 +208,15 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 861 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
-| `npm run e2e` | 32 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, a layout-shift check on a phone for somebody new, the timer reopened with the network switched off, a milestone given and taken back by a DNF, and two accounts following each other through the leaderboard and the daily. |
+| `npm test` | 870 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm run e2e` | 33 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, a layout-shift check on a phone for somebody new, the timer reopened with the network switched off, a milestone given and taken back by a DNF, two accounts following each other through the leaderboard and the daily, and all five weekly attempts typed on the keyboard with none of them public until the week closes. |
 | `npm run audit:review` | the review's accuracy | Builds CFOP solves whose true phases are known to the move — cross turns, four F2L inserts from the verified cases, an OLL and a PLL from the case lists, the scramble their inverse — and has the review read them. 1,200 solves: every phase end read to the exact turn (8,400 of 8,400) and every OLL and PLL case named. A smaller run is a unit test; an analyser that ends phases one turn late scores 14% on it. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
 | `npm run e2e:https` | 12 checks over real TLS | The two parts of authentication plain http cannot reach, and both fail silently when wrong: the `__Host-` cookie prefix, which a browser discards outright if it is not `Secure`, has a `Domain`, or is not pathed at `/`; and a relying party id derived from a real origin. Proven by breaking it — changing the cookie's path makes the browser keep no cookie at all, and the suite reports exactly that. |
-| `npm run integration:local` | 14 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
+| `npm run integration:local` | 15 integration suites | A fresh local Postgres with every migration applied, then every `scripts/integration-*.mts` against it — found by filename, so a new suite runs the moment it exists. Refuses to touch a hosted database unless told to. The rows below are the suites. |
 | `npm run integration` | local Postgres | The server modules against real Postgres: issues scrambles, waits out real solve durations, drives a failed rating window and a clean one. |
 | `npm run integration:challenges` | local Postgres | Head-to-head against real Postgres: two players, one scramble, both fairness rules asserted as facts, and a third player racing for the same open seat — one accept lands, the other is refused, the board drops the row, and the scramble stays hidden through all of it. Each guarantee was mutation-tested by breaking it and confirming the suite goes red. |
+| `npm run integration:weekly` | local Postgres | The same five for three players asking at once; each shown only when opened; the reroll closed as a DNF; another player's attempt refused; a solution to the wrong scramble refused for that reason, and the attempt spent; a sixth refused; a deadline held; an abandoned, never-closed attempt counted as a DNF; the board in WCA order; and this week's solves off the solve page and the profile until the week closes. Ten ways of breaking it, each caught. |
 | `npm run integration:follows` | local Postgres | Who ends up in your circle: you and who you follow — never who follows you, never a stranger — on the right day, DNFs last. Idempotent follow and unfollow, the database refusing a self-follow on its own, the 500 cap exercised against 500 real rows, and both circle functions called anonymously and refused. |
 | `npm run integration:milestones` | local Postgres | What a profile claims about a player. A history longer than the thousand rows one request returns, with its fastest solve past row 1,000; a refused solve that must earn nothing; and each milestone's proof — verified, practice or self-timed — told apart. Every one of those was broken in turn and the suite went red. |
 | `npm run integration:rush` | local Postgres | A whole Rush run: targets tightening, a miss costing a life, a forged solve scoring nothing, three misses ending it, and the score replayed from the stored solves rather than believed. |
@@ -1147,6 +1148,38 @@ and says what stands behind it: *verified* when the server replayed its turns,
 stopwatch time. A solve the server refused earns nothing, however fast.
 `scripts/integration-milestones.mts` holds that against a real database,
 including a history longer than the thousand rows one request returns.
+
+## The weekly competition (`/weekly`, `src/lib/server/weekly.ts`, migration 0017)
+
+Cubing's tournament is not a bracket — a solo sport has no game to bracket —
+it is what the sport already does every weekend: everybody solves the same five
+scrambles, once each, and compares averages of five. So that is the weekly. A
+round opens every Monday 00:00 UTC; results close the next Monday.
+
+**Every attempt is a ranked attempt.** Opening one is when its scramble is
+sent, not before; the moves are replayed against it on the server; inspection
+is timed from the server's clock; and opening the next one first records the
+last as a DNF, so a bad start cannot be walked away from. The verification is
+literally ranked's: both call `verifyAndStore` in
+`src/lib/server/verifiedSolve.ts`, so a rule tightened there tightens both.
+
+**The five are shared, so they are kept.** They are generated server-side by
+the first request of the week and live only in the database, never in the
+repository the way the daily's do. A week's solves are sealed until it closes
+(`isSealed` in `src/lib/weekly.ts`): they count everywhere they should, but
+their pages, replays and scrambles are left off every public surface, since
+each one is a scramble somebody else has still to solve. After Monday,
+`/weekly/<week>` publishes the board and the five.
+
+**Placing is WCA.** The average of five with best and worst dropped, a DNF
+average after every real one, ties broken by the best single and shared when
+both are equal. An attempt somebody opened and never finished is a DNF once its
+time runs out, whether or not anything has closed it. A player who has not
+finished all five is "still going", not ranked on a partial average.
+
+A shared scramble can still be passed around by somebody who has seen it — true
+of every online competition — which is why a result here says its moves were
+verified, not that it was unassisted.
 
 ## Following (`src/lib/server/follows.ts`, migration 0016)
 

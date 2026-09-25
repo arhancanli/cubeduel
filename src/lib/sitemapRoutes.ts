@@ -37,6 +37,7 @@ export const INDEXABLE: IndexableRoute[] = [
   { path: "/play", changeFrequency: "monthly", priority: 0.9 },
   { path: "/daily", changeFrequency: "daily", priority: 0.9 },
   { path: "/ranked", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/weekly", changeFrequency: "daily", priority: 0.85 },
   { path: "/duel", changeFrequency: "monthly", priority: 0.8 },
   { path: "/rush", changeFrequency: "monthly", priority: 0.8 },
   { path: "/race", changeFrequency: "monthly", priority: 0.8 },
@@ -58,6 +59,7 @@ export const INDEXABLE: IndexableRoute[] = [
  */
 export const EXCLUDED: Record<string, string> = {
   "/settings": "Useless without an account, and personal to whoever is signed in.",
+  "/weekly/[week]": "One closed week's results, reached from /weekly. Fifty-two a year of near-identical tables would crowd the pages worth landing on.",
   "/sign-in": "A door, not a destination. Nothing to read here.",
   "/join": "Same. It is reached from a page that explains why you would.",
 

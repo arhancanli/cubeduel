@@ -1,6 +1,7 @@
 import "server-only";
 
 import { ESTABLISHED_DEVIATION, type RatingPool } from "../rating";
+import { weekKey, weekStart } from "../weekly";
 import { db } from "./supabase";
 
 /**
@@ -196,6 +197,9 @@ export async function profileStats(
       .from("solves")
       .select("id, event, duration_ms, penalty, scramble, move_count, solved_at, mode")
       .eq("profile_id", profileId)
+      // This week's competition solves carry scrambles others have yet to
+      // solve; they appear here once the week closes.
+      .or(`mode.neq.weekly,solved_at.lt.${new Date(weekStart(weekKey(Date.now()))).toISOString()}`)
       .order("solved_at", { ascending: false })
       .limit(25),
     db()

@@ -9,13 +9,10 @@ import {
   type RatingState,
 } from "../rating";
 import type { Timed } from "../stats";
-import { combinePenalties, judgeInspection } from "../inspection";
-import { eventOf } from "../events";
-import { humannessOf } from "../humanness";
 import type { Penalty } from "../types";
-import { ATTEMPT_TTL_MS, verifySolve, type SubmittedMove } from "../verifySolve";
+import { ATTEMPT_TTL_MS, type SubmittedMove } from "../verifySolve";
 import { db } from "./supabase";
-import { analysisFromStream } from "./solveAnalysis";
+import { verifyAndStore } from "./verifiedSolve";
 import type { Row } from "./database.types";
 
 /**
@@ -211,21 +208,21 @@ export async function submitAttempt(
     };
   }
 
-  // The scramble compared against is the one from the database, never one the
-  // client sent along. That single choice is what the whole ladder rests on.
-  const verdict = await verifySolve({
+  const outcome = await verifyAndStore({
+    profileId: attempt.profile_id,
+    clientId: input.clientId,
+    event: attempt.event,
     scramble: attempt.scramble,
-    moves: input.moves,
-    durationMs: input.durationMs,
     issuedAt,
     receivedAt,
-    // From the stored attempt, never from the client: the event decides which
-    // puzzle the moves are replayed against, and letting the submitter pick it
-    // would let them choose the puzzle their solution happens to solve.
-    event: eventOf(attempt.event).id,
+    moves: input.moves,
+    durationMs: input.durationMs,
+    penalty: input.penalty,
+    source: input.source,
+    mode: "ranked",
   });
 
-  if (!verdict.verified) {
+  if (!outcome.verified) {
     // The attempt is still consumed. A rejected submission that left the attempt
     // open would let a cheat probe the verifier until something passed.
     await recordResult(attempt, {
@@ -233,60 +230,12 @@ export async function submitAttempt(
       durationMs: input.durationMs,
       penalty: "DNF",
     });
-    return { accepted: false, reason: verdict.reason };
+    return { accepted: false, reason: outcome.reason };
   }
-
-  // Inspection, measured from the server's own clock.
-  //
-  // The scramble was sent at `issuedAt` and the first turn happened
-  // `durationMs` before the submission arrived, so the gap between them is how
-  // long the player looked at the cube. That is the WCA rule stated faithfully —
-  // inspection begins the moment you are allowed to see it — and it is the only
-  // version that can be enforced, since the penalty only ever hurts and a
-  // client-reported figure would always be under-reported.
-  const inspection = judgeInspection(receivedAt - input.durationMs - issuedAt);
-  const penalty = combinePenalties(input.penalty, inspection.penalty);
-
-  const solvedAt = new Date(receivedAt).toISOString();
-  const analysis = await analysisFromStream(attempt.event, attempt.scramble, input.moves);
-  const { data: solve, error: solveError } = await db()
-    .from("solves")
-    .insert({
-      profile_id: attempt.profile_id,
-      client_id: input.clientId,
-      event: attempt.event,
-      scramble: attempt.scramble,
-      duration_ms: input.durationMs,
-      penalty,
-      move_count: verdict.moveCount,
-      tps: verdict.tps,
-      source: input.source,
-      mode: "ranked",
-      verified: true,
-      // Advisory only, and never consulted here. Verification says the moves
-      // solve the scramble; this says whether they arrived the way a person's
-      // moves arrive. Stored for review rather than acted on, because a missed
-      // cheat costs one rating and a wrongly flagged player costs the belief the
-      // ladder runs on.
-      humanness: humannessOf(input.moves, input.durationMs),
-      moves: input.moves as never,
-      // Derived from the verified stream, never taken from the request.
-      splits: analysis.splits as never,
-      oll_case: analysis.ollCase,
-      pll_case: analysis.pllCase,
-      solved_at: solvedAt,
-    })
-    .select("id")
-    .single();
-
-  // The attempt is about to be marked complete against this solve. Completing it
-  // with no solve stored would leave a rated result nobody can inspect.
-  if (solveError) {
-    throw new Error(`Could not store the verified solve: ${solveError.message}`);
-  }
+  const { penalty } = outcome;
 
   await recordResult(attempt, {
-    solveId: solve?.id ?? null,
+    solveId: outcome.solveId,
     durationMs: input.durationMs,
     penalty,
   });
@@ -300,11 +249,11 @@ export async function submitAttempt(
   return {
     accepted: true,
     durationMs: input.durationMs,
-    moveCount: verdict.moveCount,
-    tps: verdict.tps,
+    moveCount: outcome.moveCount,
+    tps: outcome.tps,
     penalty,
-    inspectionMs: inspection.inspectionMs,
-    inspectionReason: inspection.reason,
+    inspectionMs: outcome.inspectionMs,
+    inspectionReason: outcome.inspectionReason,
     rating,
     attemptsUntilRating: await countUntilRating(attempt),
   };

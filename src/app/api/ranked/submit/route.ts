@@ -1,7 +1,7 @@
 import { jsonError, readJson, requireProfile } from "@/lib/server/apiAuth";
 import { submitAttempt } from "@/lib/server/ranked";
 import type { Penalty } from "@/lib/types";
-import { MAX_MOVES, type SubmittedMove } from "@/lib/verifySolve";
+import { parseMoves } from "@/lib/moveInput";
 
 /**
  * Submits a solved ranked attempt for verification.
@@ -25,22 +25,6 @@ interface Body {
 }
 
 const PENALTIES = new Set<Penalty>(["OK", "PLUS2", "DNF"]);
-
-function parseMoves(value: unknown): SubmittedMove[] | null {
-  if (!Array.isArray(value) || value.length > MAX_MOVES) return null;
-
-  const moves: SubmittedMove[] = [];
-  for (const raw of value) {
-    if (typeof raw !== "object" || raw === null) return null;
-    const { move, atMs } = raw as { move?: unknown; atMs?: unknown };
-    // A cap on the token length as well as the array length: this string is
-    // headed for a regex and then an algorithm parser.
-    if (typeof move !== "string" || move.length > 8) return null;
-    if (typeof atMs !== "number" || !Number.isFinite(atMs)) return null;
-    moves.push({ move, atMs });
-  }
-  return moves;
-}
 
 export async function POST(request: Request) {
   const auth = await requireProfile();

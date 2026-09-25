@@ -4,6 +4,7 @@ import type { PhaseSplit, TimedMove } from "../cfop";
 import type { EventId } from "../events";
 import { MIN_SOLVES_FOR_DIAGNOSIS } from "../phaseStats";
 import type { StoredSolve } from "../solveHistory";
+import { isSealed } from "../weekly";
 import { db } from "./supabase";
 
 /**
@@ -92,6 +93,8 @@ export async function solvePage(id: string): Promise<SolvePageData | null> {
     .maybeSingle();
 
   if (error || !solve) return null;
+  // This week's competition scrambles stay hidden until the week closes.
+  if (isSealed(solve.mode, Date.parse(solve.solved_at))) return null;
 
   const { data: profile } = await db()
     .from("profiles")

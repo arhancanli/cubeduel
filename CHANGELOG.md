@@ -3,6 +3,26 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.31.0 — 2026-09-25
+
+### The weekly competition
+
+- **Five scrambles, the same for everyone, every week.** One attempt at each,
+  ranked by the WCA average of five — best and worst dropped, ties broken by the
+  best single. A new round opens every Monday at 00:00 UTC. Find it under
+  Compete → Weekly.
+- **Every attempt is played under ranked's rules.** A scramble is shown only
+  when you open that attempt; the server replays your turns; inspection is
+  timed by the server; and opening the next one before finishing records a DNF.
+  Ranked and the weekly now share one verifier, so they cannot drift apart.
+- **Nothing leaks mid-week.** This week's solves count toward your milestones,
+  but their pages, replays and scrambles stay off profiles until the week
+  closes. Then the board and the five scrambles are published at
+  /weekly/<week>.
+- Checked end to end: all five attempts typed on the keyboard in a real
+  browser, and the rules held against a real database, including an attempt
+  abandoned and never closed, which the board counts as the DNF it is.
+
 ## 1.30.0 — 2026-09-25
 
 ### Follow the people you measure yourself against

@@ -56,6 +56,10 @@ with sync_playwright() as p:
     check("diagrams are not all built up front", on_arrival < 78, f"{on_arrival} mounted")
     check("but some are drawn immediately", on_arrival > 0, f"{on_arrival} mounted")
 
+    # Over the page itself: the wheel scrolls whatever is under the pointer,
+    # and at (0, 0) that is the sidebar, which scrolls on its own once its
+    # links outgrow the window.
+    page.mouse.move(900, 500)
     page.mouse.wheel(0, 6000)
     page.wait_for_timeout(2500)
     after = page.locator("twisty-player").count()

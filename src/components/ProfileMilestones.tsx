@@ -12,7 +12,16 @@ const KIND_LABEL: Record<Kind, string> = { single: "single", ao5: "ao5", ao12: "
  * the window. "Verified" means the server replayed its turns; "practice" was
  * turned here but never replayed; "self-timed" is a stopwatch time.
  */
-export function ProfileMilestones({ ladders, proof }: { ladders: TrackProgress[]; proof: Map<string, Proof> }) {
+export function ProfileMilestones({
+  ladders,
+  proof,
+  sealed,
+}: {
+  ladders: TrackProgress[];
+  proof: Map<string, Proof>;
+  /** Earned in this week's competition: shown, but its solve page opens Monday. */
+  sealed: Set<string>;
+}) {
   if (ladders.length === 0) return null;
   return (
     <section data-testid="profile-milestones">
@@ -27,7 +36,18 @@ export function ProfileMilestones({ ladders, proof }: { ladders: TrackProgress[]
                 const shown = top ? (proof.get(top.solveId) ?? "practice") : null;
                 return (
                   <li key={kind} data-kind={kind}>
-                    {top ? (
+                    {top && sealed.has(top.solveId) ? (
+                      <div
+                        data-sealed=""
+                        className="flex h-full flex-col gap-0.5 rounded-xl border border-border bg-surface-hi/60 px-3 py-2.5"
+                        title="Set in this week's competition. The solve opens when the week closes."
+                      >
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{KIND_LABEL[kind]}</span>
+                        <span className="font-display text-lg font-extrabold leading-tight sm:text-xl">{rungName(top.underMs)}</span>
+                        <span className="tnum text-xs text-muted">{formatMs(top.resultMs)}</span>
+                        <span className="text-[11px] text-go">✓ verified · this week&apos;s weekly</span>
+                      </div>
+                    ) : top ? (
                       <Link
                         href={`/s/${top.solveId}`}
                         aria-label={`${rungName(top.underMs)} ${KIND_LABEL[kind]}: ${formatMs(top.resultMs)}${shown === "verified" ? ", verified" : ""}`}

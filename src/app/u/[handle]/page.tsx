@@ -167,7 +167,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
           </p>
         ) : null}
 
-        <ProfileMilestones ladders={earned.ladders} proof={earned.proof} />
+        <ProfileMilestones ladders={earned.ladders} proof={earned.proof} sealed={earned.sealed} />
 
         {stats.history.length > 1 ? (
           <section>

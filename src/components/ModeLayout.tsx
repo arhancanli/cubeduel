@@ -20,8 +20,11 @@ export function ModeLayout({
   dim = false,
   children,
   aside,
+  glyph,
 }: {
   face: FaceKey;
+  /** A pattern of its own for a page played under another face's rules. */
+  glyph?: string;
   title: string;
   blurb: string;
   /** Beside the title — an event picker, usually. */
@@ -38,7 +41,7 @@ export function ModeLayout({
       <div className="flex min-w-0 flex-col items-center gap-5 md:gap-6">
         <header className={`flex w-full flex-wrap items-center justify-between gap-4 ${fade}`}>
           <div className="flex items-center gap-3">
-            <Glyph pattern={mode.glyph} sticker={mode.sticker} size={34} />
+            <Glyph pattern={glyph ?? mode.glyph} sticker={mode.sticker} size={34} />
             <div className="flex flex-col">
               <h1 className="text-3xl leading-tight">{title}</h1>
               <p className="text-sm text-muted">{blurb}</p>

@@ -28,7 +28,7 @@ export function jsonError(message: string, status: number): Response {
  * daily. A message that names the wrong feature is worse than a bare 401: it
  * sends people looking for a problem that is not there.
  */
-export type ProtectedAction = "ranked" | "sync" | "daily" | "race" | "follow";
+export type ProtectedAction = "ranked" | "sync" | "daily" | "race" | "follow" | "weekly";
 
 const SIGNED_OUT: Record<ProtectedAction, string> = {
   ranked: "Sign in to play ranked.",
@@ -36,6 +36,7 @@ const SIGNED_OUT: Record<ProtectedAction, string> = {
   daily: "Sign in to post a daily result.",
   race: "Sign in to race.",
   follow: "Sign in to follow players.",
+  weekly: "Sign in to enter the weekly.",
 };
 
 const UNAVAILABLE: Record<ProtectedAction, string> = {
@@ -44,6 +45,7 @@ const UNAVAILABLE: Record<ProtectedAction, string> = {
   daily: "The daily board is not available right now.",
   race: "Racing is not available right now.",
   follow: "Following is not available right now.",
+  weekly: "The weekly is not available right now.",
 };
 
 export async function requireProfile(

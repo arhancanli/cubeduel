@@ -143,8 +143,8 @@ with sync_playwright() as p:
     # called the keyboard "Play" and nobody could tell.
     check("the three ways to solve sit together",
           labelled.get("Solve") == ["Timer", "Keyboard", "Smart cube"], str(labelled.get("Solve")))
-    check("ranked, races, duels, the daily and rush are the competitive half",
-          set(labelled.get("Compete", [])) == {"Ranked", "Race", "Duel", "Daily", "Rush"},
+    check("ranked, races, duels, the daily, the weekly and rush are the competitive half",
+          set(labelled.get("Compete", [])) == {"Ranked", "Race", "Duel", "Daily", "Weekly", "Rush"},
           str(labelled.get("Compete")))
     check("everything that looks back at your solves is under Improve",
           set(labelled.get("Improve", []))
