@@ -3,6 +3,17 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.25.0 — 2026-09-25
+
+### Which mode is which
+
+- **The six modes are explained on the page.** The home page shows them as
+  the faces of a cube — Daily, Race, Solve, Ranked, Duel, Rush — but what each
+  one is lived only in hover tooltips: invisible on a phone, and never hovered
+  by somebody who does not yet know what "Rush" means. A key under the net now
+  says each in one line, in the face's colour, with Solve first and marked
+  "start here".
+
 ## 1.24.0 — 2026-09-25
 
 ### Say less, show the way in

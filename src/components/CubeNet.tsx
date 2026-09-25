@@ -49,6 +49,32 @@ export function CubeNet({ className = "" }: { className?: string }) {
           </li>
         ))}
       </ul>
+      {/* What each face is. The one-line descriptions used to live only in
+          hover tooltips — invisible on a phone, and never hovered by somebody
+          who does not know what "Rush" means. Solve first: it is where
+          everybody starts. */}
+      <dl className="mt-4 grid gap-x-6 gap-y-2.5 sm:grid-cols-2" data-testid="mode-key">
+        {[...FACES].sort((a, b) => Number(b.key === "solve") - Number(a.key === "solve")).map((face) => (
+          <div key={face.key} className="flex items-baseline gap-2.5">
+            <span
+              aria-hidden="true"
+              className="size-2 shrink-0 translate-y-[-1px] rounded-[3px]"
+              style={{ background: stickerVar(face.sticker) }}
+            />
+            <dt className="shrink-0 text-sm font-semibold">
+              <Link href={face.href} className="hover:underline hover:underline-offset-4">
+                {face.label}
+              </Link>
+            </dt>
+            <dd className="text-sm leading-snug text-muted">
+              {face.blurb}
+              {face.key === "solve" ? (
+                <span className="ml-1.5 whitespace-nowrap text-xs font-semibold text-sticker-green">start here</span>
+              ) : null}
+            </dd>
+          </div>
+        ))}
+      </dl>
     </nav>
   );
 }
