@@ -8,6 +8,7 @@ import { LastLayerDiagram } from "@/components/LastLayerDiagram";
 import { formatMs } from "@/lib/format";
 import type { LearnCase } from "@/lib/learn";
 import { useSolveSession } from "@/lib/useSolveSession";
+import { ConnectCubeMenu } from "@/components/ConnectCubeMenu";
 
 /**
  * One case, on a cube you can actually turn.
@@ -402,13 +403,11 @@ function Try({ study, moves }: { study: LearnCase; moves: string[] }) {
           </h2>
           {support?.supported ? (
             <>
-              <button
-                type="button"
-                onClick={() => void connectCube()}
+              <ConnectCubeMenu
+                label="Connect a smart cube"
+                onConnect={(family) => void connectCube(family)}
                 className="self-start rounded-lg border border-border px-4 py-2.5 text-sm transition-colors hover:border-muted-dim"
-              >
-                Connect a smart cube
-              </button>
+              />
               <p className="text-xs leading-relaxed text-muted-dim">
                 {sourceName
                   ? `Connected: ${sourceName}. Turn your cube and it turns here.`

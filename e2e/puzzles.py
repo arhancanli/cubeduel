@@ -79,7 +79,14 @@ with sync_playwright() as p:
 
     print("\n== switching to 4x4 ==")
     page.get_by_role("radio", name="4×4").click()
-    four = wait_scramble(page, first)
+    # Wait for a 4x4 scramble specifically: the 3x3 solve above brings a fresh
+    # 3x3 scramble, and "anything but the first one" can catch that instead.
+    four = ""
+    for _ in range(80):
+        four = scramble_text(page)
+        if len(four.split()) >= 35:
+            break
+        page.wait_for_timeout(250)
     moves = four.split()
     check("a 4x4 scramble: long, with wide turns", len(moves) >= 35 and any("w" in m for m in moves),
           f"{len(moves)} moves")

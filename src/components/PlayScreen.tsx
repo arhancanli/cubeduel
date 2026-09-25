@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { ConnectCubeMenu } from "@/components/ConnectCubeMenu";
 import { CubeView } from "@/components/CubeView";
 import { KeyMapHint } from "@/components/KeyMapHint";
 import { MovePad } from "@/components/MovePad";
@@ -265,13 +266,7 @@ export function PlayScreen({ initialScramble }: { initialScramble?: string | nul
               </button>
             ) : null}
             {support?.supported ? (
-              <button
-                type="button"
-                onClick={() => void session.connectCube()}
-                className="btn-secondary px-5 py-2.5 text-sm"
-              >
-                Connect smart cube
-              </button>
+              <ConnectCubeMenu label="Connect smart cube" onConnect={(family) => void session.connectCube(family)} />
             ) : null}
           </div>
 

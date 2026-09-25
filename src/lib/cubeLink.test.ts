@@ -85,7 +85,8 @@ test("a cancelled picker is not an error", () => {
 
 test("a real failure says what happened", () => {
   const state = failed(IDLE, new Error("Bluetooth adapter not available."));
-  assert.match(state.error ?? "", /adapter/i);
+  // Shown, and in words that say what to do rather than naming the adapter.
+  assert.match(state.error ?? "", /turn Bluetooth on/i);
 });
 
 test("a failure after connecting falls back to needing calibration, not to idle", () => {

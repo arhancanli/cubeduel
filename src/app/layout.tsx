@@ -1,5 +1,6 @@
 
 import { HistorySync } from "@/components/HistorySync";
+import { MacPrompt } from "@/components/MacPrompt";
 import { SessionTracker } from "@/components/SessionTracker";
 import { welcomedScript } from "@/lib/firstVisit";
 import { SITE_URL } from "@/lib/site";
@@ -93,6 +94,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <HistorySync />
         {/* Renders nothing; counts one session per visit. Honours Do Not Track. */}
         <SessionTracker />
+        {/* Renders nothing until a modern GAN cube needs its address typed in. */}
+        <MacPrompt />
       </body>
     </html>
   );

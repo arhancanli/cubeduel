@@ -197,7 +197,7 @@ in the commit history was caught by exactly one of them.
 
 | | | |
 |---|---|---|
-| `npm test` | 813 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
+| `npm test` | 830 unit tests | Rating maths, WCA averages, solve verification, CFOP splitting, the drill scheduler. Pure functions, no browser. |
 | `npm run e2e` | 29 browser suites | Real Chromium, real keypresses, real solves. Includes a real session driving a ranked solve and a duel end to end, a passkey registered and used against Chromium's WebAuthn virtual authenticator, a phone-sized run that solves the daily by tapping and nothing else, an accessibility pass over every page, the link previews fetched the way a chat app fetches them, a solve built with two known faults that the review has to find, and a layout-shift check on a phone for somebody new. |
 | `npm run audit:review` | the review's accuracy | Builds CFOP solves whose true phases are known to the move — cross turns, four F2L inserts from the verified cases, an OLL and a PLL from the case lists, the scramble their inverse — and has the review read them. 1,200 solves: every phase end read to the exact turn (8,400 of 8,400) and every OLL and PLL case named. A smaller run is a unit test; an analyser that ends phases one turn late scores 14% on it. |
 | `npm run audit` | the repository's own claims | Every internal link has a page, every fetched API path has a route, every analytics event has an emitter, every path the docs name exists, every suite is wired up, and the counts in this table are the counts the runner reports. Exists because all six were wrong at some point while everything compiled and every test passed. |
@@ -1145,9 +1145,12 @@ without pretending they are the same. Nothing read from the WCA ever writes to
   score stored (see below), but nothing consults it automatically. Turning a
   statistic into a ban needs a review process and an appeal, and shipping the
   enforcement before those exist would be the wrong order.
-- **Smart cubes are still unverified against hardware.** The Bluetooth path is written
-  and typechecked but has never been run against a GAN/GoCube/GiiKER. Treat it as
-  unproven until it is. The `smartcube` rating pool exists and is deliberately separate
+- **Smart cubes are still unverified against hardware.** Two paths now: cubing.js for
+  GoCube, GiiKER, Rubik's Connected and older GANs, and
+  [gan-web-bluetooth](https://github.com/afedotov/gan-web-bluetooth) (MIT) for the GAN
+  protocol that modern GAN, MoYu AI and Monster Go cubes speak. The adapter from its
+  events to this app's moves is tested against a simulated cube, but neither path has
+  been run against a real one. Treat them as unproven until they are. The `smartcube` rating pool exists and is deliberately separate
   from `keyboard` — they are different sports with different time scales.
 - **Elo-gated cube skins.** Cosmetic only. Anything that gates function behind rating
   turns a skill ladder into a paywall with extra steps.

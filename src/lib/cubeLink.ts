@@ -1,5 +1,6 @@
 "use client";
 
+import { friendlyBluetoothError } from "./bluetoothErrors";
 import type { ConnectedPuzzle } from "./puzzleSource";
 
 /**
@@ -106,7 +107,7 @@ export function failed(previous: LinkState, error: unknown): LinkState {
   return {
     ...previous,
     status: previous.name ? "needs-calibration" : "idle",
-    error: cancelled ? null : message,
+    error: cancelled ? null : friendlyBluetoothError(message),
   };
 }
 

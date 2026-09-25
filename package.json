@@ -1,6 +1,6 @@
 {
   "name": "cubeduel",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "private": true,
   "engines": {
     "node": ">=22"
@@ -49,6 +49,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.109.0",
     "cubing": "^0.56.0",
+    "gan-web-bluetooth": "^3.0.2",
     "next": "16.3.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",

@@ -1,5 +1,6 @@
 "use client";
 
+import { ConnectCubeMenu } from "@/components/ConnectCubeMenu";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -19,6 +20,7 @@ import {
 } from "@/lib/cubeLink";
 import {
   connectSmartCube,
+  type SmartCubeFamily,
   smartCubeSupport,
   type ConnectedPuzzle,
   type SmartCubeSupport,
@@ -65,13 +67,19 @@ export function CubeLinkPanel() {
     });
   }, []);
 
-  const connect = useCallback(async () => {
+  const connect = useCallback(async (family: SmartCubeFamily = "classic") => {
     setState(connecting);
     try {
-      const puzzle = await connectSmartCube();
+      const puzzle = await connectSmartCube(family);
       trusted.current = false;
       attach(puzzle);
       setState(connected(puzzle.name));
+      // A cube that drops out goes back to "Reconnect", not a silent dead view.
+      puzzle.onDisconnect?.(() => {
+        if (puzzleRef.current !== puzzle) return;
+        trusted.current = false;
+        setState(lost);
+      });
     } catch (error) {
       setState((previous) => failed(previous, error));
     }
@@ -195,13 +203,11 @@ export function CubeLinkPanel() {
         {state.status === "idle" || state.status === "lost" ? (
           <div className="flex flex-col gap-3">
             {support?.supported ? (
-              <button
-                type="button"
-                onClick={() => void connect()}
+              <ConnectCubeMenu
+                label={state.status === "lost" ? "Reconnect" : "Connect a cube"}
+                onConnect={(family) => void connect(family)}
                 className="btn-go px-5 py-2.5 text-sm"
-              >
-                {state.status === "lost" ? "Reconnect" : "Connect a cube"}
-              </button>
+              />
             ) : (
               <p className="text-xs leading-relaxed text-muted">
                 {support?.reason ?? "Checking what this browser can do…"}

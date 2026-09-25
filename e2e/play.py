@@ -197,6 +197,26 @@ with sync_playwright() as p:
     check("a key after clicking a control still turns the cube",
           page.evaluate("() => document.activeElement === document.body || document.activeElement === null"))
 
+    print("\n== connecting a smart cube ==")
+    # Modern GAN, MoYu AI and Monster Go cubes speak a protocol cubing.js does
+    # not, and open a different device list — so the kind is asked first.
+    page.goto(BASE + "/play", wait_until="load")
+    page.wait_for_timeout(2000)
+    connect = page.get_by_role("button", name="Connect smart cube")
+    if connect.count():
+        before = page.get_by_role("button", name="New scramble").bounding_box()
+        connect.click()
+        page.wait_for_timeout(300)
+        items = page.get_by_role("menuitem").all_inner_texts()
+        check("it asks which kind of cube", len(items) == 2 and "GAN" in items[0] and "GoCube" in items[1], str(items))
+        after = page.get_by_role("button", name="New scramble").bounding_box()
+        check("the menu floats: nothing on the page moves", before == after, f"{before} -> {after}")
+        page.keyboard.press("Escape")
+        page.wait_for_timeout(200)
+        check("Escape closes it", page.get_by_test_id("connect-menu").count() == 0)
+    else:
+        check("the connect button is offered where Bluetooth exists", False, "no button")
+
     print("\n== console ==")
     check("no page errors", len(errors) == 0, "; ".join(errors[:2])[:160])
 

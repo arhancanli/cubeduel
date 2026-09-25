@@ -3,6 +3,35 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.21.0 — 2026-09-25
+
+### The smart cubes people actually own
+
+- **Modern GAN, MoYu AI and Monster Go cubes can connect.** cubing.js, which
+  handled every smart cube until now, only speaks the older protocols — GoCube,
+  GiiKER, Rubik's Connected and the first GANs. The GAN 12 ui, 356i Carry 2,
+  14 ui, Mini ui, MoYu AI 2023 and Monster Go AI speak the GAN protocol, now
+  handled by gan-web-bluetooth (MIT), the library csTimer's support is built
+  on. Their turns reach the timer and the review exactly as any other cube's.
+- **"Connect" asks which kind of cube first**, with the models listed, because
+  the two kinds open different device lists — a cube only appears in the one
+  that speaks its protocol.
+- **A cube's Bluetooth address, asked for once.** GAN-protocol cubes encrypt
+  what they send with a key salted by their own address, which Chrome only
+  reveals behind an experimental setting. When it will not, the page asks for
+  it — how to find it, in two steps — and remembers it for that cube.
+- **Errors say what to do.** "Bluetooth adapter not available" is now "Turn
+  Bluetooth on, then connect again"; a sleeping cube says to turn a face to
+  wake it. A cube that drops out mid-session says so, instead of going quiet.
+- **Fixed before it shipped:** a cube reporting it had disconnected at the
+  moment the page began listening crashed the adapter instead of being reported.
+
+### Honest about what is not proven
+
+- Neither Bluetooth path has been run against a real cube. The GAN adapter is
+  tested against a simulated cube sending the same events a real one does;
+  whether a given cube connects is still unknown until somebody tries.
+
 ## 1.20.0 — 2026-09-25
 
 ### Keyboard cubing that keeps up with your fingers

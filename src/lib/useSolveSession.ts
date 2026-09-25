@@ -15,11 +15,13 @@ import {
 import {
   connectKeyboard,
   connectSmartCube,
+  type SmartCubeFamily,
   smartCubeSupport,
   type ConnectedPuzzle,
   type SmartCubeSupport,
 } from "@/lib/puzzleSource";
 import { useLatest } from "./useLatest";
+import { friendlyBluetoothError } from "./bluetoothErrors";
 
 /**
  * One solve loop, used by every mode that solves a cube.
@@ -79,7 +81,7 @@ export interface SolveSession {
   displayRef: React.RefObject<HTMLDivElement | null>;
   onPlayerReady: (player: CubePlayer | null) => void;
   startRound: () => Promise<void>;
-  connectCube: () => Promise<void>;
+  connectCube: (family?: SmartCubeFamily) => Promise<void>;
   /** For the on-screen move pad, which is not a real input device. */
   pushMove: (move: string) => void;
   /** The scramble currently being solved, readable without a re-render. */
@@ -298,18 +300,25 @@ export function useSolveSession(options: SolveSessionOptions): SolveSession {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const connectCube = useCallback(async () => {
+  const connectCube = useCallback(async (family: SmartCubeFamily = "classic") => {
     setConnectError(null);
     try {
-      const puzzle = await connectSmartCube();
+      const puzzle = await connectSmartCube(family);
       sourceRef.current?.disconnect();
       sourceRef.current = puzzle;
       setSourceName(puzzle.name);
       puzzle.onMove((move, timestamp) => handleMoveRef.current(move, timestamp));
+      puzzle.onDisconnect?.(() => {
+        if (sourceRef.current !== puzzle) return;
+        setConnectError("Your cube disconnected. Connect it again to carry on — the keyboard still works.");
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       // A cancelled device picker is a normal user action, not a failure.
-      if (!/cancel/i.test(message)) setConnectError(message);
+      // A cancelled device list is a normal action, not a failure; anything else
+      // is said in words that tell the person what to do.
+      const friendly = friendlyBluetoothError(message);
+      if (friendly) setConnectError(friendly);
     }
   }, [handleMoveRef]);
 

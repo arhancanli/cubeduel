@@ -28,6 +28,8 @@ export interface ConnectedPuzzle {
   disconnect(): void;
   /** Returns an unsubscribe function. */
   onMove(handler: MoveHandler): () => void;
+  /** Called if the device drops the connection. Sources that cannot tell omit it. */
+  onDisconnect?(handler: () => void): void;
 }
 
 export interface SmartCubeSupport {
@@ -135,10 +137,25 @@ export async function connectKeyboard(target: Element): Promise<ConnectedPuzzle>
  * Bluetooth smart cube. Opens the browser's device picker, so it must be called
  * from a user gesture or the browser will reject it.
  */
-export async function connectSmartCube(): Promise<ConnectedPuzzle> {
+/**
+ * Which kind of cube. "gan" is the protocol modern GAN cubes speak, and MoYu AI
+ * and Monster Go with them; "classic" is everything cubing.js knows — GoCube,
+ * Giiker, Rubik's Connected and the older GANs. They open different pickers, so
+ * the person says which they have.
+ */
+export type SmartCubeFamily = "gan" | "classic";
+
+export async function connectSmartCube(family: SmartCubeFamily = "classic"): Promise<ConnectedPuzzle> {
   const support = smartCubeSupport();
   if (!support.supported) {
     throw new Error(support.reason ?? "Smart cubes are not supported in this browser.");
+  }
+  if (family === "gan") {
+    const [{ connectGanSmartCube }, { askForMac, rememberedMac }] = await Promise.all([
+      import("./ganSource"),
+      import("./macPrompt"),
+    ]);
+    return connectGanSmartCube(askForMac, rememberedMac);
   }
   const { connectSmartPuzzle } = await loadBluetoothModule();
   const puzzle = await connectSmartPuzzle({ acceptAllDevices: false });
