@@ -1,8 +1,18 @@
 # cubeduel
 
-**A speedcubing platform with a rating that means something.**
+**A free, open-source speedcubing site that shows you why you're slow.**
 
-[cubeduel.vercel.app](https://cubeduel.vercel.app) · 2x2 · 3x3 · 4x4 · 5x5 · no account needed to solve
+[![Live site](https://img.shields.io/badge/live-cubeduel.vercel.app-2bc46a)](https://cubeduel.vercel.app)
+[![Licence: AGPL v3](https://img.shields.io/badge/licence-AGPL--3.0-3e7bfa)](LICENSE)
+![No ads, no account needed](https://img.shields.io/badge/no%20ads-no%20account%20needed-ffd43b)
+
+![A keyboard solve at real speed, then its review: one moment worth a look —
+OLL and PLL cancel, about half a second back — and the time in every phase](docs/screens/demo.gif)
+
+<sub>A real solve on the keyboard, then its review. Recorded by
+`scripts/record-demo.py` from the running site — nothing staged.</sub>
+
+[cubeduel.vercel.app](https://cubeduel.vercel.app) · 2x2 · 3x3 · 4x4 · 5x5 · keyboard, smart cube, or your own cube and the spacebar
 
 The server hands you a scramble nobody has ever seen, replays your solve to prove
 it happened, and only then does it count. On top of that sits the analysis a timer
