@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 import { Glyph } from "@/components/Glyph";
 import { dayNumber, msUntilNextUtcDay, utcDayKey } from "@/lib/daily";
 import { faceFor, stickerVar, type FaceKey } from "@/lib/modes";
+import { weekEnd, weekKey } from "@/lib/weekly";
 
 /**
- * What is happening today, in three cards: the daily and how long is left on it,
- * the offers somebody has left open, and the fastest way to get a second person
- * on the same scramble.
+ * What is happening now, in three cards: the daily and how long is left on it,
+ * the offers somebody has left open, and this week's competition and when it
+ * closes. The third used to be "race a friend", which the hero above already
+ * offers as a button, while the weekly went unmentioned on the home page.
  *
  * Every number here is live. The daily number and countdown are computed from
  * the clock, and the open-challenge count is the board's own endpoint — which
@@ -47,6 +49,8 @@ export function TodayStrip({ dailyStart }: { dailyStart: string }) {
   const left = now ? msUntilNextUtcDay(now) : null;
   const hours = left === null ? null : Math.floor(left / 3_600_000);
   const minutes = left === null ? null : Math.floor((left % 3_600_000) / 60_000);
+  const week = now ? weekKey(now.getTime()) : null;
+  const weekLeft = now && week ? weekEnd(week) - now.getTime() : null;
 
   return (
     <div className="grid gap-3 md:grid-cols-3">
@@ -71,19 +75,28 @@ export function TodayStrip({ dailyStart }: { dailyStart: string }) {
         action={open ? "Take a challenge" : "Leave a challenge"}
       />
       <TodayCard
-        face="race"
-        eyebrow="Race a friend"
-        value="Live, one link"
-        body="A shared countdown, then the same scramble on both screens. You watch each other solve."
-        href="/race"
-        action="Start a race"
+        face="ranked"
+        glyph="101010101"
+        eyebrow={week ? `Weekly · ${week}` : "Weekly"}
+        value={weekLeft === null ? "…" : closesIn(weekLeft)}
+        body="Five scrambles for everyone, one attempt at each, ranked by the average of five."
+        href="/weekly"
+        action="Enter this week’s"
       />
     </div>
   );
 }
 
+/** "3 days left", then "19h left" on the last day. */
+function closesIn(ms: number): string {
+  const days = Math.floor(ms / 86_400_000);
+  if (days >= 1) return `${days} day${days === 1 ? "" : "s"} left`;
+  return `${Math.max(0, Math.floor(ms / 3_600_000))}h left`;
+}
+
 function TodayCard({
   face,
+  glyph,
   eyebrow,
   value,
   body,
@@ -91,6 +104,8 @@ function TodayCard({
   action,
 }: {
   face: FaceKey;
+  /** A pattern of its own, for a card played under another face's rules. */
+  glyph?: string;
   eyebrow: string;
   value: string;
   body: string;
@@ -105,7 +120,7 @@ function TodayCard({
       className="group relative flex flex-col gap-2 overflow-hidden rounded-2xl border border-border bg-surface p-5 transition-colors hover:border-[var(--face)] sm:p-6"
     >
       <span className="flex items-center gap-2.5">
-        <Glyph pattern={mode.glyph} sticker={mode.sticker} size={16} />
+        <Glyph pattern={glyph ?? mode.glyph} sticker={mode.sticker} size={16} />
         <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">{eyebrow}</span>
       </span>
       <span className="tnum font-display text-3xl font-extrabold tracking-tight">{value}</span>

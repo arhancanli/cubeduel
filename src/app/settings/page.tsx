@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { AccountPanel, type DeviceRow, type PasskeyRow } from "@/components/AccountPanel";
 import { CubePicker } from "@/components/CubePicker";
+import { PageHero } from "@/components/PageHero";
 import { WcaPanel } from "@/components/WcaPanel";
 import { SiteHeader } from "@/components/SiteHeader";
 import { handleRejectionReason } from "@/lib/handle";
@@ -32,9 +33,14 @@ export const dynamic = "force-dynamic";
  * and reachable from the account menu rather than buried.
  */
 export default async function SettingsPage(props: PageProps<"/settings">) {
+  // The cube's look lives in this browser, so it is offered to everybody.
+  // It used to be shown only to the signed in, which left everyone else with
+  // no way to change it anywhere on the site.
   if (!isDatabaseConfigured()) {
     return (
       <Shell>
+        <SettingsHero>How the cube looks on this device.</SettingsHero>
+        <CubeSection />
         <p className="text-sm text-muted">Accounts are not configured for this deployment.</p>
       </Shell>
     );
@@ -44,7 +50,20 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
   if (!profile) {
     return (
       <Shell>
-        <p className="text-sm text-muted">Sign in to change your handle.</p>
+        <SettingsHero>How the cube looks on this device, and — once you have an account — your handle and how you sign in.</SettingsHero>
+        <CubeSection />
+        <section data-testid="settings-account-gate" className="flex max-w-xl flex-col gap-3 rounded-2xl border border-border bg-surface p-5 sm:p-6">
+          <h2 className="text-lg tracking-tight">Account</h2>
+          <p className="text-sm leading-relaxed text-muted">
+            Your handle and public page, passkeys, the devices you are signed in on and a WCA link all belong to an
+            account. Solving never needs one.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/sign-in?next=/settings" className="btn-go px-5 py-2.5 text-sm">
+              Sign in or create an account
+            </Link>
+          </div>
+        </section>
       </Shell>
     );
   }
@@ -157,18 +176,12 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
 
   return (
     <Shell>
-      <div className="flex flex-col gap-2">
-        <h1 className="text-2xl tracking-tight">Settings</h1>
-        <p className="text-sm text-muted">
-          Your public page is{" "}
-          <Link
-            href={`/u/${profile.handle}`}
-            className="text-foreground underline underline-offset-4"
-          >
-            /u/{profile.handle}
-          </Link>
-        </p>
-      </div>
+      <SettingsHero>
+        Your public page is{" "}
+        <Link href={`/u/${profile.handle}`} className="text-foreground underline underline-offset-4">
+          /u/{profile.handle}
+        </Link>
+      </SettingsHero>
 
       <form action={save} className="flex max-w-sm flex-col gap-3">
         <label htmlFor="handle" className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-dim">
@@ -200,16 +213,7 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
         </button>
       </form>
 
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg tracking-tight">Your cube</h2>
-          <p className="max-w-lg text-sm leading-relaxed text-muted">
-            Applies everywhere a cube is drawn — the timer, the daily, duels and
-            the trainer.
-          </p>
-        </div>
-        <CubePicker />
-      </section>
+      <CubeSection />
 
       <WcaPanel
         configured={wcaAvailable}
@@ -229,11 +233,29 @@ export default async function SettingsPage(props: PageProps<"/settings">) {
   );
 }
 
+function SettingsHero({ children }: { children: React.ReactNode }) {
+  return <PageHero title="Settings">{children}</PageHero>;
+}
+
+function CubeSection() {
+  return (
+    <section className="flex flex-col gap-4" data-testid="settings-cube">
+      <div className="flex flex-col gap-1">
+        <h2 className="text-lg tracking-tight">Your cube</h2>
+        <p className="max-w-lg text-sm leading-relaxed text-muted">
+          Applies everywhere a cube is drawn — the timer, the daily, duels and the trainer. Kept in this browser.
+        </p>
+      </div>
+      <CubePicker />
+    </section>
+  );
+}
+
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="progress" />
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 pb-20 pt-6">
+      <SiteHeader active="home" />
+      <div className="page-frame flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         {children}
       </div>
     </main>

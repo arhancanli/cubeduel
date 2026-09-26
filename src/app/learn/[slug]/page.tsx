@@ -50,7 +50,7 @@ export default async function CasePage(props: PageProps<"/learn/[slug]">) {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="learn" />
 
-      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-8 px-6 pb-24 pt-8">
+      <div className="page-frame flex w-full max-w-4xl flex-1 flex-col gap-8 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <header className="flex flex-col gap-2">
           <Link
             href="/learn"

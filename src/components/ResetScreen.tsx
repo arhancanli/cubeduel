@@ -63,7 +63,7 @@ export function ResetScreen({ token }: { token: string | null }) {
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="progress" />
+      <SiteHeader active="home" />
 
       <AuthShell>
         {!token ? (

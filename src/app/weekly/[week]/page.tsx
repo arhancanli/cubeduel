@@ -31,7 +31,7 @@ export default async function PastWeekPage(props: PageProps<"/weekly/[week]">) {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="weekly" />
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-10 px-4 pb-20 pt-6 sm:px-6 lg:pt-14">
+      <div className="page-frame flex w-full max-w-3xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <PageHero eyebrow={`Weekly · ${week}`} title={weekLabel(week)}>
           {board.placed.length === 0
             ? "Nobody finished all five that week."

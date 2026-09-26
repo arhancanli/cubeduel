@@ -62,7 +62,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="leaderboard" />
 
-      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-10 px-4 pb-20 pt-6 sm:px-8 lg:pt-12">
+      <div className="page-frame flex w-full max-w-4xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <header className="flex items-center gap-5">
           {/* A monogram rather than an uploaded picture: there are no uploads,
               and a grey silhouette says "missing" where a letter says "you". */}

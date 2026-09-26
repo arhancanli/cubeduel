@@ -38,7 +38,7 @@ export default async function VerifyPage(props: PageProps<"/verify">) {
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="progress" />
+      <SiteHeader active="home" />
 
       <div className="mx-auto flex w-full max-w-sm flex-1 flex-col gap-6 px-6 pb-24 pt-12">
         <h1 className="text-2xl tracking-tight">

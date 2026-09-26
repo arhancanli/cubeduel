@@ -318,26 +318,22 @@ export function DailyRound({
               to the finish, so it shares with a ✓.
             </p>
           </div>
-          {crossMoves !== null ? (
-            <p className="text-xs text-muted-dim">
-              Today&apos;s cross is{" "}
-              <span className="text-muted">{crossDifficultyLabel(crossMoves)}</span> —{" "}
-              {crossMoves} moves on the easiest face.
-            </p>
-          ) : null}
           {/*
-            How short today's cube can be solved, from this app's own engine.
-            It gives nothing away — a length is not a solution — and it is the
-            only number here that describes the puzzle rather than the player.
+            Today's cube in three figures, read across rather than down: they
+            used to be three separate lines of small grey type under the rules,
+            each a sentence long. The engine's length gives nothing away — a
+            length is not a solution — and it is the one number here that
+            describes the puzzle rather than the player.
           */}
-          {optimalMoves !== null ? (
-            <p className="text-xs text-muted-dim">
-              This site&apos;s engine solves today&apos;s cube in{" "}
-              <span className="text-muted">{optimalMoves} moves</span>. A human
-              method takes three or four times that.
-            </p>
-          ) : null}
-          <Countdown remaining={remaining} />
+          <dl data-testid="daily-facts" className="grid w-full max-w-md grid-cols-3 gap-3 pt-2 text-center">
+            {crossMoves !== null ? (
+              <Fact label="Cross" value={`${crossMoves} moves`} note={`${crossDifficultyLabel(crossMoves)}, best face`} />
+            ) : null}
+            {optimalMoves !== null ? (
+              <Fact label="Engine" value={`${optimalMoves} moves`} note="CFOP: about 3× that" />
+            ) : null}
+            <Fact label="Next daily" value={formatCountdown(remaining).replace(/ \d+s$/, "")} note="at 00:00 UTC" />
+          </dl>
           {stats ? <DailyMemory stats={stats} todayKey={dayKey} className="pt-4" /> : null}
         </div>
       </Shell>
@@ -469,6 +465,16 @@ export function DailyRound({
         </Link>
       </div>
     </Shell>
+  );
+}
+
+function Fact({ label, value, note }: { label: string; value: string; note: string }) {
+  return (
+    <div className="flex flex-col gap-0.5 rounded-xl border border-border bg-surface px-2 py-3">
+      <dt className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-dim">{label}</dt>
+      <dd className="tnum whitespace-nowrap font-display text-base font-bold sm:text-lg">{value}</dd>
+      <dd className="text-[11px] text-muted-dim">{note}</dd>
+    </div>
   );
 }
 

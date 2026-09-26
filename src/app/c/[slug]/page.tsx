@@ -119,7 +119,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="clubs" />
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 pb-24 pt-8">
+      <div className="page-frame flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         {children}
       </div>
     </main>

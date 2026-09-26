@@ -12,7 +12,7 @@ export default function Loading() {
   return (
     <main className="flex min-h-dvh flex-col" aria-busy="true">
       <SiteHeader active="home" />
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
+      <div className="page-frame flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <span className="sr-only">Loading</span>
         <div className="h-4 w-24 animate-pulse rounded bg-surface-hi" />
         <div className="h-12 w-2/3 max-w-md animate-pulse rounded-xl bg-surface" />

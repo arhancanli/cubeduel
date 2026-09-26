@@ -3,6 +3,30 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.32.0 — 2026-09-26
+
+### Design pass, part one: one frame, and the pages that fell out of it
+
+- **Every page now starts in the same place.** The pages you read rather than
+  solve on were centred in five different widths, from 42rem to 72rem, so each
+  title landed somewhere else and moving between pages made the screen jump.
+  They now share one frame: each keeps the width its content reads best at,
+  but every title starts at the same left edge, measured on every page.
+- **Train is built like the timer and the keyboard**: its title at the top,
+  the case, cube and clock in the middle, and down the right what to drill,
+  your progress and the keyboard controls, no longer folded away.
+- **Settings works signed out.** It was one line of grey text, and the cube's
+  look — which lives in your browser and needs no account — could not be
+  changed by anyone without one. Now it can, the page says what an account
+  adds, and Settings is linked from the bottom of the sidebar for everybody.
+- **Seven pages lit up the wrong place in the sidebar.** Sign in, settings,
+  a solve's own page and the account pages all highlighted Progress. Each page
+  now marks itself or nothing, and a check holds every one to it.
+- **The weekly is on the home page**, in place of the "race a friend" card,
+  which the button above it already offers — with how long is left this week.
+- **The daily's facts read across, not down**: the cross, the engine's length
+  and the countdown as three figures instead of three lines of small print.
+
 ## 1.31.0 — 2026-09-25
 
 ### The weekly competition

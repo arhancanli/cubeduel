@@ -73,7 +73,7 @@ export default async function SolvePage(props: PageProps<"/s/[id]">) {
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="progress" />
+      <SiteHeader active="home" />
 
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         {/* ---------------------------------------------------------------- */}

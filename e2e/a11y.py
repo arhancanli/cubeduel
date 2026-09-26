@@ -154,6 +154,31 @@ with sync_playwright() as p:
           set(labelled.get("Community", [])) == {"Leaderboard", "Clubs"},
           str(labelled.get("Community")))
 
+    # The sidebar says where you are, so it must say it truly. Seven pages told
+    # it they were Progress — sign-in, settings, a solve's own page — and lit a
+    # link that led somewhere else. Each page here lights its own, or none.
+    print("\n== the nav marks the page you are on, or none ==")
+    for path, expected in [
+        ("/timer", "Timer"), ("/weekly", "Weekly"), ("/leaderboard", "Leaderboard"), ("/progress", "Progress"),
+        ("/learn/f2l", "Algorithms"), ("/settings", None), ("/sign-in", None), ("/privacy", None), ("/", None),
+    ]:
+        page.goto(BASE + path, wait_until="load")
+        page.wait_for_timeout(800)
+        lit = page.evaluate("() => [...document.querySelectorAll('nav [role=group] [aria-current=page]')].map(e => e.innerText.trim())")
+        check(f"{path} lights {expected or 'nothing'}", lit == ([expected] if expected else []), str(lit))
+
+    # Signed out, settings used to be one line of grey text — and the cube's
+    # look, which lives in this browser, was offered to nobody without an account.
+    page.goto(BASE + "/settings", wait_until="load")
+    page.wait_for_timeout(1500)
+    check("signed out, settings offers the cube's look", page.locator("[data-testid=settings-cube] input[type=radio]").count() >= 4,
+          str(page.locator("[data-testid=settings-cube] input").count()))
+    check("and says what an account adds, with a way in",
+          page.locator("[data-testid=settings-account-gate] a[href='/sign-in?next=/settings']").count() == 1)
+    check("settings is reachable from the sidebar signed out", page.locator("nav a[href='/settings']").count() >= 1)
+    page.goto(BASE + "/", wait_until="load")
+    page.wait_for_timeout(3000)
+
     print("\n== the landing page demonstrates the solver ==")
     players = page.locator("twisty-player").count()
     check("a cube is on the landing page", players >= 1, f"{players} players")

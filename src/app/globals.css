@@ -234,6 +234,19 @@ h3 {
 /* In the components layer so that utilities on the same element (padding,
    width, `hidden`) still win — unlayered CSS would beat every Tailwind class. */
 @layer components {
+/* One frame for every page that is read rather than solved on.
+
+   Each page keeps the column width its content reads best at — a privacy
+   notice is narrower than the algorithm grid — but every column starts at the
+   left edge of the same 72rem frame, the home page's. They used to be centred
+   in widths from 42rem to 72rem, so the title of each page landed somewhere
+   different and moving between pages made the whole screen jump. On a phone
+   the frame is wider than the screen and this is simply zero. */
+.page-frame {
+  margin-left: max(0px, calc((100% - 72rem) / 2));
+  margin-right: auto;
+}
+
 /* Buttons that feel like keys.
 
    A 4px darker edge along the bottom, which the press removes. It is the one

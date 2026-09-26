@@ -58,7 +58,7 @@ export const INDEXABLE: IndexableRoute[] = [
  * file was written to stop.
  */
 export const EXCLUDED: Record<string, string> = {
-  "/settings": "Useless without an account, and personal to whoever is signed in.",
+  "/settings": "Personal to whoever is looking: this browser's cube, and an account if there is one.",
   "/weekly/[week]": "One closed week's results, reached from /weekly. Fifty-two a year of near-identical tables would crowd the pages worth landing on.",
   "/sign-in": "A door, not a destination. Nothing to read here.",
   "/join": "Same. It is reached from a page that explains why you would.",

@@ -107,7 +107,7 @@ export function ClubsScreen({
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="clubs" />
 
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-6 lg:pt-14">
+      <div className="page-frame flex w-full max-w-2xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <Reveal>
           <PageHero eyebrow="Community" title="Clubs">
             A board for the people you actually cube with — your school, your

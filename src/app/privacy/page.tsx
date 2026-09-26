@@ -23,7 +23,7 @@ export default function PrivacyPage() {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="home" />
 
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 pb-24 pt-10">
+      <div className="page-frame flex w-full max-w-2xl flex-1 flex-col gap-8 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <header className="flex flex-col gap-3">
           <h1 className="text-4xl leading-[1.05] sm:text-5xl">Privacy</h1>
           <p className="text-sm leading-relaxed text-muted">

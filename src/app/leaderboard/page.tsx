@@ -305,7 +305,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="leaderboard" />
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-12 px-4 pb-20 pt-6 sm:px-6 lg:pt-14">
+      <div className="page-frame flex w-full max-w-3xl flex-1 flex-col gap-12 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         {/* A visible heading, not a hidden one: this page is a document rather
             than a solving surface, and it opened on an h2 with nothing above it. */}
         <PageHero eyebrow="Compete" title="Leaderboard">

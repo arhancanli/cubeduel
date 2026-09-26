@@ -23,7 +23,7 @@ export default function CubePage() {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="cube" />
 
-      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-10 px-6 pb-24 pt-8">
+      <div className="page-frame flex w-full max-w-4xl flex-1 flex-col gap-10 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <header className="flex flex-col gap-3">
           <h1 className="text-balance text-4xl leading-[1.05] sm:text-5xl">Your cube</h1>
           <p className="max-w-xl text-sm leading-relaxed text-muted">

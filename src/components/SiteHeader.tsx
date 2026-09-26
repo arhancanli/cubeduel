@@ -183,7 +183,12 @@ export function SiteHeader({
 
         <div className="mt-auto flex flex-col gap-2 border-t border-border px-1 pt-4">
           <AuthControl />
+          {/* Settings is here as well as behind the account: the cube's look
+              lives in this browser, so it is for everybody. */}
           <div className="flex gap-4 px-2 text-[11px] text-muted-dim">
+            <Link href="/settings" className="hover:text-foreground">
+              Settings
+            </Link>
             <Link href="/privacy" className="hover:text-foreground">
               Privacy
             </Link>

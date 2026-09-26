@@ -108,7 +108,7 @@ export function SignInScreen() {
 
   return (
     <main className="flex min-h-dvh flex-col">
-      <SiteHeader active="progress" />
+      <SiteHeader active="home" />
 
       <AuthShell>
         <Reveal className="flex flex-col gap-2">

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 import { CubeView } from "@/components/CubeView";
-import { KeyMapHint } from "@/components/KeyMapHint";
+import { KeyboardCard, ModeLayout, SideCard } from "@/components/ModeLayout";
 import { MovePad } from "@/components/MovePad";
 import { SiteHeader } from "@/components/SiteHeader";
 import { formatMs, formatRunning } from "@/lib/format";
@@ -162,48 +162,63 @@ export function TrainScreen() {
 
   // Remounted only when the player advances, so the hook re-seeds the cube with
   // the next setup — and a finished rep keeps the time on screen until then.
+  const summary = cards === null ? null : summarise(active(cards));
+
+  // The same frame as the timer and the keyboard: what this is at the top, the
+  // cube and the clock in the middle, and down the right what to drill and the
+  // keys. It used to be a narrow column of its own, with the choice of drill in
+  // a box on top of the cube and the key map folded away.
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="train" />
-      {/* The page title, for assistive tech. This screen is deliberately
-          chrome-free — a visible heading beside the clock would be noise. */}
-      <h1 className="sr-only">Case trainer</h1>
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center gap-6 px-4 pb-16 pt-4 sm:px-6 lg:pt-8">
-        {/* What this is, in one line. It used to open straight onto a case with
-            "0/6 cases seen · rep 1" and nothing saying what any of that meant. */}
-        <div className="w-full rounded-2xl border border-border bg-surface px-5 py-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-sticker-green">Train</p>
-          <p className="mt-1 text-sm leading-relaxed text-muted">
-            The cube is set up in a last-layer case: solve it on the keyboard. Slow cases come back
-            sooner, fast ones later, until each is mastered.{" "}
-            <Link href="/learn" className="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-current">
-              Every algorithm
-            </Link>
-          </p>
-          <div className="mt-4 flex flex-col gap-2">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">What to drill</p>
-            <div role="radiogroup" aria-label="What to drill" className="flex flex-wrap gap-1.5">
-              {TRAIN_SETS.map((t) => (
-                <button
-                  key={t.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={setId === t.id}
-                  onClick={(click) => {
-                    // Focus would take the keys away from the cube.
-                    click.currentTarget.blur();
-                    chooseSet(t.id);
-                  }}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                    setId === t.id ? "bg-foreground text-background" : "bg-surface-hi text-muted hover:text-foreground"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+      <ModeLayout
+        face="solve"
+        title="Train"
+        blurb="Last-layer cases on the keyboard, until each one is mastered."
+        aside={
+          <>
+            <SideCard title="What to drill">
+              <div role="radiogroup" aria-label="What to drill" className="flex flex-wrap gap-1.5">
+                {TRAIN_SETS.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={setId === t.id}
+                    onClick={(click) => {
+                      // Focus would take the keys away from the cube.
+                      click.currentTarget.blur();
+                      chooseSet(t.id);
+                    }}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                      setId === t.id ? "bg-foreground text-background" : "bg-surface-hi text-muted hover:text-foreground"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+              {summary ? (
+                <p className="text-sm text-muted">
+                  <span data-testid="train-progress">
+                    <span className="tnum font-semibold text-foreground">{summary.attempted}</span> of{" "}
+                    <span className="tnum">{summary.total}</span> drilled
+                  </span>
+                  <span className="mx-2 text-muted-dim">·</span>
+                  <span className="tnum font-semibold text-foreground">{summary.mastered}</span> mastered
+                </p>
+              ) : null}
+              <p className="text-sm leading-relaxed text-muted">
+                Slow cases come back sooner, fast ones later.{" "}
+                <Link href="/learn" className="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-current">
+                  Every algorithm
+                </Link>
+              </p>
+            </SideCard>
+            <KeyboardCard activeKey={null} />
+          </>
+        }
+      >
         {cards === null ? (
           <p className="pt-20 text-sm text-muted-dim">Building your deck…</p>
         ) : active(cards).length === 0 ? (
@@ -222,7 +237,7 @@ export function TrainScreen() {
             onNext={advance}
           />
         )}
-      </div>
+      </ModeLayout>
     </main>
   );
 }
@@ -264,30 +279,18 @@ function Drill({
     onSolved: (recording) => onSolved(recording.durationMs),
   });
 
-  const summary = summarise(cards);
   const mean = cardMean(card);
   const best = cardBest(card);
 
   return (
     <>
-      <div className="flex w-full flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col">
-          <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">
-            {card.stage === "OLL" ? "Orient the top" : "Permute the top"}
-          </span>
-          <span className="font-display text-2xl font-bold">
-            {card.stage} · {card.name ?? "unnamed case"}
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-2 text-xs">
-          <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted" data-testid="train-progress">
-            <span className="tnum font-semibold text-foreground">{summary.attempted}</span> of{" "}
-            <span className="tnum">{summary.total}</span> drilled
-          </span>
-          <span className="rounded-lg bg-surface-hi px-2.5 py-1 text-muted">
-            <span className="tnum font-semibold text-foreground">{summary.mastered}</span> mastered
-          </span>
-        </div>
+      <div className="flex flex-col items-center text-center">
+        <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-dim">
+          {card.stage === "OLL" ? "Orient the top" : "Permute the top"}
+        </span>
+        <span className="font-display text-2xl font-bold">
+          {card.stage} · {card.name ?? "unnamed case"}
+        </span>
       </div>
 
       <CubeView
@@ -335,15 +338,6 @@ function Drill({
 
       <AlgorithmHint key={card.caseId} setupAlg={card.setupAlg} />
 
-      {/* Reference, not the point of the page: folded away until wanted. */}
-      <details className="mt-2 hidden w-full md:block">
-        <summary className="cursor-pointer text-center text-xs font-semibold text-muted-dim hover:text-foreground">
-          Keyboard controls
-        </summary>
-        <div className="pt-4">
-          <KeyMapHint activeCode={null} />
-        </div>
-      </details>
     </>
   );
 }

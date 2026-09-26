@@ -35,7 +35,7 @@ export default async function LearnPage() {
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="learn" />
 
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-14 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
+      <div className="page-frame flex w-full max-w-5xl flex-1 flex-col gap-14 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <Reveal>
           <PageHero eyebrow="Learn" title="The last layer">
             <p>

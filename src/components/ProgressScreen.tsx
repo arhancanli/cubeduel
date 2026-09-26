@@ -346,7 +346,7 @@ function Shell({ children, titled = true }: { children: React.ReactNode; titled?
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="progress" />
-      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
+      <div className="page-frame flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         {titled ? (
           <PageHero eyebrow="Improve" title="Your progress">
             Where your time goes, what to work on, and whether it is working — from your

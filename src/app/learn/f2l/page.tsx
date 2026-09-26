@@ -34,7 +34,7 @@ export default function F2LPage() {
   return (
     <main className="flex min-h-dvh flex-col">
       <SiteHeader active="learn" />
-      <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
+      <div className="page-frame flex w-full max-w-5xl flex-1 flex-col gap-12 px-4 pb-24 pt-6 sm:px-8 lg:pt-12">
         <PageHero eyebrow="Algorithms · first two layers" title="All 41 F2L cases">
           <p>
             F2L pairs one corner with one edge and puts them in a slot together. Every case below is for the
