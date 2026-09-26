@@ -3,6 +3,26 @@
 Notable changes, newest first. Bug fixes are listed when the bug is worth
 knowing about — several here are more interesting than the features.
 
+## 1.33.0 — 2026-09-26
+
+### Design pass, part two: the pages with your solves in them
+
+Found by filling an account the way a player does — a csTimer history, some
+keyboard solves — and reading every page with real data on it.
+
+- **Your best on a real cube and your best on the keyboard are two numbers.**
+  Progress showed one "best" across both, so a keyboard time stood in as your
+  3×3 best; and it left a +2 out of the time it cost. Both fixed.
+- **A skip is no longer a case to drill.** The case coach could list "Solved
+  · drill this" — the case with nothing to do — and, worse, its tenth of a
+  second pulled down the typical time every real case is compared with, so
+  ordinary cases looked slow. Skips are left out of both.
+- **Barriers broken by the same solves share a row.** A first solve that
+  breaks ten barriers at once used to print the same time and date on ten
+  rows; the ladder now shows the fastest and says the rest went with it.
+- **A stopwatch solve on a profile says "timed", not "0 mv".** Its turns were
+  never recorded; it did not take none.
+
 ## 1.32.0 — 2026-09-26
 
 ### Design pass, part one: one frame, and the pages that fell out of it

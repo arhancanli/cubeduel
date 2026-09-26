@@ -12,6 +12,7 @@ import {
   tally,
   type Earned,
   type Kind,
+  type Rung,
   type TrackProgress,
 } from "@/lib/milestones";
 import { loadHistory } from "@/lib/solveHistory";
@@ -174,7 +175,7 @@ function Ladder({ ladder }: { ladder: TrackProgress }) {
         <span className="hidden sm:block">Latest</span>
       </div>
       <ol>
-        {shown.map((rung) => {
+        {sameSolves(shown).map(({ rung, same }) => {
           const isNext = rung.underMs === nextUnder;
           const latest = KINDS.map((k) => rung[k]).filter((e): e is Earned => e !== null).sort((a, b) => b.at - a.at)[0];
           return (
@@ -215,6 +216,13 @@ function Ladder({ ladder }: { ladder: TrackProgress }) {
               ) : (
                 <span className="hidden sm:block" />
               )}
+              {same.length > 0 ? (
+                <span data-testid="rungs-same" className="col-span-full pt-1.5 text-xs text-muted-dim">
+                  {same.length === 1
+                    ? `${rungName(same[0].underMs)} too — broken by the same solves.`
+                    : `${rungName(same[0].underMs)} to ${rungName(same[same.length - 1].underMs).toLowerCase()} too — broken by the same solves.`}
+                </span>
+              ) : null}
             </li>
           );
         })}
@@ -227,6 +235,25 @@ function Ladder({ ladder }: { ladder: TrackProgress }) {
       ) : null}
     </div>
   );
+}
+
+/**
+ * Rungs broken by exactly the same solves, folded under the fastest of them.
+ * Somebody whose first solves are quick breaks ten barriers with one solve and
+ * one average, and the ladder used to print the same "ao5 4.72 · 26 Sept" ten
+ * rows running. A rung with nothing broken is never folded: those are the
+ * ones still to climb.
+ */
+function sameSolves(rungs: readonly Rung[]): { rung: Rung; same: Rung[] }[] {
+  const key = (r: Rung) => (KINDS.some((k) => r[k]) ? KINDS.map((k) => r[k]?.solveId ?? "").join("|") : null);
+  const out: { rung: Rung; same: Rung[] }[] = [];
+  for (const rung of rungs) {
+    const last = out[out.length - 1];
+    const k = key(rung);
+    if (last && k !== null && key(last.rung) === k) last.same.push(rung);
+    else out.push({ rung, same: [] });
+  }
+  return out;
 }
 
 /** "sub-30, sub-45 and sub-1 minute", capitalised. */

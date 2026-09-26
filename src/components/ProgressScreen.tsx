@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { PracticeCalendar } from "@/components/PracticeCalendar";
 import { StreakCard } from "@/components/StreakCard";
 import { formatMs } from "@/lib/format";
+import { effectiveMs } from "@/lib/stats";
 import {
   aggregatePhases,
   diagnose,
@@ -284,9 +285,22 @@ function LookTurnTable({ rows }: { rows: LookTurn[] }) {
   );
 }
 
+/**
+ * A best per hand, with its penalty counted. It used to be one "best" over
+ * every 3x3 solve, so a keyboard time stood in as somebody's best on a real
+ * cube — two skills with two time scales, which the milestones and the
+ * rating already keep apart — and a +2 was left out of the time it cost.
+ */
+function bestOf(solves: readonly StoredSolve[]): number | null {
+  const times = solves
+    .map((s) => effectiveMs({ ms: s.durationMs, penalty: s.penalty }))
+    .filter((ms): ms is number => ms !== null && ms > 0);
+  return times.length > 0 ? Math.min(...times) : null;
+}
+
 function Overview({ solves, trend }: { solves: StoredSolve[]; trend: Trend }) {
-  const finished = solves.filter((s) => s.penalty !== "DNF" && s.durationMs > 0);
-  const best = finished.length > 0 ? Math.min(...finished.map((s) => s.durationMs)) : null;
+  const onCube = solves.filter((s) => s.source !== "keyboard");
+  const onKeys = solves.filter((s) => s.source === "keyboard");
   const imported = solves.filter((s) => s.origin === "cstimer").length;
 
   return (
@@ -294,7 +308,8 @@ function Overview({ solves, trend }: { solves: StoredSolve[]; trend: Trend }) {
       <h2 className="text-xl">Overall</h2>
       <div className="flex flex-wrap gap-x-10 gap-y-4">
         <Stat label="solves" value={String(solves.length)} />
-        <Stat label="best" value={best === null ? "—" : formatMs(best)} />
+        {onCube.length > 0 ? <Stat label={onKeys.length > 0 ? "best · cube" : "best"} value={fmtBest(bestOf(onCube))} /> : null}
+        {onKeys.length > 0 ? <Stat label={onCube.length > 0 ? "best · keyboard" : "best"} value={fmtBest(bestOf(onKeys))} /> : null}
         <Stat label="trend" value={trendLabel(trend)} />
       </div>
       <p className="text-xs leading-relaxed text-muted-dim">{trendExplanation(trend)}</p>
@@ -306,6 +321,10 @@ function Overview({ solves, trend }: { solves: StoredSolve[]; trend: Trend }) {
       ) : null}
     </section>
   );
+}
+
+function fmtBest(ms: number | null): string {
+  return ms === null ? "—" : formatMs(ms);
 }
 
 function trendLabel(trend: Trend): string {

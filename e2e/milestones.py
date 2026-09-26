@@ -102,6 +102,13 @@ with sync_playwright() as p:
     card = page.locator("[data-testid=milestones]").inner_text()
     check("the link lands on the ladder, which knows an ao12 needs 7 more",
           "Next: your first average of 12" in card and "7 more solves and it counts." in card, card[:120].replace("\n", " | "))
+    # One solve broke every single barrier and one average every ao5 one, so
+    # the ladder shows sub-10 once and says the rest went with it.
+    rows = page.locator("[data-testid=milestones] [data-testid=rung]")
+    same = page.locator("[data-testid=rungs-same]")
+    check("barriers broken by the same solves fold under the fastest",
+          rows.count() == 1 and same.count() == 1 and "Sub-12 to sub-2 minutes too" in same.inner_text(),
+          f"{rows.count()} rows; {same.inner_text() if same.count() else 'no fold'}")
     check("no page errors on the timer path", not errors, "; ".join(errors[:2]))
     page.close()
 

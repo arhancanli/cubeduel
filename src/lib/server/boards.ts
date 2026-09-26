@@ -164,6 +164,8 @@ export interface ProfileStats {
     moveCount: number;
     solvedAt: string;
     mode: string;
+    /** A stopwatch time has no turns behind it: its move count is unknown, not zero. */
+    source: string;
     /** Which puzzle: a 5x5 time in an unlabelled list reads as a very slow 3x3. */
     event: string;
   }[];
@@ -195,7 +197,7 @@ export async function profileStats(
       .maybeSingle(),
     db()
       .from("solves")
-      .select("id, event, duration_ms, penalty, scramble, move_count, solved_at, mode")
+      .select("id, event, duration_ms, penalty, scramble, move_count, solved_at, mode, source")
       .eq("profile_id", profileId)
       // This week's competition solves carry scrambles others have yet to
       // solve; they appear here once the week closes.
@@ -258,6 +260,7 @@ export async function profileStats(
         solvedAt: row.solved_at,
         mode: row.mode,
         event: row.event,
+        source: row.source,
       })) ?? [],
     history:
       history.data

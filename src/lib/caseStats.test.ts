@@ -112,3 +112,14 @@ test("names are generated from algorithms and attach to the right cases", async 
   // Every signature maps to exactly one name — no case wearing two labels.
   assert.equal(new Set(table.keys()).size, table.size);
 });
+
+test("a skip is not a case to drill, and does not drag the typical case down", async () => {
+  const { OLL_SKIP } = await import("./lastLayer");
+  // Three real cases at 2.0, 2.2 and 2.4s, and a skip seen often at ~0.1s.
+  const solves = [...repeat("a", 2000, 3), ...repeat("b", 2200, 3), ...repeat("c", 2400, 3), ...repeat(OLL_SKIP, 100, 6)];
+  const cases = aggregateCases(solves, "OLL");
+  assert.ok(!cases.some((c) => c.caseId === OLL_SKIP), "the skip is listed");
+  // With the skip in the reference, the median fell to 2.1s and "b" looked slow.
+  assert.equal(cases.find((c) => c.caseId === "b")?.excessMs, 0);
+  assert.equal(cases.find((c) => c.caseId === "c")?.excessMs, 600);
+});

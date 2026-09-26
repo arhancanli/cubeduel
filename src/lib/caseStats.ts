@@ -1,4 +1,4 @@
-import { KNOWN_OLL, KNOWN_PLL } from "./lastLayer";
+import { KNOWN_OLL, KNOWN_PLL, isSkip } from "./lastLayer";
 import { groupSplits } from "./phaseStats";
 import type { StoredSolve } from "./solveHistory";
 
@@ -66,7 +66,10 @@ export function aggregateCases(
     if (solve.penalty === "DNF") continue;
     const caseId = stage === "OLL" ? solve.ollCase : solve.pllCase;
     const setup = stage === "OLL" ? solve.ollSetup : solve.pllSetup;
-    if (!caseId) continue;
+    // A skip is the case with nothing to do: nothing to drill, and at a tenth
+    // of a second it pulled the typical case down and made every real case
+    // look slow against it. It used to be listed — "Solved · drill this".
+    if (!caseId || isSkip(caseId)) continue;
     const ms = stageDuration(solve, stage);
     if (ms === null) continue;
 

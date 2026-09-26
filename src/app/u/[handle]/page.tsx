@@ -209,7 +209,7 @@ export default async function ProfilePage(props: PageProps<"/u/[handle]">) {
                     {solve.mode}
                   </span>
                   <span className="tnum hidden w-16 shrink-0 text-xs text-muted-dim sm:inline">
-                    {solve.moveCount} mv
+                    {solve.source === "manual" ? "timed" : `${solve.moveCount} mv`}
                   </span>
                   <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-muted-dim">
                     {solve.scramble}
